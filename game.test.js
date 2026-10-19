@@ -6,11 +6,24 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 test('private cards, illegal actions, all-in showdown and chip conservation',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3101'},stdio:'pipe'});const clients=[];
  try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});
- async function join(code,name){const s=io('http://localhost:3101',{transports:['websocket']});clients.push(s);let state; s.on('state',v=>state=v);await new Promise(r=>s.on('connect',r));const identity=new Promise(r=>s.once('identity',r));s.emit('enter',{code,name});const id=await identity;await wait(40);return {s,id:id.id,get state(){return state;}};}
- const a=await join(null,'Alice'),b=await join(a.state.code,'Bob'),c=await join(a.state.code,'Carol');const players=[a,b,c];a.s.emit('start');await wait(100);
+ async function join(code,name,spectating=false){const s=io('http://localhost:3101',{transports:['websocket']});clients.push(s);let state; s.on('state',v=>state=v);await new Promise(r=>s.on('connect',r));const identity=new Promise(r=>s.once('identity',r));s.emit('enter',{code,name,spectating});const id=await identity;await wait(40);return {s,id:id.id,get state(){return state;}};}
+ const a=await join(null,'Alice'),b=await join(a.state.code,'Bob'),c=await join(a.state.code,'Carol'),watcher=await join(a.state.code,'Watcher',true);const players=[a,b,c];
+ assert.equal(a.state.turnSeconds,30);
+ b.s.emit('settings',{small:10,big:20,startingBank:2000,turnSeconds:45});await wait(45);assert.equal(a.state.big,20);assert.equal(a.state.players[0].chips,2000);assert.equal(a.state.turnSeconds,45);
+ watcher.s.emit('settings',{small:1,big:2,startingBank:100,turnSeconds:5});await wait(40);assert.equal(a.state.big,20);
+ b.s.emit('settings',{small:5,big:10,startingBank:1000,turnSeconds:30});await wait(40);
+ a.s.emit('start');await wait(100);
+ assert.equal(watcher.state.players.find(p=>p.id===a.id).cards[0],'?');assert.equal(watcher.state.players.find(p=>p.id===watcher.id).inHand,false);
+ const actor=players.find(p=>p.id===a.state.players[a.state.turn].id);const deadline=a.state.deadline;
+ watcher.s.emit('timecard');await wait(30);assert.equal(a.state.deadline,deadline);
+ actor.s.emit('timecard');await wait(40);assert.equal(a.state.deadline,deadline+60000);assert.equal(a.state.players.find(p=>p.id===actor.id).timeCards,2);
+ actor.s.emit('timecard');actor.s.emit('timecard');actor.s.emit('timecard');await wait(40);assert.equal(a.state.deadline,deadline+180000);assert.equal(a.state.players.find(p=>p.id===actor.id).timeCards,0);
+ b.s.emit('settings',{small:10,big:20,startingBank:1500,turnSeconds:50});await wait(40);assert.equal(a.state.big,10);assert.equal(a.state.pendingSettings.big,20);
  assert.equal(a.state.street,'preflop');assert.equal(a.state.players.find(p=>p.id===b.id).cards[0],'?');assert.equal(a.state.players.find(p=>p.id===a.id).cards.length,2);
  const turn=a.state.turn;players.find(p=>p.id!==a.state.players[turn].id).s.emit('action',{type:'raise',amount:900});await wait(40);assert.equal(a.state.bet,10);
  for(let step=0;step<20&&a.state.street!=='showdown';step++){const st=a.state,actor=players.find(p=>p.id===st.players[st.turn].id),p=st.players[st.turn];actor.s.emit('action',{type:p.chips+p.round>st.bet&&p.raiseAllowed?'raise':'call',amount:p.chips+p.round});await wait(55);}
  assert.equal(a.state.street,'showdown');assert.equal(a.state.players.reduce((n,p)=>n+p.chips,0),3000);assert.equal(a.state.board.length,5);assert.ok(a.state.players.every(p=>p.cards.every(c=>c!=='?')));assert.equal(a.state.players[0].stats.hands,1);
+ watcher.s.emit('sit');await wait(40);assert.equal(a.state.players.find(p=>p.id===watcher.id).spectating,false);watcher.s.emit('spectate');await wait(40);assert.equal(a.state.players.find(p=>p.id===watcher.id).spectating,true);
+ await wait(6600);assert.equal(a.state.big,20);assert.equal(a.state.turnSeconds,50);assert.equal(a.state.startingBank,1500);
  }finally{clients.forEach(s=>s.disconnect());child.kill();}
 });
