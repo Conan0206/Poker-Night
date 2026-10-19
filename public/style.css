@@ -19,3 +19,5 @@ body{background:radial-gradient(ellipse at 75% 5%,#6b537b66,transparent 50%),lin
 
 #welcome #joinMain{width:100%;margin-top:15px}#welcome .privateTable{width:100%;margin-top:10px;padding:13px;color:var(--accent);border-color:#718756}.brand{cursor:pointer}
 #middle{position:relative}#start{display:block;margin:16px auto 0;padding:14px 36px;min-width:180px;font-size:20px;font-weight:700}#start[hidden]{display:none}#sitDown:not([hidden])+#start{margin-top:8px}@media(max-width:700px){#start{font-size:16px;min-width:140px;padding:12px 24px}}
+
+#middle:has(#start:not([hidden])) #board,#middle:has(#start:not([hidden])) #pot,#middle:has(#start:not([hidden])) #street,#middle:has(#start:not([hidden])) #result{display:none}#middle:has(#start:not([hidden])) #start{margin:0 auto}#middle:has(#sitDown:not([hidden])) #start{margin-top:10px}
