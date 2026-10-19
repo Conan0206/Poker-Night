@@ -27,3 +27,8 @@ test('private cards, illegal actions, all-in showdown and chip conservation',asy
  await wait(6600);assert.equal(a.state.big,20);assert.equal(a.state.turnSeconds,50);assert.equal(a.state.startingBank,1500);
  }finally{clients.forEach(s=>s.disconnect());child.kill();}
 });
+test('bots take legal turns, keep private cards hidden and support watching then sitting',async()=>{
+ const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3102'},stdio:'pipe'});let s;
+ try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});s=io('http://localhost:3102',{transports:['websocket']});let state;s.on('state',v=>state=v);await new Promise(r=>s.on('connect',r));s.emit('enter',{name:'Tester'});await wait(70);s.emit('addbot');s.emit('addbot');await wait(70);assert.equal(state.players.filter(p=>p.bot).length,2);s.emit('spectate');await wait(50);assert.equal(state.players[0].spectating,true);s.emit('start');await wait(100);assert.equal(state.street,'preflop');assert.ok(state.players.filter(p=>p.bot).every(p=>p.cards[0]==='?'));await wait(1500);assert.ok(state.players.some(p=>p.bot&&p.stats.actions>0));assert.equal(state.players.reduce((n,p)=>n+p.chips+p.total,0),3000);s.emit('sit');await wait(50);assert.equal(state.players[0].spectating,false);assert.equal(state.players[0].inHand,false);for(let i=0;i<10;i++)s.emit('addbot');await wait(100);assert.equal(state.players.filter(p=>!p.spectating).length,8);
+ }finally{s?.disconnect();child.kill();}
+});
