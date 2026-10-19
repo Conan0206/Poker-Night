@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {io} from 'socket.io-client';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-test('private cards, illegal actions, all-in side pots and chip conservation',async()=>{
+test('private cards, illegal actions, all-in showdown and chip conservation',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3101'},stdio:'pipe'});const clients=[];
  try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});
  async function join(code,name){const s=io('http://localhost:3101',{transports:['websocket']});clients.push(s);let state; s.on('state',v=>state=v);await new Promise(r=>s.on('connect',r));const identity=new Promise(r=>s.once('identity',r));s.emit('enter',{code,name});const id=await identity;await wait(40);return {s,id:id.id,get state(){return state;}};}
