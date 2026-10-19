@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: river-club
+    name: poker-night
     runtime: node
     plan: free
     buildCommand: npm ci
