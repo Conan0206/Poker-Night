@@ -16,9 +16,9 @@
  const info=document.getElementById('tableInfo');info.style.top=mobile?((document.querySelector('.headerLeftActions').getBoundingClientRect().bottom+12)/scale)+'px':'';
  table.style.top=base*(mobile?.40:.22)+'px';table.style.height=base*(mobile?.26:.32)+'px';
  const own=seats.querySelector('.seat.self');if(own){own.style.left='50%';own.style.top='auto';}
- // Bring the rail to the local avatar, then place other avatars on that ellipse.
+ // Reserve the same rail in seated and spectator modes.
  const stageWidth=main.clientWidth,top=base*(mobile?.36:.20);
- const bottom=own?own.offsetTop+own.querySelector('.avatar').offsetHeight/2:base*(mobile?.73:.73);
+ const bottom=base*(mobile?.65:.62);
  const tableHeight=Math.max(mobile?280:300,bottom-top);
  table.style.top=top+'px';table.style.height=tableHeight+'px';
  const cx=table.offsetLeft+table.offsetWidth/2,cy=top+tableHeight/2;
