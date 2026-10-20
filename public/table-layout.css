@@ -102,3 +102,11 @@ body{background:#101719}
 .tableChipStack .pokerChip::before{inset:19% 21%;border:1px solid #ffffff9c;background:linear-gradient(150deg,#ffffff20,#0000001a),var(--chip-color);box-shadow:none}
 .tableChipStack .pokerChip::after{content:'♠';font-size:8px;line-height:1;color:var(--chip-ink);text-shadow:none}
 .betChips{background:#142223ed;border-color:#9ebbb340;box-shadow:0 3px 8px #0004}
+
+/* Wagers are small open stacks; the enclosed, labelled pot remains the table total. */
+.betChips{gap:5px;padding:2px 4px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:13px;text-shadow:0 1px 3px #000,0 0 5px #0009}
+.betChips .wagerValue{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.betChips small{font-size:8px;line-height:1;letter-spacing:1.2px;color:#c8d3d0;font-weight:600}
+.betChips b{font-size:13px;line-height:1.15;color:#fff9e8;white-space:nowrap}
+.tableLogo{top:50%;left:50%;width:max-content;max-width:90%;transform:translate(-50%,-50%);font-size:clamp(18px,2.2vw,34px);letter-spacing:7px;line-height:1.6;opacity:.07;pointer-events:none;user-select:none;z-index:0}
+@media(max-width:700px){.betChips{gap:1px;padding:1px 2px}.betChips small{font-size:6px;letter-spacing:.7px}.betChips b{font-size:10px}.tableLogo{font-size:18px;letter-spacing:3px}}
