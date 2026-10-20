@@ -30,3 +30,11 @@ main{transform-origin:top left;margin:0;flex-shrink:0}
 @media(max-width:1200px) and (min-width:701px){#table,#table:has(.seat.self){left:12%;width:76%}}
 @media(max-width:700px){#table,#table:has(.seat.self){left:7%;width:86%}.winnerLabel{font-size:7px}.seat.winner .avatar::after{font-size:23px;top:-21px}}
 @media(prefers-reduced-motion:reduce){.seat.active .avatar,.seat.winner .avatar{animation:none}}
+/* One permanent action area: opening sizing never changes the stage geometry. */
+#controls{height:150px;min-height:150px;max-height:150px;display:flex;flex-direction:column;justify-content:center;align-items:stretch}
+#actions,#actions:has(.betPreset){width:100%;flex:0 0 auto;margin:0;align-items:center}
+#actions .raiseSizing{width:100%;flex:0 0 100%;margin:0}
+#actions .raiseSizing:has(.allInPreset[data-armed=true]) .betPreset:not(.allInPreset){display:none}
+#actions .raiseSizing .allInPreset[data-armed=true]{grid-row:3;grid-column:1/-1;min-height:36px}
+#actions .revealCardButton{font-size:18px;white-space:nowrap}
+@media(max-width:700px){#controls{height:150px;min-height:150px;max-height:150px}#actions .revealCardButton{font-size:14px}}
