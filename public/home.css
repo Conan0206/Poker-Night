@@ -28,3 +28,11 @@
 #welcome .homeMenu .menuAvatar:focus-visible{outline:2px solid #f0ffd2;outline-offset:2px}
 @media(max-width:900px) and (min-width:701px){#menuAvatars{gap:4px}#welcome .homeMenu .menuAvatar{font-size:20px;height:32px;min-height:32px}}
 @media(max-width:400px){#menuAvatars{gap:4px}#welcome .homeMenu .menuAvatar{font-size:20px;height:32px;min-height:32px}}
+/* Equal-size cards spread from a shared pivot into a fan. */
+.homeCardFan{display:block}
+.homePlayingCard{position:absolute;left:50%;top:26px;transform-origin:50% 130%}
+.homePlayingCard+.homePlayingCard{margin-left:0}
+.homeClub{transform:translateX(-50%) rotate(-24deg)}
+.homeDiamond{transform:translateX(-50%) rotate(-8deg)}
+.homeSpade{transform:translateX(-50%) rotate(8deg)}
+.homeHeart{transform:translateX(-50%) rotate(24deg)}
