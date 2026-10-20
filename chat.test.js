@@ -13,5 +13,6 @@ test('incoming chat notifies only peers in the room and river folds allow option
  while(a.state.street!=='river'){const actor=a.state.players[a.state.turn].id===a.id?a:b;actor.s.emit('action',{type:actor.state.bet>actor.state.players[actor.state.turn].round?'call':'check'});await pause(45);}
  const actor=a.state.players[a.state.turn].id===a.id?a:b;actor.s.emit('action',{type:'fold'});await pause(70);assert.equal(a.state.street,'showdown');assert.equal(a.state.board.length,5);assert.equal(a.state.endedByFold,true);assert.equal(a.state.allInReveal,false);
  const winner=actor===a?b:a;winner.s.emit('reveal',1);await pause(60);const shown=actor.state.players.find(p=>p.id===winner.id);assert.notEqual(shown.cards[0],'?');assert.equal(shown.cards[1],'?');
+ winner.s.emit('spectate');await pause(50);winner.s.emit('sit');await pause(60);const seated=winner.state.players.find(p=>p.id===winner.id);assert.equal(seated.spectating,false);assert.deepEqual(seated.cards,['?','?']);winner.s.emit('reveal',3);await pause(40);assert.deepEqual(winner.state.players.find(p=>p.id===winner.id).cards,['?','?']);
  }finally{clients.forEach(s=>s.disconnect());child.kill();}
 });

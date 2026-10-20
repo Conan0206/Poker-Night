@@ -32,7 +32,7 @@ document.addEventListener('pointerdown',e=>{if(!panel.hidden&&!panel.contains(e.
 window.addEventListener('poker-state',({detail:{state,me}})=>{
  const player=state.players.find(p=>p.id===me);
  const valid=player&&!player.spectating&&player.inHand&&state.street!=='waiting';
- const id=valid?currentHandRank(player.cards,state.board):null;
+ const id=valid?currentHandRank(player.cards,state.rabbitBoard?.length?state.rabbitBoard:state.board):null;
  for(const [key,row] of rows){row.classList.toggle('matched',key===id);if(key===id)row.setAttribute('aria-current','true');else row.removeAttribute('aria-current');}
  const name=handRankings.find(r=>r.id===id)?.name;
  summary.textContent=name?`${player.folded?'Your folded hand':'Your hand'}: ${name}${state.board.length?'':' · preflop'}`:player?.spectating?'Take a seat to see your hand rank.':'Deal a hand to see your rank.';

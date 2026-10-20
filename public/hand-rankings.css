@@ -4,3 +4,13 @@
 @media(min-height:850px){.rankList{gap:6px}.rankList li{min-height:57px}.rankCard{height:39px}}
 @media(max-width:700px){#handRankings{top:118px;left:12px;bottom:12px;width:320px;max-width:calc(100vw - 24px)}}
 @media(max-height:600px){#handRankings{top:100px}}
+
+/* Keep all ten ranks visible within the available viewport height. */
+#handRankings{overflow:hidden;display:flex;flex-direction:column}
+.rankHeading,.rankSummary{flex-shrink:0}
+.rankList{flex:1;min-height:0;grid-template-rows:repeat(10,minmax(0,1fr));gap:2px}
+.rankList li{min-height:0;padding:2px 5px;gap:8px;overflow:hidden}
+.rankCard{height:clamp(18px,calc((100dvh - 290px)/10),39px);font-size:clamp(9px,1.6vh,13px)}
+.rankCard b{font-size:inherit}
+@media(max-height:750px){.rankText small{display:none}.rankText strong{font-size:11px}.rankSummary{margin:5px 0}.rankHeading h2{font-size:18px}}
+@media(max-height:450px){#handRankings{top:12px}.rankCards{display:none}}
