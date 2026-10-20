@@ -38,3 +38,11 @@ main{transform-origin:top left;margin:0;flex-shrink:0}
 #actions .raiseSizing .allInPreset[data-armed=true]{grid-row:3;grid-column:1/-1;min-height:36px}
 #actions .revealCardButton{font-size:18px;white-space:nowrap}
 @media(max-width:700px){#controls{height:150px;min-height:150px;max-height:150px}#actions .revealCardButton{font-size:14px}}
+/* Pot-based sizing is the sole mode; remove the redundant mode switch row. */
+#actions .raiseSizing .raiseAdjust,#actions .raiseSizing input[type=number],#actions .raiseSizing .primary{grid-row:1}
+#actions .raiseSizing .betPreset,#actions .raiseSizing .allInPreset[data-armed=true]{grid-row:2}
+/* Strong contrast for the pot total against every felt colour. */
+.potAmount{background:linear-gradient(145deg,#172638,#0d1724);border:1.5px solid #c8f497b3;box-shadow:0 4px 12px #0007,0 0 0 2px #101a2640}
+.potAmount strong{color:#fffdf1;font-weight:800;text-shadow:0 2px 3px #0008}
+.potLabel{color:#f3f8e9;font-weight:800;text-shadow:0 1px 3px #0009}
+.potBadge.side .potAmount{background:linear-gradient(145deg,#35264c,#1b142b);border-color:#cfb2fb}
