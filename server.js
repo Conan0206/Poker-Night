@@ -1,4 +1,5 @@
-import {decideBot,botThinkDelay} from './bot-strategy.js';
+import {botThinkDelay} from './bot-strategy.js';
+import {chooseBotAction} from './bot-engine.js';
 import {isAllowedAvatar,defaultAvatar} from './public/avatar-catalog.js';
 import {readFileSync} from 'node:fs';
 import {potBreakdown} from './pots.js';
@@ -8,7 +9,7 @@ import {randomBytes,randomInt} from 'node:crypto';
 import {Server} from 'socket.io';
 import solver from 'pokersolver';
 const app=express(), http=createServer(app), io=new Server(http,{maxHttpBufferSize:10000});
-app.use(express.static('public')); app.get('/health',(_,r)=>r.json({ok:true}));
+app.use(express.static('public')); app.get('/health',(_,r)=>r.json({ok:true,botEngine:'cfr-heads-up-postflop-v1'}));
 const emoteCount=JSON.parse(readFileSync(new URL('./public/emotes/manifest.json',import.meta.url),'utf8')).length;
 const rooms=new Map(), sessions=new Map();
 const next=(r,i,fn)=>{for(let n=1;n<=r.players.length;n++){const j=(i+n)%r.players.length;if(fn(r.players[j]))return j;}return -1;};
@@ -18,11 +19,14 @@ function applySettings(r){if(!r.pendingSettings)return;const v=r.pendingSettings
 function publish(r){for(const p of r.players){if(!p.socket)continue;io.to(p.socket).emit('state',{code:r.code,handNumber:r.handNumber||0,host:r.host,canManage:canManage(r,p),spectators:r.players.filter(q=>!q.bot&&!q.kicked&&q.spectating&&q.socket).map(q=>({id:q.id,name:q.name})),mode:r.mode,endedByFold:!!r.endedByFold,runningOut:!!r.runningOut,allInReveal:!!r.allInReveal,nextHandAt:r.nextHandAt||null,seatingClosed:r.mode==='tournament'&&!!r.began,startingBank:r.startingBank,turnSeconds:r.turnSeconds,pendingSettings:r.pendingSettings,started:r.started,street:r.street,board:r.board,rabbitBoard:r.rabbitBoard||[],pot:r.players.reduce((a,p)=>a+p.total,0),pots:r.displayPots||potBreakdown(r.players),awards:r.awards||[],allInCount:r.settledAllInCount??r.players.filter(q=>q.inHand&&!q.folded&&q.chips===0).length,bet:r.bet,minRaise:r.minRaise,turn:r.turn,dealer:r.dealer,deadline:r.deadline,turnDuration:r.turnDuration||r.turnSeconds*1000,small:r.small,big:r.big,level:r.level,result:r.result,history:r.history,chat:r.chat,players:r.players.map(q=>({...q,socket:!q.kicked&&(q.socket||q.bot)?'connected':null,token:undefined,cards:q.cards.map((c,i)=>q.id===p.id&&q.hideHoleCards?'?':q.id===p.id&&!q.hideHoleCards||r.allInReveal&&live(q)||(q.shown||0)&(1<<i)?c:'?')}))});}}
 function pay(p,n){n=Math.min(p.chips,n);p.chips-=n;p.round+=n;p.total+=n;}
 function schedule(r,extra=false){clearTimeout(r.timer);clearTimeout(r.botTimer);r.turnDuration=extra?(r.turnDuration||r.turnSeconds*1000)+60000:r.turnSeconds*1000;r.deadline=extra?r.deadline+60000:Date.now()+r.turnSeconds*1000;r.timer=setTimeout(()=>{const p=r.players[r.turn];if(p)act(r,p,r.bet>p.round?'fold':'check');},Math.max(0,r.deadline-Date.now()));publish(r);const current=r.players[r.turn];if(current?.bot)r.botTimer=setTimeout(()=>botAct(r,current),Math.min(botThinkDelay({call:Math.max(0,r.bet-current.round),pot:r.players.reduce((n,q)=>n+q.total,0),stack:current.chips,street:r.street}),Math.max(50,r.deadline-Date.now()-350)));}
-function botAct(r,p){
+async function botAct(r,p){
  if(r.players[r.turn]!==p||!actionable(p)||r.runningOut||r.street==='showdown')return;
+ const decisionHand=r.handNumber,decisionStreet=r.street;
  const contenders=r.players.filter(live),order=[];for(let n=1;n<=r.players.length;n++){const q=r.players[(r.dealer+n)%r.players.length];if(live(q))order.push(q);}
  const opponents=contenders.filter(q=>q!==p),eligiblePot=r.players.reduce((n,q)=>n+Math.min(q.total,p.total+p.chips),0);
- const decision=decideBot({hole:[...p.cards],board:[...r.board],opponents:opponents.length,pot:eligiblePot,bet:r.bet,round:p.round,stack:p.chips,big:r.big,minRaise:r.minRaise,raiseAllowed:p.raiseAllowed,latePosition:order.indexOf(p)>=Math.floor(order.length*2/3),position:order.indexOf(p)/Math.max(1,order.length-1),raises:r.streetRaises||0,preflopAggressor:r.preflopAggressor===p.id,initiative:r.lastAggressor===p.id,limpers:opponents.filter(q=>q.action==='call'&&q.round===r.big).length,effectiveStack:Math.min(p.chips+p.round,Math.max(...opponents.map(q=>q.chips+q.round))),opponentModels:opponents.map(q=>({hands:q.stats.hands,vpip:q.stats.vpip,pfr:q.stats.pfr,actions:q.stats.actions,aggressive:q.stats.aggressive,raisedPreflop:!!q.pfr,aggressor:r.lastAggressor===q.id&&q.round>0}))});
+ const {action:decision}=await chooseBotAction({hole:[...p.cards],board:[...r.board],opponents:opponents.length,pot:eligiblePot,bet:r.bet,round:p.round,stack:p.chips,big:r.big,minRaise:r.minRaise,raiseAllowed:p.raiseAllowed,latePosition:order.indexOf(p)>=Math.floor(order.length*2/3),position:order.indexOf(p)/Math.max(1,order.length-1),raises:r.streetRaises||0,preflopAggressor:r.preflopAggressor===p.id,initiative:r.lastAggressor===p.id,limpers:opponents.filter(q=>q.action==='call'&&q.round===r.big).length,effectiveStack:Math.min(p.chips+p.round,Math.max(...opponents.map(q=>q.chips+q.round))),opponentStack:opponents[0]?.chips||0,heroModel:{hands:p.stats.hands,vpip:p.stats.vpip,raisedPreflop:!!p.pfr,aggressor:r.lastAggressor===p.id},opponentModels:opponents.map(q=>({hands:q.stats.hands,vpip:q.stats.vpip,pfr:q.stats.pfr,actions:q.stats.actions,aggressive:q.stats.aggressive,raisedPreflop:!!q.pfr,aggressor:r.lastAggressor===q.id&&q.round>0}))},r.deadline);
+ // A fold, kick, timeout or next hand may have happened while the worker searched.
+ if(r.handNumber!==decisionHand||r.street!==decisionStreet||r.players[r.turn]!==p||!actionable(p)||r.runningOut||r.street==='showdown')return;
  act(r,p,decision.type,decision.amount);
 }
 function finish(r,message){clearTimeout(r.timer);clearTimeout(r.botTimer);r.street='showdown';r.runningOut=false;r.nextHandAt=Date.now()+7000;r.turn=-1;r.result=message;r.history.unshift(message);r.history=r.history.slice(0,30);for(const p of r.players){if(p.inHand){p.stats.hands++;if(p.vpip)p.stats.vpip++;if(p.pfr)p.stats.pfr++;}}publish(r);r.timer=setTimeout(()=>deal(r),7000);}
