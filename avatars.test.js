@@ -13,5 +13,6 @@ test('chosen avatars reach private, main, spectator and reconnect states; invali
   const watcher=await enter({code:host.state.code,avatar:'🐸',spectating:true});const player=watcher.state.players.find(p=>p.id===watcher.identity.id);assert.equal(player.avatar,'🐸');assert.equal(player.spectating,true);
   const invalid=await enter({avatar:'<img src=x>'});assert.equal(invalid.state.players[0].avatar,'😎');
   host.socket.disconnect();const resumed=await enter({token:host.identity.token});assert.equal(resumed.state.players.find(p=>p.id===host.identity.id).avatar,'👻');
+  resumed.socket.disconnect();const menuResume=await enter({token:host.identity.token,avatar:'🦄'});const returning=menuResume.state.players.find(p=>p.id===host.identity.id);assert.equal(returning.avatar,'🦄');assert.equal(returning.chips,host.state.players[0].chips);assert.equal(menuResume.state.players.filter(p=>p.id===host.identity.id).length,1);
  }finally{sockets.forEach(s=>s.disconnect());child.kill();}
 });

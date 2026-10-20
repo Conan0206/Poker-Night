@@ -72,3 +72,13 @@ body{background:radial-gradient(ellipse at 75% 5%,#6b537b66,transparent 50%),lin
 /* Place the local seat outside the felt so it cannot cover the board. */
 .seat.self{margin-top:0;transform:translate(-50%,0)}#table:has(.seat.self){height:43%;top:19%}#myCards{bottom:130px}body:has(.raiseSizing:not([hidden])) #myCards{bottom:180px}body:has(.allInPreset[data-armed=true]) #myCards{bottom:215px}@media(max-width:1100px){#table:has(.seat.self){height:38%;top:22%}.seat.self{margin-top:0}}@media(max-width:700px){#table:has(.seat.self){height:27%;top:21%}.seat.self{margin-top:0}}@media(max-height:650px) and (min-width:701px){#table:has(.seat.self){height:35%;top:22%}.seat.self{margin-top:0}}
 #table:has(.seat.self){height:36%;top:18%}@media(max-width:1100px){#table:has(.seat.self){height:30%;top:22%}}@media(max-width:700px){#table:has(.seat.self){height:27%;top:21%}}@media(max-height:650px) and (min-width:701px){#table:has(.seat.self){height:27%;top:20%}}
+
+/* Appearance previews retain their labels and fit comfortably on small screens. */
+.feltChoices button,.backChoices button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:12px 8px;font-size:12px;min-width:0}
+.feltChoices .swatch{height:38px;border:3px solid #a5aec5;box-shadow:inset 0 3px 6px #0005}
+.backChoices .card{flex:none;width:52px;height:74px;border-radius:7px;border-width:2px}
+.choices button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+#panel:has(.feltChoices){width:min(680px,92vw)}
+.backChoices{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media(max-width:600px){.backChoices{grid-template-columns:repeat(3,minmax(0,1fr))}}
