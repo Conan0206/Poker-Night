@@ -1,13 +1,13 @@
 const $=s=>document.querySelector(s),socket=io();let state,me,panelName='';
 const prefs=JSON.parse(localStorage.getItem('river-prefs')||'{}');const feltNames=['Lagoon','Midnight','Plum','Emerald','Burgundy','Ocean','Violet','Graphite','Amber'];const felts=['#467f78','#465b8d','#814b68','#246747','#763b48','#246b87','#63508e','#373f49','#8a6938'];const backNames=['Sapphire','Amethyst','Copper','Mint','Rose','Ice','Ruby','Gold','Obsidian','Pearl','Tangerine','Indigo'];const backs=['repeating-linear-gradient(45deg,#84a9ec 0 3px,#506baf 3px 10px)','repeating-radial-gradient(circle,#bb98ea 0 2px,#624a89 2px 9px)','repeating-linear-gradient(90deg,#f1be77 0 2px,#90613e 2px 8px)','repeating-conic-gradient(#428c7b 0% 25%,#b8e9c4 0% 50%) 0/12px 12px','repeating-linear-gradient(135deg,#ed99ac 0 2px,#8b465d 2px 9px)','repeating-radial-gradient(ellipse,#94d7e5 0 2px,#28677c 2px 8px)','repeating-linear-gradient(45deg,#f698a1 0 2px,#962d43 2px 9px)','repeating-conic-gradient(#f8dc85 0% 25%,#9e772d 0% 50%) 0/14px 14px','repeating-linear-gradient(135deg,#77818c 0 1px,#222c38 1px 7px)','repeating-radial-gradient(circle,#fff9e9 0 2px,#b5b7ae 2px 8px)','repeating-linear-gradient(90deg,#ffd09d 0 2px,#bc602f 2px 8px)','repeating-conic-gradient(#989ce8 0% 25%,#3e397c 0% 50%) 0/12px 12px'];
 function applyPrefs(){document.documentElement.style.setProperty('--felt',felts[prefs.felt]||felts[0]);document.documentElement.style.setProperty('--back',backs[prefs.back]||backs[0]);localStorage.setItem('river-prefs',JSON.stringify(prefs));}applyPrefs();
-function notice(t){$('#toast').textContent=t;$('#toast').style.display='block';setTimeout(()=>$('#toast').style.display='none',3500);}socket.on('notice',notice);
+function notice(t){const status=$('#joinStatus');if(status){status.hidden=!$('#welcome').open;status.textContent=t;}$('#toast').textContent=t;$('#toast').style.display='block';setTimeout(()=>$('#toast').style.display='none',3500);}socket.on('notice',notice);
 function card(c){const d=document.createElement('span');d.className='card';if(c==='?'){d.classList.add('back');return d;}if(!c){d.classList.add('empty');return d;}if(state?.street==='showdown'&&!state.endedByFold&&state.players.some(p=>p.wonHand>0&&p.winningCards?.includes(c)))d.classList.add('winningCard');const suits={s:'♠',h:'♥',d:'♦',c:'♣'};if('hd'.includes(c[1]))d.classList.add('red');d.append(c[0]==='T'?'10':c[0]);const b=document.createElement('b');b.textContent=suits[c[1]];d.append(b);return d;}
 function joinFromMenu(data){
- data.fromMenu=true;
+ data.fromMenu=true;$('#joinStatus').hidden=true;
  const previous=JSON.parse(sessionStorage.getItem('poker-last-entry')||'null');
  const name=data.name.trim()||'Player';
- if(data.code&&previous?.code===data.code.toUpperCase()&&previous.name===name&&previous.spectating===!!data.spectating)data.token=sessionStorage.getItem('river-token');
+ if(data.code&&previous?.code===data.code.toUpperCase()&&previous.name===name&&(previous.spectating===!!data.spectating||data.code.toUpperCase()==='MAIN'))data.token=sessionStorage.getItem('river-token');
  socket.emit('enter',data);
 }
 function enter(create,spectating=false){joinFromMenu({name:$('#name').value,avatar:$('#chosenAvatar').value,code:create?undefined:$('#code').value.trim(),mode:$('#mode').value,spectating});}

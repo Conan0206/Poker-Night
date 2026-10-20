@@ -40,3 +40,5 @@
 #welcome #welcomeSubtitle strong{color:#c8f497;font-weight:600}
 
 .homeIntro .homePractice{margin-top:14px;font-size:16px;line-height:1.5;color:#b8c6cb}.homePractice strong{color:#c8f497;font-weight:600}
+
+#welcome .homeMenu #joinStatus{padding:10px 12px;border:1px solid #d9bb6b66;border-radius:10px;background:#3c3324;color:#ffe3a0;font-size:12px;line-height:1.4}#joinStatus[hidden]{display:none}
