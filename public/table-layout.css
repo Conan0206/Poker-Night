@@ -89,7 +89,16 @@ main{transform-origin:top left;margin:0;flex-shrink:0}
 .chipDetails{display:flex;flex-direction:column;gap:5px;min-width:0}.chipDetails small{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:#b8c8c7}.chipDetails strong{font-size:23px;letter-spacing:-.5px;color:#f7f4e9}
 .tableChipStack{width:37px;height:21px}.tableChipStack .pokerChip{width:24px;height:17px;border-width:1px}.tableChipStack .pokerChip::after{font-size:7px}
 .betChips{gap:7px;padding:7px 11px;border:1px solid #b1c5c32e;background:linear-gradient(145deg,#15202be8,#111b23e0);box-shadow:0 3px 9px #0003}
-#pot .chipStack i.pokerChip{width:22px;height:15px;border-width:1px;background:radial-gradient(ellipse,transparent 57%,#ffffff24 58% 63%,transparent 64%),repeating-conic-gradient(from 12deg,var(--chip-color) 0deg 33deg,#f5edda 33deg 45deg);box-shadow:0 2px 0 color-mix(in srgb,var(--chip-color) 40%,#000)}
-#pot .chipStack i.pokerChip::after{font-size:6px}
 @media(max-width:600px){.chipLegend{gap:9px}.chipLegend>div,.chipLegend>div:nth-child(even){min-height:108px;padding:15px 10px;gap:12px}.chipLegend .pokerChip{flex-basis:52px;width:52px;height:52px}.chipLegend .pokerChip::after{font-size:14px}.chipDetails strong{font-size:19px}.chipDetails small{font-size:8px;letter-spacing:1px}}
 @media(max-width:370px){.chipLegend{grid-template-columns:1fr}.chipLegend>div,.chipLegend>div:nth-child(even){min-height:88px}}
+
+/* Room backdrop shares the home menu's charcoal, teal glow and quiet rings. */
+body{background:#101719}
+#game{background:radial-gradient(ellipse at 45% 32%,#6577a929,transparent 55%),radial-gradient(ellipse at 20% 80%,#4a968433,transparent 60%),#101719;isolation:isolate}
+#game .skyline{display:none}
+#game::before{content:'';position:absolute;pointer-events:none;left:50%;top:45%;width:65%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid #b1ccbf12;border-radius:50%;box-shadow:0 0 0 70px #b1ccbf05,0 0 0 140px #b1ccbf03;z-index:-1}
+/* Wager chips use clean inlays and a suit mark; exact amounts stay beside the stack. */
+.tableChipStack .pokerChip{width:23px;height:16px;background:repeating-conic-gradient(from 22deg,var(--chip-color) 0deg 70deg,#f5edda 70deg 90deg);box-shadow:0 2px 0 color-mix(in srgb,var(--chip-color) 45%,#000),0 4px 0 color-mix(in srgb,var(--chip-color) 25%,#000),0 5px 5px #0005}
+.tableChipStack .pokerChip::before{inset:19% 21%;border:1px solid #ffffff9c;background:linear-gradient(150deg,#ffffff20,#0000001a),var(--chip-color);box-shadow:none}
+.tableChipStack .pokerChip::after{content:'♠';font-size:8px;line-height:1;color:var(--chip-ink);text-shadow:none}
+.betChips{background:#142223ed;border-color:#9ebbb340;box-shadow:0 3px 8px #0004}
