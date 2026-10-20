@@ -76,7 +76,7 @@ function resetAllIn(){const b=document.querySelector('.allInPreset');if(!b)retur
 function renderPots(s){const holder=$('#pot');holder.replaceChildren();let side=0;for(const pot of (s.allInCount>=4?(s.pots||[]).filter(p=>p.kind!=='uncalled'):(s.pot?[{kind:'main',amount:s.pot}]:[]))){const item=document.createElement('div');item.className='potBadge '+pot.kind;const label=document.createElement('span');label.className='potLabel';label.textContent=pot.kind==='main'?'POT':pot.kind==='uncalled'?'UNCALLED BET':'SIDE POT '+(++side);const amount=document.createElement('span');amount.className='potAmount';const icon=document.createElement('span');icon.className='chipStack';icon.setAttribute('aria-hidden','true');for(let i=0;i<3;i++)icon.append(document.createElement('i'));const value=document.createElement('strong');value.textContent='$'+pot.amount.toLocaleString();amount.append(icon,value);item.append(label,amount);holder.append(item);}}
 
 function blindRole(s,id){if(s.street!=='preflop')return '';const hand=s.players.filter(p=>p.inHand);if(hand.length<2)return '';const dealer=hand.findIndex(p=>p.id===s.players[s.dealer]?.id);if(dealer<0)return '';const small=hand[(dealer+(hand.length===2?0:1))%hand.length],big=hand[(dealer+(hand.length===2?1:2))%hand.length];return id===small.id?'SMALL BLIND':id===big.id?'BIG BLIND':'';}
-document.querySelector('#table .felt').append(document.querySelector('#rabbit'));
+document.querySelector('.communityRow').append(document.querySelector('#rabbit'));
 
 function cardLabel(c){if(!c||c==='?')return 'Card';return (c[0]==='T'?'10':c[0])+({s:'♠',h:'♥',d:'♦',c:'♣'})[c[1]];}
 let chatSignature='',unreadChat=0;
