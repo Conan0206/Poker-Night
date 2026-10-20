@@ -24,9 +24,9 @@
   const key=spectating?'spectator-'+(++spectatorSequence):playerId;
   if(!spectating)clear(key);
   // Repeated spectator sends play immediately. Retire the oldest visual only when
-  // twelve simultaneous videos are already running, keeping memory/audio bounded.
+  // ten simultaneous videos are already running, keeping memory/audio bounded.
   const audience=[...playing].filter(([,entry])=>entry.spectating);
-  if(spectating&&audience.length>=12)clear(audience[0][0]);
+  if(spectating&&audience.length>=10)clear(audience[0][0]);
   const occupied=new Set([...playing.values()].filter(e=>e.spectating).map(e=>e.slot));let slot=0;while(occupied.has(slot))slot++;
   const pool=mediaPool.get(item.id)||[],video=pool.pop()||makeVideo(item);
   video.classList.toggle('spectatorEmote',spectating);video.currentTime=0;video.volume=window.pokerAudio.level('emotes');video.muted=localStorage.getItem('poker-muted')==='true';document.body.append(video);
@@ -39,13 +39,14 @@
  socket.on('emote',({playerId,index,spectating})=>{if(playerId!==me)showEmote(playerId,index,!!spectating);});
 
  function position(){
-  const mobile=innerWidth<=700,size=mobile?68:80,gap=size+8;
+  const mobile=innerWidth<=700;
   const header=document.querySelector('.headerLeftActions')?.getBoundingClientRect(),info=document.querySelector('#tableInfo')?.getBoundingClientRect();
   const top=Math.max((header?.bottom||100)+22,mobile?(info?.bottom||0)+15:0);
-  const bottom=mobile?innerHeight-130:Math.min(innerHeight-30,info?.top||innerHeight-30),rows=Math.max(1,Math.min(4,Math.floor((bottom-top)/gap)));
+  const bottom=mobile?innerHeight-130:Math.min(innerHeight-30,info?.top||innerHeight-30);
+  const rows=5,size=Math.max(16,Math.min(mobile?68:80,(bottom-top-32)/rows)),gap=size+8;
   for(const [key,entry]of playing){
    if(Date.now()>=entry.end){clear(key);continue;}
-   if(entry.spectating){const lane=entry.slot%(rows*3);entry.img.style.left=(16+Math.floor(lane/rows)*gap)+'px';entry.img.style.top=(top+(lane%rows)*gap)+'px';}
+   if(entry.spectating){const lane=entry.slot%10;entry.img.style.width=size+'px';entry.img.style.height=size+'px';entry.img.style.left=(16+Math.floor(lane/rows)*gap)+'px';entry.img.style.top=(top+(lane%rows)*gap)+'px';}
    else{const avatar=document.querySelector('.seat[data-id="'+entry.playerId+'"] .avatar');if(!avatar){clear(key);continue;}const rect=avatar.getBoundingClientRect();entry.img.style.left=rect.x+rect.width/2+'px';entry.img.style.top=rect.y+rect.height/2+'px';}
    entry.audio.volume=window.pokerAudio.level('emotes');entry.audio.muted=!!entry.autoplayMuted||localStorage.getItem('poker-muted')==='true';
   }
