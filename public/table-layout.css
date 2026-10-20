@@ -46,3 +46,17 @@ main{transform-origin:top left;margin:0;flex-shrink:0}
 .potAmount strong{color:#fffdf1;font-weight:800;text-shadow:0 2px 3px #0008}
 .potLabel{color:#f3f8e9;font-weight:800;text-shadow:0 1px 3px #0009}
 .potBadge.side .potAmount{background:linear-gradient(145deg,#35264c,#1b142b);border-color:#cfb2fb}
+
+/* Best five cards belonging to showdown winners, including shared board cards. */
+.card.winningCard{outline:3px solid #f4d674;outline-offset:2px;box-shadow:0 0 16px #f4d67499,0 4px 8px #0005;filter:brightness(1.09)}
+.winnerLabel{color:#ffe5a0}
+#actions .callAction{white-space:nowrap}
+
+#soundToggle,#notificationToggle{width:54px;height:54px;min-height:54px;padding:0;display:grid;place-items:center;flex:0 0 54px}
+#soundToggle .soundIcon,#notificationToggle .eyeIcon{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#notificationToggle[aria-pressed=false]{color:#899398;border-color:#4b5359;background:#20262a}
+#notificationToggle[aria-pressed=true]{color:#c8f497;border-color:#a2cf75;background:#314332}
+#notificationToggle[aria-pressed=true] .bellOffSlash{display:none}
+#notificationToggle .bellOffSlash{stroke-width:2.2}
+.winnerLabel{white-space:normal;line-height:1.2}
+@media(max-width:700px){#soundToggle,#notificationToggle{width:40px;height:40px;min-height:40px;flex-basis:40px}}
