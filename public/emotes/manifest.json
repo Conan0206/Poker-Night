@@ -5,7 +5,7 @@
     "sourceStart": 1.55,
     "sourceEnd": 4.1,
     "duration": 2.55,
-    "video": "01-kiss.webm",
+    "video": "01-kiss-sync.webm",
     "audio": "01-kiss.m4a",
     "thumbnail": "01-kiss.png",
     "audioOffset": 0,
@@ -18,7 +18,7 @@
     "sourceStart": 5.5,
     "sourceEnd": 8.4,
     "duration": 2.9,
-    "video": "02-cool.webm",
+    "video": "02-cool-sync.webm",
     "audio": "02-cool.m4a",
     "thumbnail": "02-cool.png",
     "audioOffset": 0,
@@ -31,7 +31,7 @@
     "sourceStart": 9.45,
     "sourceEnd": 11.8,
     "duration": 2.35,
-    "video": "03-surprised.webm",
+    "video": "03-surprised-sync.webm",
     "audio": "03-surprised.m4a",
     "thumbnail": "03-surprised.png",
     "audioOffset": 0,
@@ -44,7 +44,7 @@
     "sourceStart": 13.1,
     "sourceEnd": 15.25,
     "duration": 2.15,
-    "video": "04-king.webm",
+    "video": "04-king-sync.webm",
     "audio": "04-king.m4a",
     "thumbnail": "04-king.png",
     "audioOffset": 0,
@@ -57,7 +57,7 @@
     "sourceStart": 16.8,
     "sourceEnd": 19.35,
     "duration": 2.55,
-    "video": "05-laugh.webm",
+    "video": "05-laugh-sync.webm",
     "audio": "05-laugh.m4a",
     "thumbnail": "05-laugh.png",
     "audioOffset": 0,
@@ -70,7 +70,7 @@
     "sourceStart": 20.3,
     "sourceEnd": 23.4,
     "duration": 3.1,
-    "video": "06-sad.webm",
+    "video": "06-sad-sync.webm",
     "audio": "06-sad.m4a",
     "thumbnail": "06-sad.png",
     "audioOffset": 0,
@@ -83,7 +83,7 @@
     "sourceStart": 24.75,
     "sourceEnd": 28.0,
     "duration": 3.25,
-    "video": "07-party.webm",
+    "video": "07-party-sync.webm",
     "audio": "07-party.m4a",
     "thumbnail": "07-party.png",
     "audioOffset": 0,
@@ -96,7 +96,7 @@
     "sourceStart": 29.05,
     "sourceEnd": 32.2,
     "duration": 3.15,
-    "video": "08-bored.webm",
+    "video": "08-bored-sync.webm",
     "audio": "08-bored.m4a",
     "thumbnail": "08-bored.png",
     "audioOffset": 0,
@@ -113,7 +113,8 @@
     "thumbnail": "09-thinking.png",
     "animation": "09-thinking.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "09-thinking-sync.webm"
   },
   {
     "id": "10-time",
@@ -125,7 +126,8 @@
     "thumbnail": "10-time.png",
     "animation": "10-time.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "10-time-sync.webm"
   },
   {
     "id": "11-surrender",
@@ -137,7 +139,8 @@
     "thumbnail": "11-surrender.png",
     "animation": "11-surrender.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "11-surrender-sync.webm"
   },
   {
     "id": "12-smile",
@@ -149,7 +152,8 @@
     "thumbnail": "12-smile.png",
     "animation": "12-smile.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "12-smile-sync.webm"
   },
   {
     "id": "13-nervous",
@@ -161,7 +165,8 @@
     "thumbnail": "13-nervous.png",
     "animation": "13-nervous.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "13-nervous-sync.webm"
   },
   {
     "id": "14-scheming",
@@ -173,7 +178,8 @@
     "thumbnail": "14-scheming.png",
     "animation": "14-scheming.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "14-scheming-sync.webm"
   },
   {
     "id": "15-facepalm",
@@ -185,7 +191,8 @@
     "thumbnail": "15-facepalm.png",
     "animation": "15-facepalm.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "15-facepalm-sync.webm"
   },
   {
     "id": "16-excited",
@@ -197,6 +204,7 @@
     "thumbnail": "16-excited.png",
     "animation": "16-excited.webp",
     "transparent": true,
-    "audioOffset": 0
+    "audioOffset": 0,
+    "video": "16-excited-sync.webm"
   }
 ]
