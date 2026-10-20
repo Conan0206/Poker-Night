@@ -110,3 +110,18 @@ body{background:#101719}
 .betChips b{font-size:13px;line-height:1.15;color:#fff9e8;white-space:nowrap}
 .tableLogo{top:50%;left:50%;width:max-content;max-width:90%;transform:translate(-50%,-50%);font-size:clamp(18px,2.2vw,34px);letter-spacing:7px;line-height:1.6;opacity:.07;pointer-events:none;user-select:none;z-index:0}
 @media(max-width:700px){.betChips{gap:1px;padding:1px 2px}.betChips small{font-size:6px;letter-spacing:.7px}.betChips b{font-size:10px}.tableLogo{font-size:18px;letter-spacing:3px}}
+
+/* A paced deal: curved flight, gentle landing, then a deliberate face-up turn. */
+.card.dealing{animation-name:softDealFlip;animation-duration:var(--deal-duration,1500ms);animation-timing-function:cubic-bezier(.22,.61,.36,1);transform-origin:50% 65%;will-change:transform,opacity}
+.card.dealing::after{animation-name:softCardBack;animation-duration:var(--deal-duration,1500ms)}
+@keyframes softDealFlip{
+ 0%{opacity:0;transform:translate(var(--deal-x),var(--deal-y)) scale(.55) rotate(-12deg)}
+ 8%{opacity:1}
+ 38%{opacity:1;transform:translate(calc(var(--deal-x)*.45),calc(var(--deal-y)*.45 - 38px)) scale(.88) rotate(-6deg)}
+ 64%{transform:translate(0,-6px) scale(1.025) rotate(1.5deg)}
+ 73%,80%{transform:translate(0,0) scale(1) rotateY(0deg)}
+ 90%{transform:translate(0,0) scale(1) rotateY(90deg)}
+ 100%{opacity:1;transform:translate(0,0) scale(1) rotateY(0deg)}
+}
+@keyframes softCardBack{0%,89.9%{opacity:1}90%,100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.card.dealing{animation:none;will-change:auto}.card.dealing::after{display:none}}
