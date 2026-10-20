@@ -36,3 +36,5 @@
 .homeDiamond{transform:translateX(-50%) rotate(-8deg)}
 .homeSpade{transform:translateX(-50%) rotate(8deg)}
 .homeHeart{transform:translateX(-50%) rotate(24deg)}
+
+#welcome #welcomeSubtitle strong{color:#c8f497;font-weight:600}
