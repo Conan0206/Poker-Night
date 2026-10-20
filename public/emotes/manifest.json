@@ -102,5 +102,101 @@
     "audioOffset": 0,
     "animation": "08-bored.webp",
     "transparent": true
+  },
+  {
+    "id": "09-thinking",
+    "name": "Thinking",
+    "sourceStart": 1.85,
+    "sourceEnd": 4.9,
+    "duration": 3.067,
+    "audio": "09-thinking.m4a",
+    "thumbnail": "09-thinking.png",
+    "animation": "09-thinking.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "10-time",
+    "name": "Time",
+    "sourceStart": 6.7,
+    "sourceEnd": 9.8,
+    "duration": 3.1,
+    "audio": "10-time.m4a",
+    "thumbnail": "10-time.png",
+    "animation": "10-time.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "11-surrender",
+    "name": "Surrender",
+    "sourceStart": 11.6,
+    "sourceEnd": 14.6,
+    "duration": 3.0,
+    "audio": "11-surrender.m4a",
+    "thumbnail": "11-surrender.png",
+    "animation": "11-surrender.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "12-smile",
+    "name": "Smile",
+    "sourceStart": 16.25,
+    "sourceEnd": 19.6,
+    "duration": 3.367,
+    "audio": "12-smile.m4a",
+    "thumbnail": "12-smile.png",
+    "animation": "12-smile.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "13-nervous",
+    "name": "Nervous",
+    "sourceStart": 21.6,
+    "sourceEnd": 24.9,
+    "duration": 3.3,
+    "audio": "13-nervous.m4a",
+    "thumbnail": "13-nervous.png",
+    "animation": "13-nervous.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "14-scheming",
+    "name": "Scheming",
+    "sourceStart": 26.65,
+    "sourceEnd": 29.7,
+    "duration": 3.067,
+    "audio": "14-scheming.m4a",
+    "thumbnail": "14-scheming.png",
+    "animation": "14-scheming.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "15-facepalm",
+    "name": "Facepalm",
+    "sourceStart": 31.45,
+    "sourceEnd": 34.5,
+    "duration": 3.067,
+    "audio": "15-facepalm.m4a",
+    "thumbnail": "15-facepalm.png",
+    "animation": "15-facepalm.webp",
+    "transparent": true,
+    "audioOffset": 0
+  },
+  {
+    "id": "16-excited",
+    "name": "Excited",
+    "sourceStart": 35.9,
+    "sourceEnd": 39.2,
+    "duration": 3.3,
+    "audio": "16-excited.m4a",
+    "thumbnail": "16-excited.png",
+    "animation": "16-excited.webp",
+    "transparent": true,
+    "audioOffset": 0
   }
 ]
