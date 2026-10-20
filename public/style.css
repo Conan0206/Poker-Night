@@ -84,3 +84,9 @@ body{background:radial-gradient(ellipse at 75% 5%,#6b537b66,transparent 50%),lin
 @media(max-width:600px){.backChoices{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 #chatToggle{position:relative;overflow:visible}.chatUnread{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 5px;display:grid;place-items:center;border-radius:99px;background:#c8f497;color:#152317;border:2px solid #252a2d;font-size:11px;font-weight:800;line-height:1;pointer-events:none}.chatUnread[hidden]{display:none}
+
+.audioSettings{padding:4px 0 10px;border-bottom:1px solid #3e4d55;margin-bottom:22px}
+.audioSetting{display:grid;grid-template-columns:1fr auto;gap:8px;margin:16px 0;color:#f3f5ee;font-size:15px}
+.audioSetting output{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.audioSetting input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);padding:0;margin:0;height:22px;cursor:pointer}
+.audioHint{font-size:11px!important}
