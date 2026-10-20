@@ -57,9 +57,14 @@ test('bots take legal turns, keep private cards hidden and support watching then
  }finally{s?.disconnect();child.kill();}
 });
 
-test('emotes stay in their room, reject invalid or spectator sends and limit repeats',async()=>{
+test('spectators can send rapid emotes to their room while seated repeat limits remain',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3110'},stdio:'pipe'});const peers=[];
- try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});async function join(code,spectating=false){const s=io('http://localhost:3110',{transports:['websocket']});peers.push(s);let state;s.on('state',v=>state=v);await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Emote tester',spectating});await wait(60);return {s,get state(){return state;}};}const a=await join(),b=await join(a.state.code,true),other=await join();const seen=[],outside=[];b.s.on('emote',v=>seen.push(v));other.s.on('emote',v=>outside.push(v));b.s.emit('emote',2);a.s.emit('emote',999);await wait(40);assert.equal(seen.length,0);a.s.emit('emote',15);a.s.emit('emote',1);await wait(60);assert.equal(seen.length,1);assert.equal(seen[0].index,15);assert.equal(seen[0].playerId,a.state.players[0].id);assert.equal(outside.length,0);
+ try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});async function join(code,spectating=false){const s=io('http://localhost:3110',{transports:['websocket']});peers.push(s);let state;s.on('state',v=>state=v);await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Emote tester',spectating});await wait(60);return {s,get state(){return state;}};}const a=await join(),b=await join(a.state.code,true),other=await join();const seen=[],hostSeen=[],outside=[];b.s.on('emote',v=>seen.push(v));a.s.on('emote',v=>hostSeen.push(v));other.s.on('emote',v=>outside.push(v));
+ b.s.emit('emote',999);a.s.emit('emote',-1);b.s.emit('emote',{index:2,spectating:true});await wait(40);assert.equal(seen.length,0);
+ for(let i=0;i<20;i++)b.s.emit('emote',i%16);await wait(100);
+ assert.equal(seen.length,20);assert.equal(hostSeen.length,20);assert.ok(seen.every((e,i)=>e.index===i%16&&e.spectating===true&&e.playerId===b.state.players.find(p=>p.spectating).id));
+ a.s.emit('emote',15);a.s.emit('emote',1);await wait(60);assert.equal(seen.length,21);assert.equal(seen.at(-1).index,15);assert.equal(seen.at(-1).spectating,false);assert.equal(seen.at(-1).playerId,a.state.players[0].id);assert.equal(outside.length,0);
+
  }finally{peers.forEach(s=>s.disconnect());child.kill();}
 });
 

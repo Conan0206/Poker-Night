@@ -137,3 +137,7 @@ body{background:#101719}
 #rabbit[hidden]{display:none}
 @media(max-width:700px){#rabbit{left:calc(100% + 7px);width:38px;min-height:44px;padding:5px 2px;gap:2px;font-size:8px;border-radius:10px}#rabbit svg{width:21px;height:21px}}
 @media(prefers-reduced-motion:reduce){#rabbit,#rabbit svg{transition:none}#rabbit:hover svg{transform:none}}
+
+/* Spectator reactions enter from the left; seated reactions stay over avatars. */
+.avatarEmote.spectatorEmote{width:80px;height:80px;transform:none;z-index:11}
+@media(max-width:700px){.avatarEmote.spectatorEmote{width:68px;height:68px}}
