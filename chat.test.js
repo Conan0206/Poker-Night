@@ -7,7 +7,7 @@ test('incoming chat notifies only peers in the room and river folds allow option
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3114'},stdio:'pipe'}),clients=[];
  try{
  await new Promise((r,j)=>{child.stdout.once('data',r);child.once('error',j);});
- async function join(code){const s=io('http://localhost:3114',{transports:['websocket']});clients.push(s);let state,id;s.on('state',v=>state=v);s.on('identity',v=>id=v.id);await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Same name'});await pause(50);return {s,get state(){return state;},get id(){return id;}};}
+ async function join(code){const s=io('http://localhost:3114',{transports:['websocket']});clients.push(s);let state,id,token;s.on('state',v=>state=v);s.on('identity',v=>{id=v.id;token=v.token;});await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Same name'});await pause(50);return {s,get state(){return state;},get id(){return id;},get token(){return token;}};}
  const a=await join(),b=await join(a.state.code),outside=await join();let own=0,peer=0,other=0;a.s.on('chatMessage',()=>own++);b.s.on('chatMessage',d=>{assert.equal(d.senderId,a.id);peer++;});outside.s.on('chatMessage',()=>other++);
  a.s.emit('chat','Hello');await pause(80);assert.equal(own,0);assert.equal(peer,1);assert.equal(other,0);assert.equal(b.state.chat.at(-1).text,'Hello');a.s.emit('start');await pause(80);assert.equal(peer,1);
  while(a.state.street!=='river'){const actor=a.state.players[a.state.turn].id===a.id?a:b;actor.s.emit('action',{type:actor.state.bet>actor.state.players[actor.state.turn].round?'call':'check'});await pause(45);}
