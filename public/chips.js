@@ -4,19 +4,20 @@
  const denominations=[[1000,'#343a43'],[500,'#f1ce26'],[100,'#bd7b21'],[20,'#8252d7'],[5,'#e7465d'],[1,'#45cfe0']];
  const center=el=>{if(!el)return null;const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};};
  const avatar=id=>center(document.querySelector('.seat[data-id="'+id+'"] .avatar'));
- function stake(id){const placed=wagerPositions.get(id);if(placed)return placed;const el=document.querySelector('.seat[data-id="'+id+'"] .avatar'),a=center(el),c=center(document.querySelector('#table .felt'));if(!a||!c)return null;const dx=c.x-a.x,dy=c.y-a.y,distance=Math.hypot(dx,dy)||1,inset=el.getBoundingClientRect().width/2+(innerWidth<=700?28:45);return {x:a.x+dx/distance*inset,y:a.y+dy/distance*inset};}
+ function stake(id){const placed=wagerPositions.get(id);if(placed)return placed;const el=document.querySelector('.seat[data-id="'+id+'"] .avatar'),a=center(el),c=center(document.querySelector('#table .felt'));if(!a||!c)return null;const seat=el.closest('.seat'),plate=seat.querySelector('.nameplate').getBoundingClientRect();if(seat.dataset.slot==='2'){return {x:plate.right+(innerWidth<=700?35:54),y:a.y};}const dx=c.x-a.x,dy=c.y-a.y,distance=Math.hypot(dx,dy)||1,inset=el.getBoundingClientRect().width/2+(innerWidth<=700?28:45);return {x:a.x+dx/distance*inset,y:a.y+dy/distance*inset};}
  // Anchor wagers a fixed distance inside each avatar; avoid only visible pot badges, not their wide container.
  function placeWager(id,pile,occupied){
   const preferred=stake(id),felt=document.querySelector('#table .felt').getBoundingClientRect();if(!preferred)return null;
-  const size=pile.getBoundingClientRect(),w=size.width,h=size.height,pad=9;
+  const size=pile.getBoundingClientRect(),w=size.width,h=size.height,pad=9,leftMiddle=document.querySelector('.seat[data-id="'+id+'"]')?.dataset.slot==='2';
   const obstacles=[...document.querySelectorAll('.seat,.seatCards,#myCards,#pot .potBadge,#board,#result,#sitDown,#start,#rabbit')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height).concat(occupied);
   const cx=felt.x+felt.width/2,cy=felt.y+felt.height/2,rx=felt.width/2-12,ry=felt.height/2-12;
   let best=null,score=Infinity;
   for(let y=felt.top+h/2+pad;y<felt.bottom-h/2-pad;y+=10)for(let x=felt.left+w/2+pad;x<felt.right-w/2-pad;x+=10){
+   if(leftMiddle&&Math.abs(y-preferred.y)>24)continue;
    const rect={left:x-w/2-pad,right:x+w/2+pad,top:y-h/2-pad,bottom:y+h/2+pad};
    if([rect.left,rect.right].some(px=>[rect.top,rect.bottom].some(py=>((px-cx)/rx)**2+((py-cy)/ry)**2>1)))continue;
    if(obstacles.some(r=>rect.left<r.right&&rect.right>r.left&&rect.top<r.bottom&&rect.bottom>r.top))continue;
-   const distance=(x-preferred.x)**2+(y-preferred.y)**2;if(distance<score){score=distance;best={x,y,rect};}
+   const distance=(x-preferred.x)**2+(y-preferred.y)**2;const crowding=occupied.reduce((sum,r)=>{const dx=x-(r.left+r.right)/2,dy=y-(r.top+r.bottom)/2;return sum+Math.max(0,(innerWidth<=700?72:110)-Math.hypot(dx,dy))**2*2;},0);const candidateScore=distance+crowding;if(candidateScore<score){score=candidateScore;best={x,y,rect};}
   }
   if(best){occupied.push(best.rect);wagerPositions.set(id,{x:best.x,y:best.y});return best;}
   return null;
