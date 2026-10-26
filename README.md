@@ -31,3 +31,7 @@ This is a solver-derived **sampled one-street abstraction**, not a complete Hold
 Validation includes legal actions/stack caps, range card blockers, unbeatable-hand behavior, hidden-card independence, deadline fallback and worker event-loop responsiveness. The CFR core is tested against Kuhn poker's known -1/18 equilibrium value and exhaustive best responses in that small game. That benchmark validates the core algorithm; it does not measure exploitability or playing strength in full Hold'em.
 
 Algorithm background: Zinkevich et al., [Regret Minimization in Games with Incomplete Information](https://papers.nips.cc/paper/3306-regret-minimization-in-games-with-incomplete-information); Brown and Sandholm, [Superhuman AI for multiplayer poker](https://doi.org/10.1126/science.aay2400). This implementation uses standard signed-regret CFR with regret matching, not CFR+.
+
+
+### Feedback email
+Player feedback is forwarded server-side through FormSubmit to conantai2006@gmail.com. The owner must activate the form using FormSubmit's confirmation email once. Feedback is also logged as `player-feedback`; forwarding results are logged as `feedback-email`. Delivery is acknowledged only when the provider accepts the request; failed submissions keep the browser draft. FormSubmit acceptance does not prove inbox delivery. Set `FEEDBACK_EMAIL_ENABLED=false` to use logs only (used by automated integration tests). No Gmail password is stored.
