@@ -31,7 +31,7 @@
  const preview=document.createElement('div');preview.className='tutorialPreview';preview.setAttribute('aria-hidden','true');
  const progress=document.createElement('small'),title=document.createElement('h2'),text=document.createElement('p'),buttons=document.createElement('div');buttons.className='tutorialButtons';
  const skip=document.createElement('button'),next=document.createElement('button');skip.textContent='Skip tutorial';next.className='primary';buttons.append(skip,next);card.append(progress,title,preview,text,buttons);dialog.append(spot,card);document.body.append(dialog);
- let index=0,previousFocus,starting=false;
+ let index=0,previousFocus,starting=false,entryPending=false;
  function position(){
   if(!dialog.open)return;
   let target=document.querySelector(steps[index][0]);
@@ -52,9 +52,11 @@
  skip.onclick=finish;next.onclick=()=>{if(index===steps.length-1)finish();else{index++;show();}};
  dialog.addEventListener('cancel',e=>{e.preventDefault();finish();});
  addEventListener('resize',position);window.visualViewport?.addEventListener('resize',position);
+ function scheduleEntryTutorial(){if(!entryPending||starting)return;starting=true;setTimeout(()=>{starting=false;if(!entryPending)return;if(!document.querySelector('dialog[open]')){entryPending=false;window.startPokerTutorial();}},600);}
+ addEventListener('poker-entered',()=>{entryPending=true;scheduleEntryTutorial();});
  addEventListener('poker-state',()=>{
   requestAnimationFrame(()=>{positionReveal();position();});
-  if(!localStorage.getItem('poker-tutorial-v1')&&!starting){starting=true;setTimeout(()=>{starting=false;if(!document.querySelector('dialog[open]'))window.startPokerTutorial();},600);}
+  scheduleEntryTutorial();
  });
  positionReveal();
 })();
