@@ -2,27 +2,17 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const section=document.createElement('section');section.className='settingsCommunity';
  const updates=document.createElement('details');
  const title=document.createElement('summary');title.textContent='What’s new · Recent improvements';updates.append(title);
- const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 26 October 2026';updates.append(date);
+ const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 27 October 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
-  'Shared pause: any seated player can pause or resume the clocks, bots, board runout, and next deal.',
-  'Standalone Tournament switch beside the info panel: confirm a fresh 1,000-chip tournament after the current hand. Starting bank and 7-minute blind levels are adjustable in settings. Hand reveals are cash-game only. Purple-and-gold felt, compact table information, and an expandable blind schedule distinguish tournament play.',
-  'All-in music: the opening 32 seconds of Frontend Theme loops until the next valid action or the hand ends.',
-  'Guided tutorial: learn the controls, bots, statistics, emotes, reveals, and Rabbit. Replay it from settings.',
-  'Corner controls: Reveal hand sits to the left of emotes, and Sit down is in the top-left toolbar, clear of player cards.',
-  'Reveal hand button: choose a player or bot after a hand ends. Remaining uses appear on the button; the allowance is adjustable in settings.',
-  'Returning from spectate: choose to reset your chips to the starting amount or keep your previous stack.',
-  'Chip guide: hover the top-right chip icon for coloured chips and their values.',
-  'Player statistics: click any player or bot avatar to see their statistics.',
-  'Next-hand countdown: synchronized with server time and pauses briefly at 0 seconds before dealing.',
-  'Bot practice: range-aware decisions, human-paced thinking, and a bounded heads-up postflop CFR solver. Preflop and multiway play use heuristics.',
-  'Smoother card dealing, clearer wager positions, chip collection animations, and distinct payout sounds.',
-  'Spectator emotes: rapid reactions with up to 10 displayed in two columns and five rows. Favourite emotes appear first.',
-  'Turn alerts, optional background-tab notifications, chat unread counts, and separate audio volume controls.',
-  'Hand-ranking guide, winning-card highlights, rabbit hunt beside the community cards, and improved table spacing.',
-  'Full main tables open in spectate mode. Busted players move to spectate after the hand finishes.',
-  'Settings categories: Audio, Table settings, Send feedback, and Recent updates each have their own section.',
-  'Feedback: send suggestions and report problems directly from settings.'
+  'Added chip and BB leaderboards with chip-leader stars.',
+  'Added two-way Cash/Tournament switching.',
+  'Improved tournament blinds, timing, and starting-stack settings.',
+  'Enlarged Pause/Resume and fixed control placement.',
+  'Added tournament colours and an expandable blind schedule.',
+  'Added a guided tutorial and settings categories.',
+  'Added feedback and cash-game hand reveals.',
+  'Improved emotes, audio, card animations, and countdowns.'
  ]){const li=document.createElement('li');li.textContent=text;list.append(li);}updates.append(list);
  const feedback=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Write feedback';feedback.append(summary);
  const intro=document.createElement('p');intro.className='fine';intro.textContent='Suggest an improvement or report a problem. Your table name and feedback are emailed to the game owner through FormSubmit. A backup is saved in server logs.';feedback.append(intro);

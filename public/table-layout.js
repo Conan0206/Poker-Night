@@ -13,7 +13,7 @@
  main.style.zoom=String(scale);main.style.width=(innerWidth/scale)+'px';
  main.style.height=height+'px';main.style.minHeight=height+'px';game.style.minHeight=height+'px';
  document.documentElement.style.setProperty('--dock-height',dock+'px');
- const info=document.getElementById('tableInfo');info.style.top=mobile?((document.querySelector('.headerLeftActions').getBoundingClientRect().bottom+12)/scale)+'px':'';
+ const info=document.getElementById('tableInfoDock')||document.getElementById('tableInfo');info.style.top=mobile?((document.querySelector('.headerLeftActions').getBoundingClientRect().bottom+12)/scale)+'px':'';
  table.style.top=base*(mobile?.40:.22)+'px';table.style.height=base*(mobile?.26:.32)+'px';
  const own=seats.querySelector('.seat.self');if(own){own.style.left='50%';own.style.top='auto';}
  // Reserve the same rail in seated and spectator modes.
