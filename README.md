@@ -40,6 +40,6 @@ Player feedback is forwarded server-side through FormSubmit to conantai2006@gmai
 ### Shared table controls
 Pause below Settings freezes turn timeouts, bot thinking, all-in board runouts, the next-hand timer, and tournament blind-level time. Any seated human can toggle it; a spectator may manage it when no human is seated. Poker actions and time cards are rejected while paused.
 
-The Tournament button beside Live Hand Analysis requires confirmation. It queues a fresh tournament after the current hand, resets seated stacks to 5,000 and blinds to 25/50, and closes seating after play begins.
+The Tournament button beside the blinds and starting bank requires confirmation. Tournament tables use purple felt and gold rails; the equity panel is hidden and a blind-level schedule shows all 13 levels (level 13 is capped). It queues a fresh tournament after the current hand, resets seated stacks to 5,000 and blinds to 25/50, and closes seating after play begins.
 
 All-in theme: the user-supplied Hungry Shark Evolution Frontend Theme from https://downloads.khinsider.com/game-soundtracks/album/hungry-shark-evolution-android-ios-gamerip-2012/01.%2520Frontend%2520Theme.mp3 is trimmed to its opening 32 seconds in `public/audio/all-in-theme-32s.mp3`. It loops while the latest action is an all-in, stops at the next valid poker action or showdown, and follows main/effects volume, mute, and table pause.

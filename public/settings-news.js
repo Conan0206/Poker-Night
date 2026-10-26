@@ -6,7 +6,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
   'Shared pause: any seated player can pause or resume the clocks, bots, board runout, and next deal.',
-  'Switch to tournament beside Live Hand Analysis: confirm a fresh 5,000-chip tournament after the current hand.',
+  'Tournament switch beside the blinds and starting bank: confirm a fresh 5,000-chip tournament after the current hand. Purple-and-gold felt, compact table information, and an expandable blind schedule distinguish tournament play.',
   'All-in music: the opening 32 seconds of Frontend Theme loops until the next valid action or the hand ends.',
   'Guided tutorial: learn the controls, bots, statistics, emotes, reveals, and Rabbit. Replay it from settings.',
   'Corner controls: Reveal hand sits to the left of emotes, and Sit down is in the top-left toolbar, clear of player cards.',
