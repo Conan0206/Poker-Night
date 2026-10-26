@@ -90,3 +90,6 @@ body{background:radial-gradient(ellipse at 75% 5%,#6b537b66,transparent 50%),lin
 .audioSetting output{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
 .audioSetting input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);padding:0;margin:0;height:22px;cursor:pointer}
 .audioHint{font-size:11px!important}
+
+/* Compact chip reference in the toolbar. */
+.chipMenu{position:relative;pointer-events:auto}.chipMenu ul{position:absolute;right:0;top:100%;width:148px;list-style:none;margin:0;padding:10px 14px;background:#172329;border:1px solid #637c85;border-radius:14px;box-shadow:0 12px 32px #0008;visibility:hidden;opacity:0;pointer-events:none;z-index:30}.chipMenu:hover ul,.chipMenu:has(>button:focus-visible) ul,.chipMenu.isOpen ul{visibility:visible;opacity:1;pointer-events:auto}.chipMenu li{display:flex;align-items:center;gap:18px;padding:8px 0;color:#f8f8ee}.chipMenu li+li{border-top:1px solid #ffffff12}.chipMenu .pokerChip{position:relative;flex:0 0 30px;width:30px;height:30px}.chipMenu strong{font-size:15px}.seat .avatar[role=button]{cursor:pointer}.seat .avatar[role=button]:focus-visible{outline:3px solid #f3ce78;outline-offset:5px}
