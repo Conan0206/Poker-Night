@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';import {io} from 'socket.io-client';
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+test('time-card settings update everyone immediately without restoring spent cards',async()=>{
+ const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3147'},stdio:'pipe'}),clients=[];
+ try{await new Promise((r,j)=>{child.stdout.once('data',r);child.once('error',j);});async function join(code){const s=io('http://localhost:3147',{transports:['websocket']});clients.push(s);let state,id;s.on('state',v=>state=v);s.on('identity',v=>id=v.id);await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Time card test'});await wait(50);return {s,get state(){return state;},get id(){return id;}};}
+ const a=await join(),b=await join(a.state.code),settings={small:5,big:10,startingBank:1000,turnSeconds:30};a.s.emit('settings',{...settings,timeCardAllowance:5});await wait(40);assert.ok(a.state.players.every(p=>p.timeCards===5));a.s.emit('start');await wait(40);const actor=[a,b].find(c=>c.id===a.state.players[a.state.turn].id),deadline=a.state.deadline;actor.s.emit('timecard');await wait(40);assert.equal(a.state.deadline,deadline+60000);assert.equal(a.state.players.find(p=>p.id===actor.id).timeCards,4);
+ for(const allowance of [0,5]){a.s.emit('settings',{...settings,timeCardAllowance:allowance});await wait(40);assert.equal(a.state.players.find(p=>p.id===actor.id).timeCards,Math.max(0,allowance-1));}a.s.emit('settings',{...settings,timeCardAllowance:-1});await wait(40);assert.equal(a.state.timeCardAllowance,5);const c=await join(a.state.code);assert.equal(c.state.players.find(p=>p.id===c.id).timeCards,5);
+ }finally{clients.forEach(s=>s.disconnect());child.kill();}
+});

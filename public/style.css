@@ -143,3 +143,5 @@ body.tournamentTheme .seat .nameplate{min-width:0}body.tournamentTheme .seat .na
 
 /* Opaque standings prevent table rails and felt from creating bands behind rows. */
 body.tournamentTheme #leaderboardMenu .leaderboardPanel{background:#281d35;border:1px solid #a58a55;box-shadow:0 12px 30px #09041080}#leaderboardMenu .leaderboardSelf{background:#33263f}#leaderboardMenu .leaderboardPanel th{background:transparent}#leaderboardMenu .leaderboardPanel td{background:transparent}
+
+.feltChoices button:disabled{opacity:.3;filter:grayscale(1);cursor:not-allowed;box-shadow:none}.feltLockedNote{font-size:13px;color:#d6bc88;line-height:1.5}
