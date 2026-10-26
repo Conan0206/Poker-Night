@@ -5,6 +5,8 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 26 October 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Guided tutorial: learn the controls, bots, statistics, emotes, reveals, and Rabbit. Replay it from settings.',
+  'Corner controls: Reveal hand sits to the left of emotes, and Sit down is in the top-left toolbar, clear of player cards.',
   'Reveal hand button: choose a player or bot after a hand ends. Remaining uses appear on the button; the allowance is adjustable in settings.',
   'Returning from spectate: choose to reset your chips to the starting amount or keep your previous stack.',
   'Chip guide: hover the top-right chip icon for coloured chips and their values.',
