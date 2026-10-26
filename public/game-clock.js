@@ -8,9 +8,9 @@
    receivedAt = performance.now();
    ready = true;
   },
-  remaining(deadline) {
+  remaining(deadline, pausedAt) {
    if (!Number.isFinite(deadline)) return 0;
-   const now = ready ? serverTime + performance.now() - receivedAt : Date.now();
+   const now = Number.isFinite(pausedAt) ? pausedAt : ready ? serverTime + performance.now() - receivedAt : Date.now();
    return Math.max(0, deadline - now);
   }
  };

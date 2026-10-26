@@ -5,6 +5,9 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 26 October 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Shared pause: any seated player can pause or resume the clocks, bots, board runout, and next deal.',
+  'Switch to tournament beside Live Hand Analysis: confirm a fresh 5,000-chip tournament after the current hand.',
+  'All-in music: the opening 32 seconds of Frontend Theme loops until the next valid action or the hand ends.',
   'Guided tutorial: learn the controls, bots, statistics, emotes, reveals, and Rabbit. Replay it from settings.',
   'Corner controls: Reveal hand sits to the left of emotes, and Sit down is in the top-left toolbar, clear of player cards.',
   'Reveal hand button: choose a player or bot after a hand ends. Remaining uses appear on the button; the allowance is adjustable in settings.',
