@@ -1,4 +1,4 @@
-import {chipLeaderboard} from './leaderboard-model.js';
+import {chipLeaderboard,eliminationLeaderboard} from './leaderboard-model.js';
 
 const menu=document.createElement('details');menu.id='leaderboardMenu';menu.hidden=true;
 const toggle=document.createElement('summary');toggle.setAttribute('aria-label','Leaderboard');toggle.title='Leaderboard';toggle.innerHTML='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 29V17h8v12M11 29V11h10v18M21 29V21h8v8M2 29h28"/><path class="podiumStar" d="m16 2 1.5 3 3.3.5-2.4 2.3.6 3.2-3-1.5-3 1.5.6-3.2-2.4-2.3 3.3-.5Z"/></svg>';
@@ -7,10 +7,14 @@ const title=document.createElement('h3');title.textContent='Leaderboard';
 const note=document.createElement('p');note.className='leaderboardNote';
 const table=document.createElement('table'),head=document.createElement('thead'),row=document.createElement('tr');
 for(const label of ['Rank','Player','Stack','BB']){const th=document.createElement('th');th.scope='col';th.textContent=label;row.append(th);}head.append(row);
-const body=document.createElement('tbody');table.append(head,body);panel.append(title,note,table);menu.append(toggle,panel);
+const body=document.createElement('tbody');table.append(head,body);panel.append(title,note,table);const eliminationTitle=document.createElement('h3');eliminationTitle.className='eliminationTitle';eliminationTitle.textContent='🔥 Most eliminations';
+const eliminationNote=document.createElement('p');eliminationNote.className='leaderboardNote';eliminationNote.textContent='This tournament · tied pot knockouts share credit';
+const eliminationTable=document.createElement('table'),eliminationHead=document.createElement('thead'),eliminationRow=document.createElement('tr'),eliminationBody=document.createElement('tbody');
+for(const label of ['Rank','Player','Eliminations']){const th=document.createElement('th');th.textContent=label;th.scope='col';eliminationRow.append(th);}eliminationHead.append(eliminationRow);eliminationTable.append(eliminationHead,eliminationBody);panel.append(eliminationTitle,eliminationNote,eliminationTable);menu.append(toggle,panel);
 document.querySelector('[data-panel="history"]').before(menu);
 addEventListener('poker-state',({detail:{state,me}})=>{
  menu.hidden=state.mode!=='tournament';if(menu.hidden){menu.open=false;return;}
+ eliminationBody.replaceChildren();for(const p of eliminationLeaderboard(state.players)){const row=document.createElement('tr');if(p.id===me)row.className='leaderboardSelf';for(const value of [p.rank,(p.eliminationLeader?'🔥 ':'')+p.avatar+' '+p.name+(p.bot?' · BOT':''),p.eliminations.toLocaleString(undefined,{maximumFractionDigits:2})]){const td=document.createElement('td');td.textContent=String(value);row.append(td);}eliminationBody.append(row);}
  const entries=chipLeaderboard(state.players,state.big);note.textContent='★ Chip leader · BB = $'+state.big.toLocaleString()+' · '+entries.length+' players';body.replaceChildren();
  for(const p of entries){
   const row=document.createElement('tr');if(p.id===me)row.classList.add('leaderboardSelf');

@@ -6,3 +6,8 @@ export function chipLeaderboard(players,big){
   return {...p,rank,bb:big>0?p.chips/big:0,chipLeader:p.chips>0&&p.chips===entries[0].chips};
  });
 }
+
+export function eliminationLeaderboard(players){
+ const entries=chipLeaderboard(players,1).sort((a,b)=>(b.eliminations||0)-(a.eliminations||0)||b.chips-a.chips||a.name.localeCompare(b.name));
+ let rank=0;return entries.map((p,i)=>{const count=p.eliminations||0;if(!i||count!==(entries[i-1].eliminations||0))rank=i+1;return {...p,rank,eliminations:count,eliminationLeader:count>0&&count===(entries[0].eliminations||0)};});
+}

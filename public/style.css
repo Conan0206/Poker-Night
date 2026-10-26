@@ -138,3 +138,5 @@ body.tournamentTheme .potAmount{background:linear-gradient(145deg,#382343,#20152
 
 /* BB labels wrap within each seat instead of widening one half of the plate. */
 body.tournamentTheme .seat .nameplate{min-width:0}body.tournamentTheme .seat .nameplate strong{white-space:normal;overflow-wrap:anywhere}body.tournamentTheme .seat .nameplate .bbAmount{display:block;white-space:normal;line-height:1.25}body.tournamentTheme .seat .seatActionBadge{white-space:normal;overflow-wrap:anywhere;line-height:1.25;letter-spacing:0;padding:5px 3px}body.tournamentTheme .seat .seatActionBadge .bbAmount{display:block;white-space:normal;font-size:.95em}
+
+#leaderboardMenu .eliminationTitle{margin-top:20px;padding-top:16px;border-top:1px solid #a58a5540;color:#f2bd7c}#leaderboardMenu .eliminationTitle~table td:last-child{color:#f2bd7c}
