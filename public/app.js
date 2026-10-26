@@ -53,7 +53,7 @@ let raiseExpanded=false, actionTurn='';
 function compactActions(){
  const actions=$('#actions'), context=state.handNumber+':'+state.street+':'+state.turn;
  if(context!==actionTurn){raiseExpanded=false;actionTurn=context;}
- const time=actions.querySelector('.timeCard');if(time){const self=state.players.find(p=>p.id===me);time.textContent='Time card ('+self.timeCards+')';time.title='Add 60 seconds to your turn';time.setAttribute('aria-label',time.textContent+' · add 60 seconds');}
+ $('#actionTimeCard')?.remove();const time=actions.querySelector('.timeCard');if(time){const self=state.players.find(p=>p.id===me);time.id='actionTimeCard';time.replaceChildren();const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 32 36');icon.setAttribute('aria-hidden','true');icon.innerHTML='<rect x="7" y="3" width="21" height="29" rx="4"/><path d="M4 9v20a6 6 0 0 0 6 6h12"/><circle cx="17.5" cy="17" r="6"/><path d="M17.5 13v4l3 2"/>';const label=document.createElement('span');label.textContent='Time card ('+self.timeCards+')';time.append(icon,label);time.title='Add 60 seconds to your turn';time.setAttribute('aria-label',label.textContent+' · add 60 seconds');$('#controls').append(time);}
  const raise=actions.querySelector('.primary');if(!raise)return;
  const fold=actions.querySelector('.foldAction'),call=actions.querySelector('.callAction');
  const sizing=document.createElement('div');sizing.className='raiseSizing';sizing.hidden=!raiseExpanded;
@@ -62,7 +62,7 @@ function compactActions(){
  const close=button('✕',()=>{resetAllIn();raiseExpanded=false;sizing.hidden=true;toggle.setAttribute('aria-expanded','false');toggle.focus();},sizing);close.className='closeSizing';close.setAttribute('aria-label','Close raise sizing');raise.textContent='Confirm $'+sizing.querySelector('input[type=number]').value;
  const presets=[...sizing.querySelectorAll('.betPreset')];presets.forEach((button,i)=>{if(i>0&&i<4)button.textContent=['','¼','½','¾'][i];});
  const number=sizing.querySelector('input[type=number]');const syncLabel=()=>{raise.textContent='Confirm $'+Number(number.value).toLocaleString();};sizing.addEventListener('input',()=>{resetAllIn();syncLabel();});sizing.addEventListener('click',e=>{if(!e.target.closest('.allInPreset'))resetAllIn();});sizing.addEventListener('click',syncLabel);
- actions.replaceChildren(...[call,fold,toggle,time,sizing].filter(Boolean));
+ actions.replaceChildren(...[call,fold,toggle,sizing].filter(Boolean));
 }
 function enhanceSetting(label,input,key,disabled){
  label.classList.add('settingField');input.setAttribute('aria-label',label.firstChild.textContent);const steps={timeCardAllowance:1,levelMinutes:1,tournamentBank:100,revealAllowance:1,turnSeconds:5,startingBank:100,small:1,big:1},step=steps[key];
