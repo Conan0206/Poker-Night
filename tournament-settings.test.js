@@ -25,3 +25,14 @@ test('switching either mode removes every bot and leaves a lone human ready to a
  for(const mode of ['tournament','cash']){socket.emit('addbot');socket.emit('addbot');await wait(50);assert.equal(state.players.filter(p=>p.bot).length,2);socket.emit('switchMode',{mode});await wait(50);assert.equal(state.mode,mode);assert.equal(state.players.length,1);assert.equal(state.started,false);assert.equal(state.seatingClosed,false);assert.equal(state.big,10);assert.equal(state.players[0].chips,1000);}
  }finally{socket?.disconnect();child.kill();}
 });
+
+test('spectators edit shared table settings before play and queue validated changes during a hand',async()=>{
+ const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3146'},stdio:'pipe'}),clients=[];
+ try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});
+ async function join(code,spectating=false){const s=io('http://localhost:3146',{transports:['websocket']});clients.push(s);let state,id;s.on('state',v=>state=v);s.on('identity',v=>id=v.id);await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Shared settings',spectating});await wait(50);return {s,get state(){return state;},get id(){return id;}};}
+ const a=await join(),b=await join(a.state.code),watch=await join(a.state.code,true);
+ const first={small:10,big:20,startingBank:2000,turnSeconds:45};watch.s.emit('settings',first);await wait(50);for(const c of [a,b,watch]){assert.equal(c.state.big,20);assert.equal(c.state.turnSeconds,45);}assert.equal(watch.state.players.find(p=>p.id===watch.id).spectating,true);
+ a.s.emit('start');await wait(50);watch.s.emit('settings',{...first,small:15,big:30,turnSeconds:60,startingBank:3000});await wait(50);assert.equal(a.state.big,20);assert.equal(a.state.pendingSettings.big,30);watch.s.emit('settings',{...first,big:0});await wait(30);assert.equal(a.state.pendingSettings.big,30);
+ const actor=[a,b].find(c=>c.id===a.state.players[a.state.turn].id);actor.s.emit('action',{type:'fold'});await wait(7800);assert.equal(a.state.big,30);assert.equal(b.state.turnSeconds,60);assert.equal(watch.state.startingBank,3000);assert.equal(a.state.players.reduce((n,p)=>n+p.chips+p.total,0),4000);
+ }finally{clients.forEach(s=>s.disconnect());child.kill();}
+});

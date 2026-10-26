@@ -10,7 +10,7 @@ test('private cards, illegal actions, all-in showdown and chip conservation',asy
  const a=await join(null,'Alice'),b=await join(a.state.code,'Bob'),c=await join(a.state.code,'Carol'),watcher=await join(a.state.code,'Watcher',true);const players=[a,b,c];
  assert.equal(a.state.turnSeconds,30);assert.equal(a.state.spectators.length,1);assert.equal(a.state.spectators[0].name,'Watcher');
  b.s.emit('settings',{small:10,big:20,startingBank:2000,turnSeconds:45});await wait(45);assert.equal(a.state.big,20);assert.equal(a.state.players[0].chips,2000);assert.equal(a.state.turnSeconds,45);
- watcher.s.emit('settings',{small:1,big:2,startingBank:100,turnSeconds:5});await wait(40);assert.equal(a.state.big,20);
+ watcher.s.emit('settings',{small:1,big:2,startingBank:100,turnSeconds:5});await wait(40);assert.equal(a.state.big,2);assert.equal(b.state.startingBank,100);
  b.s.emit('settings',{small:5,big:10,startingBank:1000,turnSeconds:30});await wait(40);
  a.s.emit('start');await wait(100);
  assert.equal(watcher.state.players.find(p=>p.id===a.id).cards[0],'?');assert.equal(watcher.state.players.find(p=>p.id===watcher.id).inHand,false);
