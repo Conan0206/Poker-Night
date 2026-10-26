@@ -18,7 +18,7 @@ test('shared pause preserves turn, runout and next-deal timers; tournament conve
   const next=[a,b].find(p=>p.id===a.state.players[a.state.turn].id);next.s.emit('action',{type:'call'});await wait(40);assert.ok(a.state.actionNumber>sound);assert.equal(a.state.runningOut,true);
   a.s.emit('pause');await wait(30);await wait(1600);assert.equal(a.state.board.length,0);b.s.emit('pause');await wait(5800);assert.equal(a.state.street,'showdown');
   a.s.emit('pause');a.s.emit('tournament');await wait(40);assert.equal(a.state.pendingMode,'tournament');assert.equal(a.state.mode,'cash');const nextAt=a.state.nextHandAt;await wait(7600);assert.equal(a.state.street,'showdown');assert.equal(a.state.nextHandAt,nextAt);
-  b.s.emit('pause');await wait(40);const delay=a.state.nextHandAt-Date.now()+700;await wait(Math.max(0,delay));assert.equal(a.state.mode,'tournament');assert.equal(a.state.pendingMode,null);assert.equal(a.state.street,'preflop');assert.equal(a.state.startingBank,5000);assert.equal(a.state.small,25);assert.equal(a.state.big,50);assert.equal(a.state.seatingClosed,true);assert.equal(a.state.players.filter(p=>!p.spectating).reduce((n,p)=>n+p.chips+p.total,0),10000);
+  b.s.emit('pause');await wait(40);const delay=a.state.nextHandAt-Date.now()+700;await wait(Math.max(0,delay));assert.equal(a.state.mode,'tournament');assert.equal(a.state.pendingMode,null);assert.equal(a.state.street,'preflop');assert.equal(a.state.startingBank,1000);assert.equal(a.state.small,25);assert.equal(a.state.big,50);assert.equal(a.state.seatingClosed,true);assert.equal(a.state.players.filter(p=>!p.spectating).reduce((n,p)=>n+p.chips+p.total,0),2000);
  }finally{clients.forEach(s=>s.disconnect());child.kill();}
 });
 

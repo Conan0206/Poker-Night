@@ -22,7 +22,7 @@
   ['[data-panel="collection"]','Customize your table','Choose a table felt and card-back design with the customize button.'],
   ['[data-panel="settings"]','Audio settings','Open Settings → Audio to adjust main audio, sound effects, and emote volume separately. Table settings, feedback, and recent updates have their own categories.'],
   ['#emoteToggle','Clash Royale emotes','Open the emote bank to send a reaction. Star favourites to put them first; use arrows, dots, or swipe to see more. Spectators can send emotes too.'],
-  ['#revealHands','Reveal a hand','The number in brackets is your remaining reveals. After a hand ends, choose a player or bot to reveal their cards. The button turns grey at zero. Change the allowance in Table settings.'],
+  ['#revealHands','Reveal a hand','In cash games, the number in brackets is your remaining reveals. Hand reveals are disabled in tournaments. After a hand ends, choose a player or bot to reveal their cards. The button turns grey at zero. Change the allowance in Table settings.'],
   ['#rabbit','Rabbit hunt','After a hand ends before the river, Rabbit appears beside the community cards. Reveal the undealt board to see what might have happened. It does not change the result.']
  ];
  const dialog=document.createElement('dialog');dialog.id='pokerTutorial';dialog.setAttribute('aria-label','Poker Night tutorial');
