@@ -12,6 +12,6 @@ export async function sendFeedbackEmail(feedback,{fetchImpl=fetch,enabled=proces
   });
   const result=await response.json();
   if(response.ok&&(result.success===true||result.success==='true'))return {ok:true};
-  return {ok:false};
- }catch{return {ok:false};}
+  return {ok:false,status:response.status,activationRequired:/activat/i.test(String(result.message||'')),reason:String(result.message||'Email service rejected the request').slice(0,300)};
+ }catch(error){return {ok:false,reason:error.name||'Network error'};}
 }
