@@ -145,3 +145,5 @@ body.tournamentTheme .seat .nameplate{min-width:0}body.tournamentTheme .seat .na
 body.tournamentTheme #leaderboardMenu .leaderboardPanel{background:#281d35;border:1px solid #a58a55;box-shadow:0 12px 30px #09041080}#leaderboardMenu .leaderboardSelf{background:#33263f}#leaderboardMenu .leaderboardPanel th{background:transparent}#leaderboardMenu .leaderboardPanel td{background:transparent}
 
 .feltChoices button:disabled{opacity:.3;filter:grayscale(1);cursor:not-allowed;box-shadow:none}.feltLockedNote{font-size:13px;color:#d6bc88;line-height:1.5}
+
+#actions:has(>.timeCard){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#actions:has(>.timeCard)>button{min-width:0;width:100%;font-size:13px;padding:10px 6px}#actions>.timeCard{color:#d8efb5;border-color:#789264;background:#26372b}#actions>.timeCard:disabled{opacity:.35}#actions:has(>.timeCard)>.raiseSizing{grid-column:1/-1}body.tournamentTheme #actions>.timeCard{color:#f1d18e;border-color:#aa8e56;background:#382742}@media(max-width:700px){#actions:has(>.timeCard){gap:4px}#actions:has(>.timeCard)>button{font-size:10px;padding:8px 3px}}
