@@ -28,8 +28,9 @@
  const dialog=document.createElement('dialog');dialog.id='pokerTutorial';dialog.setAttribute('aria-label','Poker Night tutorial');
  const spot=document.createElement('div');spot.className='tutorialSpotlight';spot.setAttribute('aria-hidden','true');
  const card=document.createElement('section');card.className='tutorialCard';
+ const preview=document.createElement('div');preview.className='tutorialPreview';preview.setAttribute('aria-hidden','true');
  const progress=document.createElement('small'),title=document.createElement('h2'),text=document.createElement('p'),buttons=document.createElement('div');buttons.className='tutorialButtons';
- const skip=document.createElement('button'),next=document.createElement('button');skip.textContent='Skip tutorial';next.className='primary';buttons.append(skip,next);card.append(progress,title,text,buttons);dialog.append(spot,card);document.body.append(dialog);
+ const skip=document.createElement('button'),next=document.createElement('button');skip.textContent='Skip tutorial';next.className='primary';buttons.append(skip,next);card.append(progress,title,preview,text,buttons);dialog.append(spot,card);document.body.append(dialog);
  let index=0,previousFocus,starting=false;
  function position(){
   if(!dialog.open)return;
@@ -44,7 +45,8 @@
   x=Math.max(12,Math.min(innerWidth-w-12,x));y=Math.max(12,Math.min(innerHeight-h-12,y));
   card.style.left=x+'px';card.style.top=y+'px';
  }
- function show(){progress.textContent='QUICK TOUR · '+(index+1)+' / '+steps.length;title.textContent=steps[index][1];text.textContent=steps[index][2];next.textContent=index===steps.length-1?'Finish tutorial':'Next';position();next.focus();}
+ function renderPreview(){preview.replaceChildren();preview.hidden=true;if(index===1){const sample=document.createElement('div');sample.className='tutorialDemoAvatar';const face=document.createElement('span');face.textContent='🤖';const kick=document.createElement('span');kick.className='tutorialDemoKick';kick.textContent='Kick';sample.append(face,kick);preview.append(sample);preview.hidden=false;}else if(steps[index][0]==='#rabbit'){const sample=document.getElementById('rabbit').cloneNode(true);sample.removeAttribute('id');sample.removeAttribute('hidden');sample.hidden=false;sample.className='tutorialRabbitPreview';sample.setAttribute('tabindex','-1');sample.setAttribute('inert','');preview.append(sample);preview.hidden=false;}}
+ function show(){renderPreview();progress.textContent='QUICK TOUR · '+(index+1)+' / '+steps.length;title.textContent=steps[index][1];text.textContent=steps[index][2];next.textContent=index===steps.length-1?'Finish tutorial':'Next';position();next.focus();}
  function finish(){localStorage.setItem('poker-tutorial-v1','done');dialog.close();previousFocus?.focus();}
  window.startPokerTutorial=()=>{if(dialog.open)return;previousFocus=document.activeElement;index=0;dialog.showModal();show();};
  skip.onclick=finish;next.onclick=()=>{if(index===steps.length-1)finish();else{index++;show();}};
