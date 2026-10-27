@@ -16,7 +16,7 @@ addEventListener('poker-state',({detail:{state,me}})=>{
  menu.hidden=state.mode!=='tournament';if(menu.hidden){menu.open=false;return;}
  const activeIds=new Set(state.players.filter(p=>!p.spectating&&!p.kicked).map(p=>p.id));const settledPlayers=(state.standings?.players||state.players).filter(p=>activeIds.has(p.id)),settledBig=state.standings?.big||state.big;
  eliminationBody.replaceChildren();for(const p of eliminationLeaderboard(settledPlayers)){const row=document.createElement('tr');if(p.id===me)row.className='leaderboardSelf';for(const value of [p.rank,(p.eliminationLeader?'🔥 ':'')+p.avatar+' '+p.name+(p.bot?' · BOT':''),p.eliminations.toLocaleString(undefined,{maximumFractionDigits:2})]){const td=document.createElement('td');td.textContent=String(value);row.append(td);}eliminationBody.append(row);}
- const entries=chipLeaderboard(settledPlayers,settledBig);note.textContent='★ Chip leader · BB = $'+settledBig.toLocaleString()+' · '+entries.length+' players · End of last hand';body.replaceChildren();
+ const entries=chipLeaderboard(settledPlayers,settledBig);const averageBB=entries.length?entries.reduce((sum,p)=>sum+p.bb,0)/entries.length:0;note.textContent='Average BB = '+averageBB.toLocaleString(undefined,{maximumFractionDigits:1})+' BB';body.replaceChildren();
  for(const p of entries){
   const row=document.createElement('tr');if(p.id===me)row.classList.add('leaderboardSelf');
   const rank=document.createElement('td');rank.textContent=String(p.rank);
