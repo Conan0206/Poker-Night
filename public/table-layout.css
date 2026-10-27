@@ -151,5 +151,5 @@ body{background:#101719}
 /* Show the real five community slots for the hand-ranking tutorial before dealing. */
 body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility:visible!important}body.tutorialCommunityHighlight #middle #start{display:none!important}
 
-/* Reserve the original amount in both modes so countdowns never shift the pots. */
+/* Reserve the widest chip and fractional BB text so every pot stays fixed during payouts. */
 .potAmount{display:grid}.potAmount>strong{grid-area:1/1;text-align:center;white-space:nowrap}.potAmount>.potSizer{visibility:hidden;pointer-events:none}
