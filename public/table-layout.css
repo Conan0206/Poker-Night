@@ -156,3 +156,6 @@ body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility
 
 /* Keep changing payout digits crisp, without shadow trails or crossfades. */
 #pot .potAmount strong,#pot .potAmount .bbAmount{text-shadow:none!important;filter:none;transition:none;animation:none}
+
+/* Currency, brackets and BB units never move as the digit counts change. */
+#pot .potAmount>strong:not(.potSizer){display:inline-flex;align-items:baseline;justify-content:center}#pot .potChipDigits,#pot .potBBDigits{display:inline-block;flex:none;text-align:right;font-variant-numeric:tabular-nums}body.tournamentTheme #pot .potAmount strong:not(.potSizer)>.bbAmount{display:inline-flex;align-items:baseline;gap:0;margin-left:.3em;white-space:nowrap}#pot .potBBUnit{margin-left:.3em}#pot .potCurrency,#pot .potBBOpen,#pot .potBBUnit,#pot .potBBClose{flex:none}
