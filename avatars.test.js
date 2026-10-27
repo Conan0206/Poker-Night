@@ -10,7 +10,7 @@ test('chosen avatars reach private, main, spectator and reconnect states; invali
   const host=await enter({avatar:'👻'});assert.equal(host.state.players[0].avatar,'👻');
   const guest=await enter({code:host.state.code,avatar:'🦊'});assert.equal(guest.state.players.find(p=>p.id===guest.identity.id).avatar,'🦊');assert.equal(guest.state.players.find(p=>p.id===host.identity.id).avatar,'👻');
   const main=await enter({code:'MAIN',avatar:'🐼'});assert.equal(main.state.players.find(p=>p.id===main.identity.id).avatar,'🐼');
-  const watcher=await enter({code:host.state.code,avatar:'🐸',spectating:true});const player=watcher.state.players.find(p=>p.id===watcher.identity.id);assert.equal(player.avatar,'🐸');assert.equal(player.spectating,true);
+  const watcher=await enter({code:host.state.code,avatar:'🐸',spectating:true});const player=watcher.state.players.find(p=>p.id===watcher.identity.id);assert.equal(player.avatar,'🐸');assert.equal(player.spectating,true);assert.equal(watcher.state.spectators.find(p=>p.id===watcher.identity.id).avatar,'🐸');
   const invalid=await enter({avatar:'<img src=x>'});assert.equal(invalid.state.players[0].avatar,'😎');
   host.socket.disconnect();const resumed=await enter({token:host.identity.token});assert.equal(resumed.state.players.find(p=>p.id===host.identity.id).avatar,'👻');
   resumed.socket.disconnect();const menuResume=await enter({token:host.identity.token,avatar:'🦄',fromMenu:true});const returning=menuResume.state.players.find(p=>p.id===host.identity.id);assert.equal(returning.avatar,'🦄');assert.equal(returning.hideHoleCards,true);assert.equal(returning.chips,host.state.players[0].chips);assert.equal(menuResume.state.players.filter(p=>p.id===host.identity.id).length,1);
