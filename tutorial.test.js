@@ -13,8 +13,8 @@ test('tutorial navigates every feature, opens on every entry after skipping, and
  assert.ok(header.children.includes(targets.sitDown));assert.equal(targets.revealHands.style.left,'638px');assert.equal(targets.revealHands.style.top,'607px');
  events['poker-entered']();events['poker-state']();timers.shift()();const dialog=nodes.find(e=>e.id==='pokerTutorial');assert.equal(dialog.open,true);
  const skip=nodes.find(e=>e.textContent==='Skip tutorial'),next=nodes.find(e=>e.textContent==='Next'),title=nodes.find(e=>e.tag==='h2');
- assert.equal(title.textContent,'Add a bot');targets.rabbit.hidden=true;const titles=[];
- for(let i=0;i<12;i++){titles.push(title.textContent);if(i===1)assert.ok(nodes.some(e=>e.textContent==='Kick'));if(i===11){assert.ok(nodes.some(e=>e.className==='tutorialRabbitPreview'));assert.equal(nodes.find(e=>e.className==='tutorialSpotlight').hidden,true);}next.onclick();}
+ assert.equal(title.textContent,'Add a bot');targets.rabbit.hidden=true;targets.revealHands.hidden=true;const titles=[];
+ for(let i=0;i<12;i++){titles.push(title.textContent);if(i===1)assert.ok(nodes.some(e=>e.textContent==='Kick'));if(i===9){assert.ok(nodes.some(e=>e.className==='tutorialRevealButton'&&e.textContent.includes('(3)')));assert.equal(nodes.find(e=>e.className==='tutorialSpotlight').hidden,true);}if(i===10){assert.ok(nodes.some(e=>e.className==='tutorialRankingCards'));assert.ok(nodes.some(e=>e.textContent==='★ Royal Flush'));}if(i===11){assert.ok(nodes.some(e=>e.className==='tutorialRabbitPreview'));assert.equal(nodes.find(e=>e.className==='tutorialSpotlight').hidden,true);}next.onclick();}
  assert.equal(dialog.open,false);assert.equal(saved.get('poker-tutorial-v1'),'done');assert.ok(titles.includes('Player statistics'));assert.ok(titles.includes('Rabbit hunt'));assert.ok(titles.includes('Audio settings'));assert.ok(titles.includes('Hand rankings'));
  window.startPokerTutorial();assert.equal(dialog.open,true);skip.onclick();assert.equal(dialog.open,false);
  events['poker-state']();assert.equal(timers.length,0);events['poker-entered']();timers.shift()();assert.equal(dialog.open,true);skip.onclick();
