@@ -26,7 +26,7 @@
  if(collect){for(const p of old.players){const now=s.players.find(q=>q.id===p.id),amount=p.round+Math.max(0,(now?.total||p.total)-p.total);if(amount>0)fly(amount,oldPositions.get(p.id)||stake(p.id),pot,bet?250:0);}if(!document.hidden)window.pokerEffects?.stack(bet?.65:.4);}
  if(s.street==='showdown'&&old.street!=='showdown'){
   const plan=window.pokerPayoutPlan(s),initialDelay=collect?850:200;window.animatePokerPotCounts(s,plan,initialDelay);
-  plan.forEach((award,i)=>{const origin=center(document.querySelectorAll('#pot .potAmount')[award.index])||pot,delay=initialDelay+window.pokerPayoutTiming.offset(i,award.index===0);for(const winner of award.winners)fly(winner.amount,origin,avatar(winner.id),delay,window.pokerPayoutTiming.duration);if(!document.hidden)window.pokerEffects?.stack((delay+window.pokerPayoutTiming.duration)/1000);});
+  plan.forEach((award,i)=>{const delay=initialDelay+window.pokerPayoutTiming.offset(i,award.index===0);if(!document.hidden)window.pokerEffects?.stack((delay+window.pokerPayoutTiming.duration)/1000);});
  }
  }
  window.addEventListener('poker-state',e=>update(e.detail.state));
