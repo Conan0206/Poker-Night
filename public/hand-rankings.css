@@ -14,3 +14,6 @@
 .rankCard b{font-size:inherit}
 @media(max-height:750px){.rankText small{display:none}.rankText strong{font-size:11px}.rankSummary{margin:5px 0}.rankHeading h2{font-size:18px}}
 @media(max-height:450px){#handRankings{top:12px}.rankCards{display:none}}
+
+/* The reference follows board hover only; it cannot keep itself open. */
+#handRankings{pointer-events:none}

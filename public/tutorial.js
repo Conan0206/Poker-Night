@@ -23,6 +23,7 @@
   ['[data-panel="settings"]','Audio settings','Open Settings → Audio to adjust main audio, sound effects, and emote volume separately. Table settings, feedback, and recent updates have their own categories.'],
   ['#emoteToggle','Clash Royale emotes','Open the emote bank to send a reaction. Star favourites to put them first; use arrows, dots, or swipe to see more. Spectators can send emotes too.'],
   ['#revealHands','Reveal a hand','In cash games, the number in brackets is your remaining reveals. Hand reveals are disabled in tournaments. After a hand ends, choose a player or bot to reveal their cards. The button turns grey at zero. Change the allowance in Table settings.'],
+  ['#board','Hand rankings','Hover over the five community-card slots to see the hand rankings and your current hand. Move outside those five slots and the guide disappears immediately. On touch screens, press and hold the cards.'],
   ['#rabbit','Rabbit hunt','After a hand ends before the river, Rabbit appears beside the community cards. Reveal the undealt board to see what might have happened. It does not change the result.']
  ];
  const dialog=document.createElement('dialog');dialog.id='pokerTutorial';dialog.setAttribute('aria-label','Poker Night tutorial');
@@ -35,6 +36,9 @@
  function position(){
   if(!dialog.open)return;
   let target=document.querySelector(steps[index][0]);
+  const rabbitDemo=steps[index][0]==='#rabbit'&&(!target||target.hidden||!target.getClientRects().length);
+  spot.hidden=rabbitDemo;dialog.setAttribute('data-preview-only',String(rabbitDemo));
+  if(rabbitDemo){card.style.left=Math.max(12,(innerWidth-card.offsetWidth)/2)+'px';card.style.top=Math.max(12,(innerHeight-card.offsetHeight)/2)+'px';return;}
   if(!target||!target.getClientRects().length)target=document.getElementById('board');
   const b=target.getBoundingClientRect(),padding=6;
   Object.assign(spot.style,{left:(b.left-padding)+'px',top:(b.top-padding)+'px',width:(b.width+padding*2)+'px',height:(b.height+padding*2)+'px'});

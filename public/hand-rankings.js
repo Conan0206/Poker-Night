@@ -4,7 +4,7 @@ const panel=document.createElement('aside');panel.id='handRankings';panel.hidden
 panel.setAttribute('aria-label','Hand rankings');
 const heading=document.createElement('div');heading.className='rankHeading';
 const title=document.createElement('h2');title.textContent='Hand rankings';
-const close=document.createElement('button');close.textContent='×';close.setAttribute('aria-label','Close hand rankings');heading.append(title,close);
+heading.append(title);
 const summary=document.createElement('p');summary.className='rankSummary';summary.textContent='Deal a hand to see your rank.';summary.setAttribute('aria-live','polite');
 const list=document.createElement('ol');list.className='rankList';
 const suits={s:'♠',h:'♥',d:'♦',c:'♣'};
@@ -16,19 +16,14 @@ for(const rank of handRankings){
  const text=document.createElement('span');text.className='rankText';const name=document.createElement('strong');name.textContent=rank.name;const description=document.createElement('small');description.textContent=rank.description;text.append(name,description);row.append(examples,text);list.append(row);rows.set(rank.id,row);
 }
 panel.append(heading,summary,list);document.body.append(panel);
-board.tabIndex=0;board.setAttribute('role','button');board.setAttribute('aria-label','Show hand rankings');board.setAttribute('aria-controls',panel.id);board.setAttribute('aria-expanded','false');
-let pinned=false,hideTimer;
-function show(){clearTimeout(hideTimer);panel.hidden=false;board.setAttribute('aria-expanded','true');}
-function hide(){clearTimeout(hideTimer);pinned=false;panel.hidden=true;board.setAttribute('aria-expanded','false');}
-function leave(){clearTimeout(hideTimer);hideTimer=setTimeout(()=>{if(!pinned&&!panel.matches(':hover')&&!board.matches(':hover')&&!panel.contains(document.activeElement)&&document.activeElement!==board)hide();},180);}
-board.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')show();});board.addEventListener('pointerleave',leave);
-board.addEventListener('focus',show);board.addEventListener('blur',leave);
-board.addEventListener('click',()=>{pinned=!pinned;if(pinned)show();else hide();});
-board.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pinned=!pinned;if(pinned)show();else hide();}});
-panel.addEventListener('pointerenter',()=>clearTimeout(hideTimer));panel.addEventListener('pointerleave',leave);panel.addEventListener('focusout',leave);
-close.addEventListener('click',()=>{board.focus();hide();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){board.focus();hide();}});
-document.addEventListener('pointerdown',e=>{if(!panel.hidden&&!panel.contains(e.target)&&!board.contains(e.target))hide();});
+board.tabIndex=0;board.setAttribute('role','group');board.setAttribute('aria-label','Community cards · hover for hand rankings');board.setAttribute('aria-controls',panel.id);board.setAttribute('aria-expanded','false');
+function show(){panel.hidden=false;board.setAttribute('aria-expanded','true');}
+function hide(){panel.hidden=true;board.setAttribute('aria-expanded','false');}
+board.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')show();});
+board.addEventListener('pointerleave',hide);board.addEventListener('pointercancel',hide);
+board.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')show();});board.addEventListener('pointerup',e=>{if(e.pointerType==='touch')hide();});
+board.addEventListener('focus',()=>{if(board.matches(':focus-visible'))show();});board.addEventListener('blur',hide);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hide();});
 window.addEventListener('poker-state',({detail:{state,me}})=>{
  const player=state.players.find(p=>p.id===me);
  const valid=player&&!player.spectating&&player.inHand&&state.street!=='waiting';
