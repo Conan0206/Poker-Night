@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';import {io} from 'socket.io-client';const wait=ms=>new Promise(r=>setTimeout(r,ms));
+test('same socket moves from private cash to main tournament and back to main cash without converting source rooms',async()=>{
+ const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3151'},stdio:'pipe'}),clients=[];
+ try{await new Promise((r,j)=>{child.stdout.once('data',r);child.once('error',j);});async function join(code){const s=io('http://localhost:3151',{transports:['websocket']});clients.push(s);let state,id;s.on('state',v=>state=v);s.on('identity',v=>id=v.id);await new Promise(r=>s.on('connect',r));s.emit('enter',{code,name:'Transfer tester'});await wait(50);return {s,get state(){return state;},get id(){return id;}};}
+ const a=await join(),sourceCode=a.state.code,b=await join(sourceCode),tour=await join('TOUR'),tour2=await join('TOUR'),cash=await join('MAIN');tour.s.emit('start');a.s.emit('start');await wait(40);const oldId=a.id;
+ await new Promise(r=>a.s.emit('leave',r));a.s.emit('enter',{code:'TOUR',name:'Transfer tester',fromMenu:true});await wait(60);assert.equal(a.state.code,'TOUR');assert.equal(a.state.mode,'tournament');assert.notEqual(a.id,oldId);assert.equal(a.state.players.find(p=>p.id===a.id).spectating,true);assert.equal(b.state.code,sourceCode);assert.equal(b.state.mode,'cash');assert.equal(b.state.players.find(p=>p.id===oldId).kicked,true);
+ await new Promise(r=>a.s.emit('leave',r));a.s.emit('enter',{code:'MAIN',name:'Transfer tester',fromMenu:true});await wait(60);assert.equal(a.state.code,'MAIN');assert.equal(a.state.mode,'cash');assert.equal(a.state.players.find(p=>p.id===a.id).spectating,false);assert.equal(tour.state.mode,'tournament');assert.equal(cash.state.players.filter(p=>!p.kicked&&!p.spectating).length,2);
+ }finally{clients.forEach(s=>s.disconnect());child.kill();}
+});

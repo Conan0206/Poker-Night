@@ -12,6 +12,7 @@ function joinFromMenu(data){
  if(data.code&&previous?.code===data.code.toUpperCase()&&previous.name===name&&(previous.spectating===!!data.spectating||['MAIN','TOUR'].includes(data.code.toUpperCase())))data.token=sessionStorage.getItem('river-token');
  socket.emit('enter',data);
 }
+window.moveToMainTable=(mode)=>{const self=state?.players.find(p=>p.id===me);if(!self||!socket.connected)return;const data={name:self.name,avatar:self.avatar,code:mode==='tournament'?'TOUR':'MAIN',mode,fromMenu:true};socket.emit('leave',()=>{sessionStorage.removeItem('river-token');sessionStorage.removeItem('poker-last-entry');me=null;state=null;if(!$('#welcome').open)$('#welcome').showModal();joinFromMenu(data);});};
 function enter(create,spectating=false){joinFromMenu({name:$('#name').value,avatar:$('#chosenAvatar').value,code:create?undefined:$('#code').value.trim(),mode:$('#mode').value,spectating});}
 $('#addbot').onclick=()=>state?socket.emit('addbot'):notice('Join a table first.');$('#sitDown').onclick=()=>openPanel('sit');
 $('#watch').onclick=()=>enter(false,true);$('#spectate').onclick=()=>{if(!state)return notice('Join a table first.');if(!state.players.find(p=>p.id===me)?.spectating)socket.emit('spectate');};
