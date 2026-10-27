@@ -153,3 +153,6 @@ body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility
 
 /* Reserve the widest chip and fractional BB text so every pot stays fixed during payouts. */
 .potAmount{display:grid}.potAmount>strong{grid-area:1/1;text-align:center;white-space:nowrap}.potAmount>.potSizer{visibility:hidden;pointer-events:none}
+
+/* Keep changing payout digits crisp, without shadow trails or crossfades. */
+#pot .potAmount strong,#pot .potAmount .bbAmount{text-shadow:none!important;filter:none;transition:none;animation:none}

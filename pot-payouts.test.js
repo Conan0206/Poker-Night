@@ -29,3 +29,9 @@ test('main and side pots reserve fractional BB space even when the initial BB is
  assert.equal(holder.children[0].children[1].children[2].children[0].textContent,' (888.8 BB)');assert.equal(holder.children[1].children[1].children[2].children[0].textContent,' (88.8 BB)');
  context.window.pokerPotPayout={key:'T:1',remaining:[1018,198]};context.renderPots({mode:'tournament',big:10,code:'T',handNumber:1,pots:[{kind:'main',amount:1040},{kind:'side',amount:200}]});assert.equal(holder.children[0].children[1].children[2].children[0].textContent,' (888.8 BB)');
 });
+
+test('payout updates existing chip and BB text without rebuilding nodes',()=>{
+ let frame;const w={},text={nodeType:3,nodeValue:'$1,040'},bb={textContent:' (104 BB)'},el={firstChild:text,querySelector:()=>bb};
+ vm.runInNewContext(readFileSync('public/pot-payouts.js','utf8'),{window:w,matchMedia:()=>({matches:false}),performance:{now:()=>0},requestAnimationFrame:fn=>frame=fn,document:{querySelector:()=>el},tournamentBB:amount=>' ('+(amount/10)+' BB)',appendTournamentBB(){throw Error('Must preserve the existing BB node');}});
+ w.animatePokerPotCounts({mode:'tournament',code:'T',handNumber:1,pots:[{kind:'main',amount:1040}]},[{index:0,amount:1040}],0);frame(1000);assert.equal(text.nodeValue,'$780');assert.equal(bb.textContent,' (78 BB)');frame(4000);assert.equal(text.nodeValue,'$0');assert.equal(bb.textContent,' (0 BB)');assert.equal(el.firstChild,text);
+});
