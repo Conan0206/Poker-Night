@@ -10,7 +10,7 @@ for(const label of ['Rank','Player','Stack','BB']){const th=document.createEleme
 const body=document.createElement('tbody');table.append(head,body);panel.append(title,note,table);const eliminationTitle=document.createElement('h3');eliminationTitle.className='eliminationTitle';eliminationTitle.textContent='🔥 Most eliminations';
 const eliminationNote=document.createElement('p');eliminationNote.className='leaderboardNote';eliminationNote.textContent='This tournament · tied pot knockouts share credit';
 const eliminationTable=document.createElement('table'),eliminationHead=document.createElement('thead'),eliminationRow=document.createElement('tr'),eliminationBody=document.createElement('tbody');
-for(const label of ['Rank','Player','Eliminations']){const th=document.createElement('th');th.textContent=label;th.scope='col';eliminationRow.append(th);}eliminationHead.append(eliminationRow);eliminationTable.append(eliminationHead,eliminationBody);panel.append(eliminationTitle,eliminationNote,eliminationTable);menu.append(toggle,panel);
+for(const label of ['Rank','Player','Eliminations']){const th=document.createElement('th');th.textContent=label;th.scope='col';eliminationRow.append(th);}eliminationHead.append(eliminationRow);eliminationTable.append(eliminationHead,eliminationBody);panel.append(eliminationTitle,eliminationNote,eliminationTable);const chipColumn=document.createElement('div'),eliminationColumn=document.createElement('div');chipColumn.className=eliminationColumn.className='leaderboardColumn';chipColumn.append(title,note,table);eliminationColumn.append(eliminationTitle,eliminationNote,eliminationTable);panel.replaceChildren(chipColumn,eliminationColumn);menu.append(toggle,panel);
 document.querySelector('[data-panel="history"]').before(menu);
 addEventListener('poker-state',({detail:{state,me}})=>{
  menu.hidden=state.mode!=='tournament';if(menu.hidden){menu.open=false;return;}
@@ -31,3 +31,6 @@ menu.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&!menu.conta
 menu.addEventListener('focusout',e=>{if(!menu.contains(e.relatedTarget))menu.open=false;});
 menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;toggle.focus();}});
 document.addEventListener('pointerdown',e=>{if(!menu.contains(e.target))menu.open=false;});
+
+function fitStandings(){if(!menu.open)return;const available=Math.max(100,innerHeight-toggle.getBoundingClientRect().bottom-16);const scale=Math.min(1,available/panel.offsetHeight);panel.style.zoom=String(Math.floor(scale*1000)/1000);}
+menu.addEventListener('toggle',fitStandings);new ResizeObserver(fitStandings).observe(panel);addEventListener('resize',fitStandings);
