@@ -5,14 +5,16 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 27 October 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
-  'Added chip and BB leaderboards with chip-leader stars.',
-  'Added two-way Cash/Tournament switching.',
-  'Improved tournament blinds, timing, and starting-stack settings.',
-  'Enlarged Pause/Resume and fixed control placement.',
-  'Added tournament colours and an expandable blind schedule.',
-  'Added a guided tutorial and settings categories.',
-  'Added feedback and cash-game hand reveals.',
-  'Improved emotes, audio, card animations, and countdowns.'
+  'Join the main cash or tournament table from the homepage or mode switch.',
+  'Tournament raises use BB, with half-BB controls and flexible typed values.',
+  'Leaderboards show seated players and refresh after each completed hand.',
+  'Added elimination rankings and a champion celebration with party blowers.',
+  'Improved bet placement and made tournament BB amounts clearer.',
+  'Added tournament reset beside Sit down to reopen seating.',
+  'Added adjustable time cards beside the action panel.',
+  'Hand rankings appear on community-card hover; tutorial highlights are improved.',
+  'Homepage fits one screen; Settings opens on Table settings.',
+  'Tournament card backs remain customizable while the felt stays fixed.'
  ]){const li=document.createElement('li');li.textContent=text;list.append(li);}updates.append(list);
  const feedback=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Write feedback';feedback.append(summary);
  const intro=document.createElement('p');intro.className='fine';intro.textContent='Suggest an improvement or report a problem. Your table name and feedback are emailed to the game owner through FormSubmit. A backup is saved in server logs.';feedback.append(intro);
