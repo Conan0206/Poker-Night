@@ -9,7 +9,7 @@
  function placeWager(id,pile,occupied){
   const seat=document.querySelector('.seat[data-id="'+id+'"]'),avatar=seat?.querySelector('.avatar');if(!avatar)return null;
   const felt=document.querySelector('#table .felt').getBoundingClientRect(),size=pile.getBoundingClientRect();
-  const obstacles=[...document.querySelectorAll('.seat .avatar,.seat .nameplate,.seat .seatActionBadge,.seatCards,#myCards,#pot .potBadge,#street,#board,#result,#sitDown,#start,#rabbit')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
+  const obstacles=[...document.querySelectorAll('.seat .avatar,.seat .nameplate,.seat .seatActionBadge,.seatCards,#myCards,#pot .potBadge,#street,#board,#result,#sitDown,#start,#rabbit')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&(el.id!=='result'||el.textContent.trim())).map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
   const best=window.findPokerWagerPosition({felt,avatar:avatar.getBoundingClientRect(),width:size.width,height:size.height,obstacles,occupied,self:seat.classList.contains('self')});
   if(best){occupied.push(best.rect);wagerPositions.set(id,{x:best.x,y:best.y});}return best;
  }

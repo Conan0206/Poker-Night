@@ -10,3 +10,10 @@ test('top wager stays near the avatar and wholly inside the felt; own wager stay
 test('all other seats keep wagers within the oval without covering avatars',()=>{
  const felt=rect(30,80,1000,450);for(const [x,y]of [[85,305],[220,155],[850,155],[970,305],[850,440],[220,440]]){const avatar=rect(x-35,y-35,70,70);const at=place({felt,avatar,width:110,height:32,obstacles:[avatar]});assert.ok(at);inside(at,felt);assert.ok(Math.hypot(at.x-x,at.y-y)<200);assert.ok(at.rect.right<=avatar.left||at.rect.left>=avatar.right||at.rect.bottom<=avatar.top||at.rect.top>=avatar.bottom);}
 });
+
+test('eight-player table keeps every wager clear and YOU wager directly beside its avatar',()=>{
+ const felt=rect(200,210,1400,440),avatars=[rect(850,530,100,100),rect(390,550,80,80),rect(190,390,80,80),rect(390,240,80,80),rect(860,175,80,80),rect(1330,240,80,80),rect(1530,390,80,80),rect(1330,550,80,80)];
+ const plates=[rect(810,635,180,120),rect(480,530,140,120),rect(285,377,140,120),rect(480,220,140,115),rect(950,155,140,115),rect(1425,220,140,115),rect(1625,377,140,120),rect(1425,530,140,120)];
+ const obstacles=[...avatars,...plates,rect(690,415,450,115),rect(810,345,180,60),rect(870,310,65,20)],occupied=[];
+ for(let i=0;i<avatars.length;i++){const at=place({felt,avatar:avatars[i],width:145,height:36,obstacles,occupied,self:i===0});assert.ok(at,'seat '+i+' has a visible wager');inside(at,felt);if(i===0){assert.ok(at.rect.left>=avatars[0].right);assert.ok(at.rect.left-avatars[0].right<=30);}occupied.push(at.rect);}
+});
