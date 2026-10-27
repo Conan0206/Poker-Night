@@ -1,0 +1,19 @@
+/* Screen-coordinate geometry shared by every seat and game mode. */
+(()=>{
+ window.findPokerWagerPosition=({felt,avatar,width,height,obstacles=[],occupied=[],self=false})=>{
+  const cx=felt.left+felt.width/2,cy=felt.top+felt.height/2,rx=felt.width/2-8,ry=felt.height/2-8,pad=5;
+  if(rx<=0||ry<=0)return null;
+  const ax=avatar.left+avatar.width/2,ay=avatar.top+avatar.height/2,dx=cx-ax,dy=cy-ay,d=Math.hypot(dx,dy)||1;
+  const preferred=self?{x:avatar.right+width/2+10,y:ay-8}:{x:ax+dx/d*(avatar.width/2+width/3+18),y:ay+dy/d*(avatar.height/2+height/2+14)};
+  let best=null,score=Infinity;
+  for(let y=felt.top+height/2+pad;y<felt.bottom-height/2-pad;y+=6)for(let x=felt.left+width/2+pad;x<felt.right-width/2-pad;x+=6){
+   if(self&&x-width/2<avatar.right+6)continue;
+   const rect={left:x-width/2-pad,right:x+width/2+pad,top:y-height/2-pad,bottom:y+height/2+pad};
+   if([rect.left,rect.right].some(px=>[rect.top,rect.bottom].some(py=>((px-cx)/rx)**2+((py-cy)/ry)**2>1)))continue;
+   if([...obstacles,...occupied].some(r=>rect.left<r.right&&rect.right>r.left&&rect.top<r.bottom&&rect.bottom>r.top))continue;
+   const distance=(x-preferred.x)**2+(y-preferred.y)**2;
+   if(distance<score){score=distance;best={x,y,rect};}
+  }
+  return best;
+ };
+})();
