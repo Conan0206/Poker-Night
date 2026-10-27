@@ -1,6 +1,6 @@
 (() => {
  const sit=document.getElementById('sitDown');
- document.querySelector('.headerLeftActions').append(sit);
+ document.querySelector('.headerLeftActions').append(sit);const resetTournament=document.getElementById('resetTournament');if(resetTournament)document.querySelector('.headerLeftActions').append(resetTournament);
  const reveal=document.getElementById('revealHands'),emote=document.getElementById('emoteToggle');
  function positionReveal(){
   if(reveal.hidden)return;
