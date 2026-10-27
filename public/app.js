@@ -60,6 +60,7 @@ function compactActions(){
  const remaining=[...actions.children].filter(el=>el!==fold&&el!==call&&el!==time);sizing.append(...remaining);
  const toggle=document.createElement('button');toggle.textContent='Raise';toggle.className='primary raiseToggle';toggle.setAttribute('aria-expanded',String(raiseExpanded));toggle.onclick=()=>{raiseExpanded=!raiseExpanded;sizing.hidden=!raiseExpanded;toggle.setAttribute('aria-expanded',String(raiseExpanded));};
  const close=button('✕',()=>{resetAllIn();raiseExpanded=false;sizing.hidden=true;toggle.setAttribute('aria-expanded','false');toggle.focus();},sizing);close.className='closeSizing';close.setAttribute('aria-label','Close raise sizing');raise.textContent='Confirm $'+sizing.querySelector('input[type=number]').value;
+ if(state.mode==='tournament'){window.setupTournamentRaise(sizing,state,state.players.find(p=>p.id===me),close);actions.replaceChildren(...[call,fold,toggle,sizing].filter(Boolean));return;}
  const presets=[...sizing.querySelectorAll('.betPreset')];presets.forEach((button,i)=>{if(i>0&&i<4)button.textContent=['','¼','½','¾'][i];});
  const number=sizing.querySelector('input[type=number]');const syncLabel=()=>{raise.textContent='Confirm $'+Number(number.value).toLocaleString();};sizing.addEventListener('input',()=>{resetAllIn();syncLabel();});sizing.addEventListener('click',e=>{if(!e.target.closest('.allInPreset'))resetAllIn();});sizing.addEventListener('click',syncLabel);
  actions.replaceChildren(...[call,fold,toggle,sizing].filter(Boolean));
