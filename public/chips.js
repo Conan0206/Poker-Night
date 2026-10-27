@@ -10,7 +10,8 @@
   const seat=document.querySelector('.seat[data-id="'+id+'"]'),avatar=seat?.querySelector('.avatar');if(!avatar)return null;
   const felt=document.querySelector('#table .felt').getBoundingClientRect(),size=pile.getBoundingClientRect();
   const obstacles=[...document.querySelectorAll('.seat .avatar,.seat .nameplate,.seat .seatActionBadge,.seatCards,#myCards,#pot .potBadge,#street,#board,#result,#sitDown,#start,#rabbit')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&(el.id!=='result'||el.textContent.trim())).map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
-  const best=window.findPokerWagerPosition({felt,avatar:avatar.getBoundingClientRect(),width:size.width,height:size.height,obstacles,occupied,self:seat.classList.contains('self')});
+  const tail=[...document.querySelectorAll('#board .card')].slice(3).map(el=>el.getBoundingClientRect());const communityAnchor=tail.length===2?{left:tail[0].left,right:tail[1].right,bottom:Math.max(tail[0].bottom,tail[1].bottom)}:null;
+  const best=window.findPokerWagerPosition({felt,avatar:avatar.getBoundingClientRect(),width:size.width,height:size.height,obstacles,occupied,self:seat.classList.contains('self'),communityAnchor});
   if(best){occupied.push(best.rect);wagerPositions.set(id,{x:best.x,y:best.y});}return best;
  }
  function stack(amount){const group=document.createElement('span');group.className='tableChipStack';let left=amount,count=0;for(const [value,color] of denominations){const n=Math.min(3,Math.floor(left/value));left%=value;for(let i=0;i<n&&count<7;i++,count++){const chip=document.createElement('i');chip.className='pokerChip';chip.dataset.value=value===1000?'1K':String(value);if(value===500)chip.style.setProperty('--chip-ink','#43350c');chip.style.setProperty('--chip-color',color);chip.style.left=(count%2)*9+'px';chip.style.top=(-Math.floor(count/2)*5)+'px';group.append(chip);}}return group;}

@@ -17,3 +17,8 @@ test('eight-player table keeps every wager clear and YOU wager directly beside i
  const obstacles=[...avatars,...plates,rect(690,415,450,115),rect(810,345,180,60),rect(870,310,65,20)],occupied=[];
  for(let i=0;i<avatars.length;i++){const at=place({felt,avatar:avatars[i],width:145,height:36,obstacles,occupied,self:i===0});assert.ok(at,'seat '+i+' has a visible wager');inside(at,felt);if(i===0){assert.ok(at.rect.left>=avatars[0].right);assert.ok(at.rect.left-avatars[0].right<=30);}occupied.push(at.rect);}
 });
+
+test('own wager is anchored directly below the turn and river slots',()=>{
+ const felt=rect(200,200,1400,450),avatar=rect(860,520,96,96),board=rect(695,406,428,113),anchor={left:956,right:1123,bottom:519};
+ const at=place({felt,avatar,width:145,height:36,obstacles:[avatar,board,rect(820,625,180,120)],self:true,communityAnchor:anchor});assert.ok(at);inside(at,felt);assert.ok(at.rect.top>=anchor.bottom);assert.ok(Math.abs(at.x-(anchor.left+anchor.right)/2)<10);assert.ok(at.y-anchor.bottom<45);
+});
