@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';import {io} from 'socket.io-client';const wait=ms=>new Promise(r=>setTimeout(r,ms));
+test('main tournament is shared, separate from cash, and full or started joins watch safely',async()=>{
+ const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3148'},stdio:'pipe'}),clients=[];
+ try{await new Promise((r,j)=>{child.stdout.once('data',r);child.once('error',j);});async function join(data){const s=io('http://localhost:3148',{transports:['websocket']});clients.push(s);let state,identity;s.on('state',v=>state=v);s.on('identity',v=>identity=v);await new Promise(r=>s.on('connect',r));s.emit('enter',{name:'Main tournament test',...data});await wait(50);assert.ok(identity);return {s,get state(){return state;},get identity(){return identity;}};}
+ const a=await join({code:'TOUR',mode:'cash'}),b=await join({code:'TOUR'});assert.equal(a.state.code,'TOUR');assert.equal(b.state.mode,'tournament');assert.equal(a.state.players.length,2);const cash=await join({code:'MAIN',mode:'tournament'});assert.equal(cash.state.mode,'cash');assert.equal(cash.state.players.length,1);
+ for(let i=0;i<6;i++)await join({code:'TOUR'});const watcher=await join({code:'TOUR'});assert.equal(watcher.state.players.find(p=>p.id===watcher.identity.id).spectating,true);a.s.emit('start');await wait(40);assert.equal(a.state.seatingClosed,true);const late=await join({code:'TOUR'});assert.equal(late.state.players.find(p=>p.id===late.identity.id).spectating,true);
+ const token=watcher.identity.token;watcher.s.disconnect();const resumed=await join({code:'TOUR',token});assert.equal(resumed.state.players.find(p=>p.id===resumed.identity.id).spectating,true);assert.equal(resumed.identity.id,watcher.identity.id);
+ }finally{clients.forEach(s=>s.disconnect());child.kill();}
+});
