@@ -147,3 +147,6 @@ body{background:#101719}
 
 /* Only the visible street label reserves space; its full row must not displace wagers. */
 #middle #street{width:fit-content;max-width:100%;min-width:0}
+
+/* Show the real five community slots for the hand-ranking tutorial before dealing. */
+body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility:visible!important}body.tutorialCommunityHighlight #middle #start{display:none!important}
