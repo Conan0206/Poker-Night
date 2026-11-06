@@ -17,7 +17,7 @@
   ['.seat:not(.self) .avatar','Kick a bot','When table management is available, hover a bot avatar and choose Kick, then confirm. On touch screens the Kick control is shown on the avatar.'],
   ['.seat .avatar','Player statistics','Click a player or bot avatar to see VPIP, preflop raises, hands played, and aggression for this table.'],
   ['#soundToggle','Game sound','Use the music icon to mute or unmute game sounds.'],
-  ['#notificationToggle','Turn notifications','Use the bell to enable browser notifications for your turn and all-ins. Popups appear only while you are away from this tab. Your browser may ask for permission.'],
+  ['#notificationToggle','Turn notifications','Enable turn alerts before joining, or use the bell later. Pop-ups appear when you switch tabs or apps. Try Send test notification in Settings → Audio. Your browser may ask for permission.'],
   ['#fullscreen','Fullscreen','Expand the table into fullscreen for more space. Use the same button or Escape to leave fullscreen.'],
   ['[data-panel="collection"]','Customize your table','Choose a table felt and card-back design with the customize button.'],
   ['[data-panel="settings"]','Audio settings','Open Settings → Audio to adjust main audio, sound effects, and emote volume separately. Table settings, feedback, and recent updates have their own categories.'],

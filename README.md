@@ -83,3 +83,12 @@ Cash-game Reveal hand exposes a chosen hidden hand only in the requesting viewer
 
 
 Run-twice hand history stores a public snapshot of both boards and aggregates each player's winnings per run. Main/side-pot breakdowns are collapsed by default; uncalled chips are listed separately from winnings. No private hole cards or reveal maps are added to history. Older repeated Run 1/Run 2 messages are grouped when their full format can be recognized. Tournament BB formatting and blind-level dividers remain in place.
+
+
+## Notification permission and diagnostics
+
+A first-time player choosing Join/Create/Watch sees an optional turn-alert setup before the socket enters the table. Enable alerts requests browser permission from that explicit click; Not now continues without alerts. Granted, enabled permissions and saved choices avoid repeat prompts. Table entry remains available when notifications are unsupported or denied. Reconnects do not prompt. Each person's preference stays in local storage; the bell toggles it.
+
+Turn/all-in notifications are sent while the table is hidden or unfocused, and are suppressed while actively focused or paused. Settings → Audio → Browser notifications includes a Send test notification button that bypasses the away-only filter, plus Chrome/Windows troubleshooting instructions. A successful constructor/test-send does not prove Windows displayed a banner; Chrome permission, Windows app banners and Do not disturb can independently affect presentation. No website can override a browser-denied permission or Windows notification policy.
+
+The individual reveal list contains human players only. Bots are exposed through Reveal all bot hands; privacy, post-hand timing and cash/Training allowances remain unchanged.
