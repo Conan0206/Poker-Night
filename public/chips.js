@@ -11,7 +11,7 @@
   const felt=document.querySelector('#table .felt').getBoundingClientRect(),size=pile.getBoundingClientRect();
   const obstacles=[...document.querySelectorAll('.seat .avatar,.seat .nameplate,.seat .seatActionBadge,.seatCards,#myCards,#pot .potBadge,#street,#board,#result,#sitDown,#start,#rabbit')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&(el.id!=='result'||el.textContent.trim())).map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
   const tail=[...document.querySelectorAll('#board .card')].slice(3).map(el=>el.getBoundingClientRect());const communityAnchor=tail.length===2?{left:tail[0].left,right:tail[1].right,bottom:Math.max(tail[0].bottom,tail[1].bottom)}:null;
-  const a=avatar.getBoundingClientRect(),plate=seat.querySelector('.nameplate').getBoundingClientRect(),order=Number(seat.dataset.seatOrder),count=document.querySelectorAll('.seat').length;let target=null;if(count===8){if(order===1)target={x:plate.right+size.width/2+12,y:a.top-size.height/2-5};if(order===2)target={x:plate.right+size.width/2+12,y:a.top+a.height/2};if(order===3)target={x:plate.right+size.width/2+12,y:plate.bottom+size.height/2+30};if(order===5)target={x:a.left-size.width/2-12,y:a.bottom+size.height/2+12};if(order===7)target={x:a.right+size.width/2+14,y:a.top-size.height/2-12};}
+  const a=avatar.getBoundingClientRect(),plate=seat.querySelector('.nameplate').getBoundingClientRect(),order=Number(seat.dataset.seatOrder),count=document.querySelectorAll('.seat').length;let target=null;if(count===8){if(order===1)target={x:plate.right+size.width/2+12,y:a.top-size.height/2-5};if(order===2)target={x:plate.right+size.width/2+12,y:a.top+a.height/2};if(order===3)target={x:plate.right+size.width/2+12,y:plate.bottom+size.height/2+30};if(order===5)target={x:a.left-size.width/2-12,y:a.bottom+size.height/2+12};if(order===7)target={x:a.left-size.width/2-14,y:a.top-size.height/2-12};}
   const best=window.findPokerWagerPosition({felt,avatar:avatar.getBoundingClientRect(),width:size.width,height:size.height,obstacles,occupied,target,self:seat.classList.contains('self'),communityAnchor});
   if(best){occupied.push(best.rect);wagerPositions.set(id,{x:best.x,y:best.y});}return best;
  }
@@ -27,7 +27,7 @@
  if(collect){for(const p of old.players){const now=s.players.find(q=>q.id===p.id),amount=p.round+Math.max(0,(now?.total||p.total)-p.total);if(amount>0)fly(amount,oldPositions.get(p.id)||stake(p.id),pot,bet?250:0);}if(!document.hidden)window.pokerEffects?.stack(bet?.65:.4);}
  if(s.street==='showdown'&&old.street!=='showdown'){
   const plan=window.pokerPayoutPlan(s),initialDelay=collect?850:200;window.animatePokerPotCounts(s,plan,initialDelay);
-  plan.forEach((award,i)=>{const delay=initialDelay+window.pokerPayoutTiming.offset(i,award.index===0);if(!document.hidden)window.pokerEffects?.stack((delay+window.pokerPayoutTiming.duration)/1000);});
+  plan.forEach((award,i)=>{const delay=initialDelay+window.pokerPayoutTiming.offset(i,award.index===0);const origin=center(document.querySelectorAll('#pot .potAmount')[award.index])||pot;for(const winner of award.winners)fly(winner.amount,origin,avatar(winner.id),delay+window.pokerPayoutTiming.duration-650,650);if(!document.hidden)window.pokerEffects?.stack((delay+window.pokerPayoutTiming.duration)/1000);});
  }
  }
  window.addEventListener('poker-state',e=>update(e.detail.state));
