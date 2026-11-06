@@ -16,7 +16,7 @@ window.moveToMainTable=(mode)=>{const self=state?.players.find(p=>p.id===me);if(
 window.joinDirectoryTable=(code)=>joinFromMenu({code,name:$('#name').value,avatar:$('#chosenAvatar').value,spectating:true});
 function enter(create,spectating=false){joinFromMenu({name:$('#name').value,avatar:$('#chosenAvatar').value,code:create?undefined:$('#code').value.trim(),mode:$('#mode').value,spectating});}
 $('#addbot').onclick=()=>state?socket.emit('addbot'):notice('Join a table first.');$('#sitDown').onclick=()=>openPanel('sit');
-$('#watch').onclick=()=>enter(false,true);$('#spectate').onclick=()=>{if(!state)return notice('Join a table first.');if(!state.players.find(p=>p.id===me)?.spectating)socket.emit('spectate');};
+$('#spectate').onclick=()=>{if(!state)return notice('Join a table first.');if(!state.players.find(p=>p.id===me)?.spectating)socket.emit('spectate');};
 $('#create').onclick=()=>enter(true);$('#join').onclick=()=>enter(false);$('#welcome').addEventListener('cancel',e=>e.preventDefault());
 // A new page always starts at the menu; only an interrupted live game reconnects automatically.
 const lastEntry=JSON.parse(sessionStorage.getItem('poker-last-entry')||'null');if(lastEntry?.name)$('#name').value=lastEntry.name;
