@@ -2,9 +2,11 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const section=document.createElement('section');section.className='settingsCommunity';
  const updates=document.createElement('details');
  const title=document.createElement('summary');title.textContent='What’s new · Recent improvements';updates.append(title);
- const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 27 October 2026';updates.append(date);
+ const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Watch the live Bot arena and browse public or locked private tables from the homepage.',
+  'Added resumable offline bot training with tested, versioned strategy updates.',
   'Join the main cash or tournament table from the homepage or mode switch.',
   'Tournament raises use BB, with half-BB controls and flexible typed values.',
   'Leaderboards show seated players and refresh after each completed hand.',

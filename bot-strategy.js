@@ -35,7 +35,7 @@ export function decideBot(view,random=Math.random){
   if(call>big*8&&quality<.68&&equity<odds+.1)return {type:'fold'};
   return passive();
  }
- const f=boardFeatures(hole,board),draw=f.flushDraw||f.straightDraw;const tactic=postflopTactic(view,{equity,features:f},random);if(tactic)return tactic;const station=(view.opponentModels||[]).some(m=>m.facedBets>=12&&m.foldsToBet/m.facedBets<.25||m.hands>=20&&m.vpip/m.hands>.48);
+ const f=boardFeatures(hole,board),draw=f.flushDraw||f.straightDraw;const tactic=view.tacticsEvaluated?null:postflopTactic(view,{equity,features:f},random);if(tactic)return tactic;const station=(view.opponentModels||[]).some(m=>m.facedBets>=12&&m.foldsToBet/m.facedBets<.25||m.hands>=20&&m.vpip/m.hands>.48);
  const opponentsAggressive=(view.opponentModels||[]).some(m=>m.hands>=8&&m.actions>0&&m.aggressive/m.actions>.45);
  const margin=.012+(commitment>.35?.025:0)+(opponents>2?.025:0)-(opponentsAggressive?.012:0);
  if(call&&equity<odds+margin){

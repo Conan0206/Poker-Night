@@ -59,7 +59,8 @@
  addEventListener('resize',position);window.visualViewport?.addEventListener('resize',position);
  function scheduleEntryTutorial(){if(!entryPending||starting)return;starting=true;setTimeout(()=>{starting=false;if(!entryPending)return;if(!document.querySelector('dialog[open]')){entryPending=false;window.startPokerTutorial();}},600);}
  addEventListener('poker-entered',()=>{entryPending=true;scheduleEntryTutorial();});
- addEventListener('poker-state',()=>{
+ addEventListener('poker-state',event=>{
+  if(event?.detail?.state?.practice){entryPending=false;if(dialog.open)finish();return;}
   requestAnimationFrame(()=>{positionReveal();position();});
   scheduleEntryTutorial();
  });

@@ -25,7 +25,7 @@ export function rangeEquity(view,random=Math.random){
  const {hole,board,opponents}=view,known=[...hole,...board];
  if(hole.length!==2||board.length>5||new Set(known).size!==known.length||known.some(c=>! /^[2-9TJQKA][shdc]$/.test(c)))throw Error('Invalid bot cards');
  const deck=[...'23456789TJQKA'].flatMap(r=>[...'shdc'].map(s=>r+s)).filter(c=>!known.includes(c));
- const count=clamp(opponents,1,7),samples=board.length?700:500;let equity=0;
+ const count=clamp(opponents,1,7),samples=Number.isInteger(view.equitySamples)?clamp(view.equitySamples,16,700):(board.length?700:500);let equity=0;
  for(let sample=0;sample<samples;sample++){
   const pool=deck.slice(),villains=[];
   for(let n=0;n<count;n++){

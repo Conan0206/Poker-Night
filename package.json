@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
     "test": "node --test",
-    "db:check": "node --env-file-if-exists=.env scripts/check-database.js"
+    "db:check": "node --env-file-if-exists=.env scripts/check-database.js",
+    "train:nightly": "node --env-file-if-exists=.env scripts/train-bots.js",
+    "train:check": "node --env-file-if-exists=.env scripts/train-bots.js --smoke --seconds=45"
   },
   "engines": {
     "node": ">=22"

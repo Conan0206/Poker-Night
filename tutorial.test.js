@@ -19,4 +19,5 @@ test('tutorial navigates every feature, opens on every entry after skipping, and
  assert.equal(dialog.open,false);assert.equal(saved.get('poker-tutorial-v1'),'done');assert.ok(titles.includes('Player statistics'));assert.ok(titles.includes('Rabbit hunt'));assert.ok(titles.includes('Audio settings'));assert.ok(titles.includes('Hand rankings'));
  window.startPokerTutorial();assert.equal(dialog.open,true);skip.onclick();assert.equal(dialog.open,false);
  events['poker-state']();assert.equal(timers.length,0);events['poker-entered']();timers.shift()();assert.equal(dialog.open,true);skip.onclick();
+ events['poker-entered']();events['poker-state']({detail:{state:{practice:true}}});timers.shift()();assert.equal(dialog.open,false);
 });

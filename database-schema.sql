@@ -9,3 +9,14 @@ CREATE TABLE IF NOT EXISTS poker_hand_actions (
  context jsonb NOT NULL, action jsonb NOT NULL, PRIMARY KEY(hand_id,ordinal)
 );
 CREATE INDEX IF NOT EXISTS poker_hands_finished_at ON poker_hands(finished_at);
+CREATE TABLE IF NOT EXISTS poker_training_runs (
+ id uuid PRIMARY KEY, report jsonb NOT NULL,
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS poker_bot_policies (
+ id text PRIMARY KEY, parent_id text, params jsonb NOT NULL,
+ metrics jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS poker_active_policy (
+ singleton integer PRIMARY KEY CHECK(singleton=1), policy_id text NOT NULL
+);
