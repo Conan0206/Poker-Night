@@ -18,3 +18,6 @@
   return best;
  };
 })();
+
+/* Panel placement uses seat, card and control rectangles as hard exclusions. */
+window.findPokerPanelPosition=({width,height,viewportWidth,viewportHeight,board,obstacles=[]})=>{const gap=12,preferred={x:board.left-width-20,y:board.top+(board.height-height)/2};let best=null,score=Infinity;const xs=[preferred.x,board.right+20,12,viewportWidth-width-12],ys=[preferred.y,board.top-height-20,board.bottom+20,140];for(let x=12;x<=viewportWidth-width-12;x+=16)xs.push(x);for(let y=12;y<=viewportHeight-height-12;y+=16)ys.push(y);for(const x of xs)for(const y of ys){if(x<12||y<12||x+width>viewportWidth-12||y+height>viewportHeight-12)continue;const rect={left:x,top:y,right:x+width,bottom:y+height};if(obstacles.some(r=>rect.left<r.right+gap&&rect.right>r.left-gap&&rect.top<r.bottom+gap&&rect.bottom>r.top-gap))continue;const d=(x-preferred.x)**2+(y-preferred.y)**2;if(d<score){score=d;best={x,y};}}return best;};

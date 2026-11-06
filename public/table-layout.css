@@ -172,3 +172,5 @@ body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility
 
 /* Keep run captions clear of the lower player and crown. */
 #runResult{position:fixed;z-index:60;width:240px;max-width:calc(100vw - 24px);padding:17px 18px;border:1px solid #617d77;border-radius:16px;background:linear-gradient(145deg,#20332e,#13212a);box-shadow:0 10px 28px #0005}#runResult[hidden]{display:none}#runResult .runWinners{display:flex;flex-direction:column;gap:9px;font-size:14px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}#runResult .runWinners>span:first-child{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:#b5cba2}#runResult p{font-size:11px;color:#aabeba;line-height:1.5;margin:12px 0 0}
+
+#runResult{overflow:auto;max-height:300px}#runVote .runVotePlayers{max-height:150px;overflow:auto}
