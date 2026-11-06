@@ -1,5 +1,6 @@
 (()=>{
  const toggle=document.getElementById('emoteToggle'),picker=document.getElementById('emotePicker'),choices=document.getElementById('emoteChoices');let catalog=[],spectatorSequence=0;const playing=new Map(),mediaPool=new Map();
+ let muted=localStorage.getItem('poker-emotes-muted')==='true';const mute=document.createElement('button');mute.id='muteEmotes';picker.append(mute);function muteState(){mute.textContent=muted?'Unmute emotes':'Mute emotes';mute.setAttribute('aria-pressed',String(muted));toggle.classList.toggle('emotesMuted',muted);}mute.onclick=()=>{muted=!muted;localStorage.setItem('poker-emotes-muted',String(muted));if(muted)for(const id of [...playing.keys()])clear(id);muteState();};muteState();
  const close=()=>{picker.hidden=true;toggle.setAttribute('aria-expanded','false');};
  toggle.onclick=()=>{picker.hidden=!picker.hidden;toggle.setAttribute('aria-expanded',String(!picker.hidden));};
  document.addEventListener('pointerdown',e=>{if(!e.target.closest('#emoteDock'))close();});document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
@@ -20,7 +21,7 @@
  function clear(id){const old=playing.get(id);if(!old)return;old.audio.pause();old.img.getAnimations().forEach(a=>a.cancel());old.img.remove();old.audio.onended=null;old.audio.onplaying=null;old.audio.currentTime=0;const pool=mediaPool.get(old.item.id);if(pool&&pool.length<2)pool.push(old.audio);playing.delete(id);}
 
  function showEmote(playerId,index,spectating=false){
-  const item=catalog[index];if(!item)return;
+  if(muted)return;const item=catalog[index];if(!item)return;
   const key=spectating?'spectator-'+(++spectatorSequence):playerId;
   if(!spectating)clear(key);
   // Repeated spectator sends play immediately. Retire the oldest visual only when
