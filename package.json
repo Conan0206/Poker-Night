@@ -1,1 +1,24 @@
-{"name":"poker-night","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js","test":"node --test"},"engines":{"node":">=22"},"dependencies":{"express":"^5.1.0","pokersolver":"^2.1.4","socket.io":"^4.8.1"},"devDependencies":{"socket.io-client":"^4.8.4"}}
+{
+  "name": "poker-night",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "test": "node --test",
+    "db:check": "node --env-file-if-exists=.env scripts/check-database.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.23.1",
+    "pokersolver": "^2.1.4",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.14",
+    "socket.io-client": "^4.8.4"
+  }
+}

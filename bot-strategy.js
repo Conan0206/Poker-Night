@@ -1,3 +1,4 @@
+import {postflopTactic} from './bot-tactics.js';
 import {preflopQuality,boardFeatures,rangeEquity} from './bot-ranges.js';
 export {preflopQuality,boardFeatures,rangeEquity} from './bot-ranges.js';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -34,7 +35,7 @@ export function decideBot(view,random=Math.random){
   if(call>big*8&&quality<.68&&equity<odds+.1)return {type:'fold'};
   return passive();
  }
- const f=boardFeatures(hole,board),draw=f.flushDraw||f.straightDraw;
+ const f=boardFeatures(hole,board),draw=f.flushDraw||f.straightDraw;const tactic=postflopTactic(view,{equity,features:f},random);if(tactic)return tactic;const station=(view.opponentModels||[]).some(m=>m.facedBets>=12&&m.foldsToBet/m.facedBets<.25||m.hands>=20&&m.vpip/m.hands>.48);
  const opponentsAggressive=(view.opponentModels||[]).some(m=>m.hands>=8&&m.actions>0&&m.aggressive/m.actions>.45);
  const margin=.012+(commitment>.35?.025:0)+(opponents>2?.025:0)-(opponentsAggressive?.012:0);
  if(call&&equity<odds+margin){
@@ -48,6 +49,7 @@ export function decideBot(view,random=Math.random){
   if(draw&&board.length<5&&opponents<=2&&equity>.36&&commitment<.25&&raises<2&&random()<.29)return raiseTo(bet+Math.max(minRaise,(pot+call)*.7));
   return passive();
  }
+ if(!call&&!latePosition&&!view.initiative&&!view.preflopAggressor&&view.opponentRaisedPreflop&&!view.checkedThisStreet)return passive();
  const valueThreshold=opponents===1?.59:Math.min(.82,.62+opponents*.035);
  if(equity>valueThreshold){
   const frequency=equity>.95?.99:latePosition?.9:.79;
@@ -57,7 +59,7 @@ export function decideBot(view,random=Math.random){
  if(board.length===3&&initiative&&opponents<=2&&!f.monotone&&equity>.23&&random()<(f.wet?.48:.76))return raiseTo(Math.max(big,pot*(f.wet?.65:.33)));
  if(draw&&board.length<5&&equity>.26&&opponents<=2&&random()<(latePosition?.65:.43))return raiseTo(Math.max(big,pot*.65));
  const bluffCandidate=board.length===5?f.category===0||f.nutBlocker:f.category===0&&quality>.42;
- if(latePosition&&opponents<=2&&bluffCandidate&&equity<.48&&random()<(opponents===1?(f.nutBlocker?.32:.2):.065))return raiseTo(Math.max(big,pot*(board.length===5?.8:.55)));
+ if(!station&&latePosition&&opponents<=2&&bluffCandidate&&equity<.48&&random()<(opponents===1?(f.nutBlocker?.32:.2):.065))return raiseTo(Math.max(big,pot*(board.length===5?.8:.55)));
  return passive();
 }
 

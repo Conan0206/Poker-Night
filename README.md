@@ -47,3 +47,12 @@ All-in theme: the user-supplied Hungry Shark Evolution Frontend Theme from https
 Tournament Blind Levels is above Turn Timer, uses the configured 1–120 minute duration (default 7), and freezes during pause. Hand reveals (both voluntary and forced) are unavailable in tournament mode; required showdown exposure remains unchanged. Tournament settings use opening blind values to avoid multiplying an already-increased blind a second time.
 
 The mode switch is anchored outside the information panel and reads Cash in tournaments. Switching back waits for settlement, preserves stacks, restores the previous cash blinds and starting-bank setting, and reopens seating/reveals. The star toolbar menu ranks current stacks in chips and current big blinds; tied chip leaders share a star. Blind multipliers are defined once in `public/tournament-structure.js` and the complete schedule is published by the server.
+
+
+## PostgreSQL and learning data foundation
+
+Use Neon Free PostgreSQL (no fixed trial expiry; storage/compute quotas still apply). Create a project near the Render service (US East/Virginia). Copy the pooled connection string into the existing Render service's `DATABASE_URL` environment variable. Keep TLS certificate verification enabled; the server upgrades `sslmode=require` to `sslmode=verify-full`. Do not paste credentials into GitHub, public files or chat. Locally, copy `.env.example` to `.env`, fill it privately, and run `npm run db:check`.
+
+On connection the server creates `poker_hands` and `poker_hand_actions` from `database-schema.sql`. Completed hands are written atomically with validated actions. Records include public boards, numeric results and each bot's own cards at its decisions; human hole cards, names, tokens and connection secrets are not archived. A unique UUID per deal prevents collisions across server restarts; writes are idempotent. The game continues if storage is temporarily unavailable; `/health` reports only `database.configured` and `database.connected`, never credentials. Failed writes are logged by error code only and are not guaranteed to be replayed.
+
+This is storage infrastructure, not autonomous training. No model retraining or persistent player-identity tracking is enabled. The separate bot strategy update adds context-sensitive check-raises, occasional trapping checks, selective donk leads and blocker/draw-based bluffs using observed public behavior. Heads-up CFR still handles ordinary solver decisions. These are heuristics, not a measured guarantee of stronger or GTO play.

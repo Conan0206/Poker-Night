@@ -1,8 +1,11 @@
+import {postflopTactic} from './bot-tactics.js';
+import {rangeEquity,boardFeatures} from './bot-ranges.js';
 // Keep search off the Socket.IO event loop. Two jobs maximum; bounded fallback under load.
 import {Worker} from 'node:worker_threads';
 import {decideBot} from './bot-strategy.js';
 const slots=[];let nextId=0;
 export function chooseBotAction(view,deadline=Date.now()+1500){
+ if(view.board.length>=3&&view.raiseAllowed&&(view.checkedThisStreet||!view.bet)){const action=postflopTactic(view,{equity:rangeEquity(view),features:boardFeatures(view.hole,view.board)});if(action)return Promise.resolve({action,source:'contextual-tactics-v2'});}
  const fallback=()=>({action:decideBot(view),source:'range-heuristic'});
  const budget=Math.min(850,deadline-Date.now()-150);
  if(view.board.length<3||view.opponents!==1||budget<200)return Promise.resolve(fallback());
