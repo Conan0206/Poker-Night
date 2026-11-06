@@ -9,7 +9,7 @@ test('directory includes live private tables without leaking codes or identities
  const rows=tableDirectory(rooms);assert.equal(rows.length,3);const entry=rows.find(p=>p.private);assert.equal(entry.players,2);assert.equal(entry.watching,1);assert.equal(entry.playing,true);
  for(const secret of ['SECRET','secret-id','Private name','private-socket','secret-token','watch-socket'])assert.ok(!JSON.stringify(rows).includes(secret));
 });
-test('bot arena plays across hands without people, stays watch-only and releases disconnected watchers',async()=>{
+test('bot training plays across hands without people, stays watch-only and releases disconnected watchers',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3192',DATABASE_URL:''},stdio:'pipe'});let socket;
  try{
   await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});

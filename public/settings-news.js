@@ -5,9 +5,10 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Reveals are private; added Reveal all bot hands and renamed Bot training.',
   'Simplified table info to the timer, blinds and starting bank.',
   'Redesigned the homepage with live tables and a simpler invite-code join.',
-  'Watch the live Bot arena and browse public or locked private tables from the homepage.',
+  'Watch the live Bot training and browse public or locked private tables from the homepage.',
   'Added resumable offline bot training with tested, versioned strategy updates.',
   'Join the main cash or tournament table from the homepage or mode switch.',
   'Tournament raises use BB, with half-BB controls and flexible typed values.',

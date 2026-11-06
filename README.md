@@ -58,9 +58,9 @@ On connection the server creates `poker_hands` and `poker_hand_actions` from `da
 Hands provide an append-only record; persistent human-identity tracking is not enabled. Offline parameter training is described below. The separate bot strategy update adds context-sensitive check-raises, occasional trapping checks, selective donk leads and blocker/draw-based bluffs using observed public behavior. Heads-up CFR still handles ordinary solver decisions. These are heuristics, not a measured guarantee of stronger or GTO play.
 
 
-## Live bot arena and table directory
+## Live bot training and table directory
 
-The homepage lifts the artwork/intro above a live directory. `/api/tables` returns the main cash/tournament tables, Bot arena and occupied private rooms. Private listings are anonymous and omit their invite codes, names and session IDs; the host must still share the invite code. Counts distinguish seated players from watchers. Empty private rooms are omitted.
+The homepage lifts the artwork/intro above a live directory. `/api/tables` returns the main cash/tournament tables, Bot training and occupied private rooms. Private listings are anonymous and omit their invite codes, names and session IDs; the host must still share the invite code. Counts distinguish seated players from watchers. Empty private rooms are omitted.
 
 The reserved `BOTS` room automatically deals to four bots while the server is awake, even without human players. It uses the normal game engine, histories, payouts and database logging. Spectators cannot sit, add/kick bots, pause or change its settings. Busted bots receive a fresh practice stack between hands; excessively deep stacks also reset. Set `BOT_ARENA=off` to disable autoplay. This does not prevent Render Free from sleeping and is not a 24/7 hosting guarantee.
 
@@ -75,3 +75,8 @@ Checkpointed validation accumulates across nights under `.training/`, invalidati
 Neon stores `poker_training_runs`, immutable `poker_bot_policies`, and one `poker_active_policy` pointer. Reports also remain locally in `.training/<run-id>.json`. Promotion checks the expected parent version in a transaction; a stale run cannot overwrite a newer policy. The server checks the pointer at most every 30 minutes, freezes the selected version for each new hand, and applies approved frequency changes only to multiway cash decisions. Completed hand records include the policy version. No policy changes mid-hand. Keep prior policy rows to support rollback by updating the active pointer to an existing policy ID.
 
 The nightly Codex schedule runs this command in the existing checkout at 03:00 Asia/Kuala_Lumpur. The computer must be on with the desktop app running and the checkout available. Reports and checkpoints are ignored by Git; the automation does not edit source, push commits, change hosting plans or print credentials. Watching the live arena produces recorded matches, but the separate offline evaluation is what decides whether a strategy update qualifies.
+
+
+## Private hand reveals
+
+Cash-game Reveal hand exposes a chosen hidden hand only in the requesting viewer's state, after settlement and before the next deal. The server keeps a per-hand viewer/target map outside serialized player objects; it does not change public `shown` flags. Reveal all bot hands is available in cash games and Bot training, and costs one reveal for all currently hidden bot hands. Repeated requests with no new hidden targets do not consume uses. Per-viewer allowances default to three per table session. Public showdown/all-in cards and voluntary self-reveals remain public. Optional private reveals are rejected during betting and in tournaments; new deals clear the private map.

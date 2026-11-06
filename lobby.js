@@ -9,7 +9,7 @@ export function tableDirectory(rooms){
   if(!main&&!seated.length&&!watching)continue;
   const entry={mode:room.mode,players:seated.length,watching,playing:!!room.started,private:!main&&!room.practice};
   if(main)Object.assign(main,entry);
-  else if(room.practice)result.unshift({...entry,code:'BOTS',name:'Bot arena',practice:true});
+  else if(room.practice)result.unshift({...entry,code:'BOTS',name:'Bot training',practice:true});
   else result.push({...entry,name:'Private table '+(++privateNumber)});
  }
  return result;
