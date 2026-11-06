@@ -22,7 +22,7 @@
   ['[data-panel="collection"]','Customize your table','Choose a table felt and card-back design with the customize button.'],
   ['[data-panel="settings"]','Audio settings','Open Settings → Audio to adjust main audio, sound effects, and emote volume separately. Table settings, feedback, and recent updates have their own categories.'],
   ['#emoteToggle','Clash Royale emotes','Open the emote bank to send a reaction. Star favourites to put them first; use arrows, dots, or swipe to see more. Spectators can send emotes too.'],
-  ['#revealHands','Reveal a hand','In cash games and Bot training, choose a player or bot after a hand ends to view their cards privately. Reveal all bot hands uses one reveal. Only you see these cards. The number in brackets is your remaining reveals; adjust the allowance in Table settings. Optional reveals are disabled in tournaments.'],
+  ['#revealHands','Reveal a hand','In cash games and Bot training, choose a player or bot after a hand ends to view their cards privately. Only you see these cards. Bot training has unlimited reveals. In cash games, Reveal all bot hands uses one reveal, and the number in brackets is your remaining allowance; adjust it in Table settings. Optional reveals are disabled in tournaments.'],
   ['#board','Hand rankings','Hover over the five community-card slots to see the hand rankings and your current hand. Move outside those five slots and the guide disappears immediately. On touch screens, press and hold the cards.'],
   ['#rabbit','Rabbit hunt','After a hand ends before the river, Rabbit appears beside the community cards. Reveal the undealt board to see what might have happened. It does not change the result.']
  ];

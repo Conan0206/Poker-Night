@@ -7,8 +7,8 @@ test('single reveals belong only to their viewer and do not change public shown 
  assert.equal(hasPrivateReveal(room,viewer,human),true);assert.equal(hasPrivateReveal(room,other,human),false);assert.equal(human.shown,0);assert.equal(viewer.revealsUsed,1);
  assert.equal(revealPrivately(room,viewer,{handNumber:5,targetId:human.id}),'ignored');assert.equal(viewer.revealsUsed,1);
 });
-test('all-bot reveal costs one use, excludes humans and already visible bots, and works in practice',()=>{
- const {room,viewer,other,human,bots}=fixture();room.practice=true;
+test('cash all-bot reveal costs one use and excludes humans and already visible bots',()=>{
+ const {room,viewer,other,human,bots}=fixture();
  assert.equal(revealPrivately(room,viewer,{handNumber:5,allBots:true}),'revealed');assert.equal(viewer.revealsUsed,1);
  for(const bot of bots){assert.equal(hasPrivateReveal(room,viewer,bot),true);assert.equal(hasPrivateReveal(room,other,bot),false);assert.equal(bot.shown,0);}
  assert.equal(hasPrivateReveal(room,viewer,human),false);assert.equal(revealPrivately(room,viewer,{handNumber:5,allBots:true}),'ignored');assert.equal(viewer.revealsUsed,1);
@@ -20,4 +20,15 @@ test('phase, hand number, allowance, kicked players and the next deal enforce pr
  assert.equal(revealPrivately(room,viewer,{handNumber:4,allBots:true}),'ignored');viewer.kicked=true;assert.equal(revealPrivately(room,viewer,{handNumber:5,allBots:true}),'ignored');delete viewer.kicked;
  viewer.revealsUsed=3;assert.equal(revealPrivately(room,viewer,{handNumber:5,allBots:true}),'limit');viewer.revealsUsed=0;
  assert.equal(revealPrivately(room,viewer,{handNumber:5,allBots:true}),'revealed');room.street='preflop';assert.equal(hasPrivateReveal(room,viewer,bots[0]),false);room.privateReveals=new Map();room.handNumber++;room.street='showdown';assert.equal(hasPrivateReveal(room,viewer,bots[0]),false);
+});
+test('Bot training permits unlimited private single and all-bot reveals without consuming uses',()=>{
+ const {room,viewer,other,bots}=fixture();room.practice=true;room.revealAllowance=0;viewer.revealsUsed=99;
+ for(let hand=5;hand<15;hand++){
+  room.handNumber=hand;
+  assert.equal(revealPrivately(room,viewer,{handNumber:hand,targetId:bots[0].id}),'revealed');
+  assert.equal(revealPrivately(room,viewer,{handNumber:hand,allBots:true}),'revealed');
+  assert.equal(viewer.revealsUsed,99);
+  for(const bot of bots){assert.equal(hasPrivateReveal(room,viewer,bot),true);assert.equal(hasPrivateReveal(room,other,bot),false);}
+ }
+ room.practice=false;assert.equal(revealPrivately(room,other,{handNumber:room.handNumber,allBots:true}),'limit');
 });

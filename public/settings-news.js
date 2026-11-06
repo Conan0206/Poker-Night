@@ -5,6 +5,8 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Run-twice history now groups payouts by run with optional pot details.',
+  'Bot training now has unlimited private hand reveals.',
   'Reveals are private; added Reveal all bot hands and renamed Bot training.',
   'Simplified table info to the timer, blinds and starting bank.',
   'Redesigned the homepage with live tables and a simpler invite-code join.',

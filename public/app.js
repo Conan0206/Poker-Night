@@ -122,17 +122,17 @@ chipMenu.addEventListener("focusin",()=>chipToggle.setAttribute("aria-expanded",
 chipMenu.addEventListener("focusout",e=>{if(!chipMenu.contains(e.relatedTarget)){chipMenu.classList.remove("isOpen");chipToggle.setAttribute("aria-expanded","false");}});
 
 const revealHandsButton=document.createElement('button');revealHandsButton.id='revealHands';revealHandsButton.hidden=true;revealHandsButton.onclick=()=>openPanel('reveal');document.body.append(revealHandsButton);
-function updateRevealButton(){const count=state.revealsRemaining??0;revealHandsButton.hidden=state.mode==='tournament';revealHandsButton.textContent='Reveal hand ('+count+')';revealHandsButton.disabled=count===0;revealHandsButton.title=count?'Choose a player or bot after the hand ends':'No hand reveals remaining';}
+function updateRevealButton(){const unlimited=!!state.revealsUnlimited,count=unlimited?'∞':state.revealsRemaining??0;revealHandsButton.hidden=state.mode==='tournament';revealHandsButton.textContent='Reveal hand ('+count+')';revealHandsButton.disabled=!unlimited&&count===0;revealHandsButton.title=unlimited?'Unlimited private reveals after the hand ends':count?'Choose a player or bot after the hand ends':'No hand reveals remaining';}
 function renderRevealPicker(body){
  if(state.mode==='tournament'){body.textContent='Hand reveals are available in cash games and Bot training only.';return;}
- const note=document.createElement('p');note.textContent='Revealed cards are visible only to you · '+state.revealsRemaining+' reveals remaining';body.append(note);
+ const note=document.createElement('p');note.textContent='Revealed cards are visible only to you · '+(state.revealsUnlimited?'Unlimited reveals':state.revealsRemaining+' reveals remaining');body.append(note);
  const finished=state.street==='showdown';
  const targets=state.players.filter(p=>p.id!==me&&!p.kicked&&p.inHand&&p.cards.length===2&&(p.shown||0)!==3&&!p.privatelyRevealed);
- const all=button('Reveal all bot hands',()=>{socket.emit('revealAllBots',{handNumber:state.handNumber});$('#panel').close();},body);all.className='revealAllBots primary';all.disabled=!finished||state.revealsRemaining<=0||!targets.some(p=>p.bot);
- const hint=document.createElement('p');hint.className='fine';hint.textContent='Uses 1 reveal to show every hidden bot hand, only on your screen.';body.append(hint);
+ const all=button('Reveal all bot hands',()=>{socket.emit('revealAllBots',{handNumber:state.handNumber});$('#panel').close();},body);all.className='revealAllBots primary';all.disabled=!finished||!state.revealsUnlimited&&state.revealsRemaining<=0||!targets.some(p=>p.bot);
+ const hint=document.createElement('p');hint.className='fine';hint.textContent=state.revealsUnlimited?'Unlimited in Bot training. These cards are visible only to you.':'Uses 1 reveal to show every hidden bot hand, only on your screen.';body.append(hint);
  if(!finished){const text=document.createElement('p');text.textContent='Available after this hand ends.';body.append(text);return;}
  if(!targets.length){const text=document.createElement('p');text.textContent='No hidden hands to reveal.';body.append(text);}
- for(const p of targets){const b=button(p.avatar+' '+p.name+(p.bot?' · BOT':''),()=>{socket.emit('revealHand',{id:p.id,handNumber:state.handNumber});$('#panel').close();},body);b.className='revealTarget';b.disabled=state.revealsRemaining<=0;}
+ for(const p of targets){const b=button(p.avatar+' '+p.name+(p.bot?' · BOT':''),()=>{socket.emit('revealHand',{id:p.id,handNumber:state.handNumber});$('#panel').close();},body);b.className='revealTarget';b.disabled=!state.revealsUnlimited&&state.revealsRemaining<=0;}
 }
 
 function renderSitChoices(body){const p=state.players.find(p=>p.id===me);if(!p?.spectating){$('#panel').close();return;}const text=document.createElement('p');text.textContent=state.mode==='tournament'?'Take your seat with the tournament starting stack.':'Choose the chips you bring back to the table.';body.append(text);const choices=[['reset','Reset amount',state.startingBank]];if(state.mode!=='tournament')choices.push(['keep','Keep previous amount',p.chips]);for(const [mode,label,amount]of choices){const b=button(label+' · $'+amount.toLocaleString(),()=>{socket.emit('sit',{mode});$('#panel').close();},body);b.className='seatAmountChoice';b.disabled=mode==='keep'&&amount<=0;}const cancel=button('Cancel',()=>$('#panel').close(),body);cancel.className='seatAmountChoice';}
