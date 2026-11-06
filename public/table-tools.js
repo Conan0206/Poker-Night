@@ -3,7 +3,7 @@
  const pause=document.createElement('button');pause.id='pauseGame';pause.textContent='Ⅱ Pause';pause.hidden=true;document.body.append(pause);
  pause.onclick=()=>socket.emit('pause');
  function positionPause(){const b=settings.getBoundingClientRect(),custom=document.querySelector('[data-panel="collection"]').getBoundingClientRect(),width=Math.max(90,b.right-custom.left);pause.style.top=(b.bottom+10)+'px';pause.style.width=width+'px';pause.style.left=Math.max(8,Math.min(innerWidth-width-8,custom.left))+'px';}
- const info=document.getElementById('tableInfo'),heading=info.querySelector('.eyebrow');
+ const info=document.getElementById('tableInfo');
  const tournament=document.createElement('button');tournament.id='tournamentMode';tournament.hidden=true;tournament.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17l-5-5M21 17H4l5 5"/></svg><span>Tournament</span>';const dock=document.createElement('div');dock.id='tableInfoDock';info.before(dock);dock.append(info,tournament);const tournamentLabel=tournament.querySelector('span');
 
  const resetTournament=document.createElement('button');resetTournament.id='resetTournament';resetTournament.className='tournamentReset';resetTournament.textContent='Reset tournament';resetTournament.hidden=true;resetTournament.onclick=()=>window.confirmTournamentReset();document.querySelector('.headerLeftActions').append(resetTournament);
@@ -22,7 +22,7 @@
   const self=state?.players.find(p=>p.id===me);resetTournament.hidden=!self||state.mode!=='tournament';resetTournament.disabled=!!state.pendingTournamentReset||!!state.pendingMode;resetTournament.textContent=state.pendingTournamentReset?'Reset after hand':'Reset tournament';tournament.hidden=!self;pause.hidden=!self;pause.disabled=!self||!state.canManage;
   pause.textContent=state?.paused?'▶ Resume':'Ⅱ Pause';pause.setAttribute('aria-pressed',String(!!state?.paused));
   tournament.disabled=!self;
-  tournamentLabel.textContent=state.mode==='tournament'?'Cash':'Tournament';tournament.classList.toggle('modeActive',state.mode==='tournament');document.body.classList.toggle('tournamentTheme',state.mode==='tournament');for(const el of [heading,info.querySelector('.equityHeading'),info.querySelector('.equityTrack'),document.getElementById('equityNote')])el.hidden=state.mode==='tournament';renderBlindLevels(state);
+  tournamentLabel.textContent=state.mode==='tournament'?'Cash':'Tournament';tournament.classList.toggle('modeActive',state.mode==='tournament');document.body.classList.toggle('tournamentTheme',state.mode==='tournament');renderBlindLevels(state);
   tournament.title='Join the main '+(state.mode==='tournament'?'cash':'tournament')+' table';
   positionPause();
  };

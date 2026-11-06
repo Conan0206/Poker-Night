@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Simplified table info to the timer, blinds and starting bank.',
   'Redesigned the homepage with live tables and a simpler invite-code join.',
   'Watch the live Bot arena and browse public or locked private tables from the homepage.',
   'Added resumable offline bot training with tested, versioned strategy updates.',

@@ -3,18 +3,17 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {tournamentSchedule} from './public/tournament-structure.js';
 import {readFileSync} from 'node:fs';
-test('tournament info hides equity, keeps table facts, and lists the server blind schedule',()=>{
+test('table info keeps facts and the tournament blind schedule without hand analysis',()=>{
  const nodes=[],classes=()=>{const set=new Set();return {add:v=>set.add(v),toggle(v,on){on?set.add(v):set.delete(v);},has:v=>set.has(v)};};
  function el(tag){const e={tag,style:{},children:[],hidden:false,classList:classes(),offsetWidth:80,append(...x){this.children.push(...x);for(const c of x)c.parentElement=this;},before(){},setAttribute(k,v){this[k]=v;},getBoundingClientRect:()=>({left:100,top:100,height:200,bottom:300,right:200}),querySelector(){return this.span||(this.span=el('span'));},replaceChildren(...x){this.children=x;},showModal(){this.open=true;},close(){this.open=false;}};nodes.push(e);return e;}
- const body=el('body'),heading=el('span'),equity=el('div'),track=el('div'),note=el('p'),info=el('aside'),format=el('span'),bank=el('b'),timer=el('b');el('div').append(format);el('div').append(bank);el('div').append(timer);
- info.querySelector=s=>s==='.eyebrow'?heading:s==='.equityHeading'?equity:track;
- const settings=el('button'),ids={tableInfo:info,infoFormat:format,infoBank:bank,infoTimer:timer,equityNote:note};
+ const body=el('body'),info=el('aside'),format=el('span'),bank=el('b'),timer=el('b');el('div').append(format);el('div').append(bank);el('div').append(timer);
+ const settings=el('button'),ids={tableInfo:info,infoFormat:format,infoBank:bank,infoTimer:timer};
  const document={body,querySelector:()=>settings,getElementById:id=>ids[id],createElement:el};
  const state={players:[{id:'me',spectating:false}],canManage:true,mode:'tournament',level:2,baseSmall:5,baseBig:10,blindSchedule:tournamentSchedule(),nextBlindAt:700000,paused:false};
  const window={visualViewport:{addEventListener(){}},pokerClock:{remaining:()=>61000}};
  vm.runInNewContext(readFileSync('public/table-tools.js','utf8'),{window,document,state,me:'me',socket:{emit(){}},innerWidth:1000,innerHeight:800,setInterval(){},addEventListener(){},ResizeObserver:class{observe(){}}});
- window.updateTableTools();assert.equal(heading.hidden,true);assert.equal(equity.hidden,true);assert.equal(track.hidden,true);assert.equal(note.hidden,true);assert.ok(body.classList.has('tournamentTheme'));
+ window.updateTableTools();assert.ok(body.classList.has('tournamentTheme'));assert.doesNotMatch(readFileSync('public/index.html','utf8'),/LIVE HAND ANALYSIS|Hand winrate|id="equityValue"/);
  const schedule=nodes.find(e=>e.className==='blindSchedule');assert.equal(schedule.children.length,13);assert.ok(schedule.children[1].classList.has('current'));assert.equal(schedule.children[1].children[1].textContent,'$10 / $20');assert.equal(schedule.children[12].children[1].textContent,'$400 / $800');
  const switchButton=nodes.find(e=>e.id==='tournamentMode');assert.ok(nodes.find(e=>e.id==='tableInfoDock').children.includes(switchButton));assert.equal(switchButton.style.top,undefined);assert.equal(switchButton.disabled,false);assert.equal(switchButton.querySelector('span').textContent,'Cash');assert.equal(schedule.children[0].children[2].textContent,'0–7 min');assert.equal(schedule.children[1].children[2].textContent,'7–14 min');state.levelMinutes=3;window.updateTableTools();assert.equal(schedule.children[0].children[2].textContent,'0–3 min');
- state.mode='cash';window.updateTableTools();assert.equal(heading.hidden,false);assert.equal(note.hidden,false);assert.equal(nodes.find(e=>e.id==='blindLevels').hidden,true);assert.equal(body.classList.has('tournamentTheme'),false);
+ state.mode='cash';window.updateTableTools();assert.equal(nodes.find(e=>e.id==='blindLevels').hidden,true);assert.equal(body.classList.has('tournamentTheme'),false);
 });
