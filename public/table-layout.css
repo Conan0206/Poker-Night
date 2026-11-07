@@ -215,6 +215,8 @@ body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility
  #leaderboardMenu .leaderboardPanel th{font-size:9px;padding:7px 3px}
  #leaderboardMenu .leaderboardPanel td{font-size:11px;padding:8px 3px}
  #leaderboardMenu .leaderboardColumn th:first-child,#leaderboardMenu .leaderboardColumn td:first-child{width:28px}
+ #leaderboardMenu .leaderboardColumn th:nth-child(2){width:35%}
+ #leaderboardMenu .leaderboardColumn:first-child td:nth-child(3){white-space:nowrap}
 }
 .languageSetting{display:flex;flex-direction:column;gap:12px;margin:22px 0;font-size:14px}.languageSetting select{width:100%;padding:14px;font-size:16px}
 html[lang=zh-Hans] body,html[lang=zh-Hans] button,html[lang=zh-Hans] input,html[lang=zh-Hans] select,html[lang=zh-Hans] textarea,html[lang=zh-Hans] .playerStyleProfile svg{font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif}
