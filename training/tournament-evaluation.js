@@ -1,4 +1,5 @@
 import {estimate} from './evaluation.js';
+import {BOT_STYLE_IDS} from '../public/bot-styles.js';
 export const TOURNAMENT_GROUPS=['incumbent','station','tight','aggressive'].flatMap(style=>[3,6].map(seats=>({style,seats,key:`${style}-${seats}`})));
 export const TOURNAMENT_VALIDATION_BLOCKS=512;
 export function tournamentPromotionGate(report){
@@ -12,7 +13,7 @@ export function tournamentPromotionGate(report){
   if(values.length<64)reasons.push(`Insufficient ${group.key} tournament evaluation`);
   else if(estimate(values).bb100<0)reasons.push(`Win-rate regression against ${group.key}`);
  }
- for(const style of ['balanced','tight','pressure','tricky']){
+ for(const style of BOT_STYLE_IDS){
   const values=validation.personalities?.[style]||[];
   if(values.length<128)reasons.push(`Insufficient ${style} personality evaluation`);
   else if(estimate(values).bb100<0)reasons.push(`Win-rate regression for ${style} personality`);

@@ -22,3 +22,9 @@ test('own wager is anchored directly below the turn and river slots',()=>{
  const felt=rect(200,200,1400,450),avatar=rect(860,520,96,96),board=rect(695,406,428,113),anchor={left:956,right:1123,bottom:519};
  const at=place({felt,avatar,width:145,height:36,obstacles:[avatar,board,rect(820,625,180,120)],self:true,communityAnchor:anchor});assert.ok(at);inside(at,felt);assert.ok(at.rect.top>=anchor.bottom);assert.ok(Math.abs(at.x-(anchor.left+anchor.right)/2)<10);assert.ok(at.y-anchor.bottom<45);
 });
+test('seven-player left seats reuse approved eight-player anchors; six-player lower left moves above its nameplate',()=>{
+ const target=context.window.pokerWagerTarget,avatar=rect(300,300,80,80),plate=rect(390,280,140,110);
+ for(const order of [1,2,3])assert.deepEqual(target({count:7,order,avatar,plate,width:150,height:38}),target({count:8,order,avatar,plate,width:150,height:38}));
+ const six=target({count:6,order:1,avatar,plate,width:150,height:38});assert.ok(six.x-75>plate.right);assert.ok(six.y+19<plate.top);
+ assert.equal(target({count:6,order:2,avatar,plate,width:150,height:38}),null);
+});

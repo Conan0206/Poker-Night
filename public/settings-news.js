@@ -5,6 +5,10 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Added separate chip sounds for bets and raises.',
+  'Reveal hand now shows all bot cards directly when no other human is seated.',
+  'Tidied six/seven-player bets, enlarged wager chips and amounts, and simplified the emote bank.',
+  'Choose TAG, LAG, FISH, ROCK or Mixed bots, and see measured play-style charts in Statistics.',
   'Bots now have distinct styles and blind-aware tournament play, with separate tournament training.',
   'Added optional turn-alert setup before entry and a notification test in Audio settings.',
   'Individual hand reveals now list human players; bots use Reveal all bot hands.',

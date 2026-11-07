@@ -1,5 +1,19 @@
 /* Screen-coordinate geometry shared by every seat and game mode. */
 (()=>{
+ window.pokerWagerTarget=({count,order,avatar:a,plate,width,height})=>{
+  // Seven seats use the same left-rail anchors as the approved eight-seat layout.
+  if(count===8||count===7){
+   if(order===1)return {x:plate.right+width/2+12,y:a.top-height/2-5};
+   if(order===2)return {x:plate.right+width/2+12,y:a.top+a.height/2};
+   if(order===3)return {x:plate.right+width/2+12,y:plate.bottom+height/2+30};
+  }
+  if(count===8){
+   if(order===5)return {x:a.left-width/2-12,y:a.bottom+height/2+12};
+   if(order===7)return {x:a.left-width/2-14,y:a.top-height/2-12};
+  }
+  if(count===6&&order===1)return {x:plate.right+width/2+12,y:plate.top-height/2-6};
+  return null;
+ };
  window.findPokerWagerPosition=({felt,avatar,width,height,obstacles=[],occupied=[],self=false,communityAnchor=null,target=null})=>{
   const cx=felt.left+felt.width/2,cy=felt.top+felt.height/2,rx=felt.width/2-8,ry=felt.height/2-8,pad=5;
   if(rx<=0||ry<=0)return null;

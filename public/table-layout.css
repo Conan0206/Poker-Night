@@ -177,3 +177,7 @@ body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility
 
 /* Table facts use the full panel width after removing hand analysis. */
 @media(max-width:700px){#tableInfo{display:block}}
+
+/* Slightly larger wagers; measured geometry reserves the full visible stack. */
+.betChips b{font-size:15px}.betChips .tableChipStack{width:42px;height:24px}.betChips .tableChipStack .pokerChip{width:27px;height:19px}
+@media(max-width:700px){.betChips b{font-size:11px}.betChips .tableChipStack{width:26px;height:21px}.betChips .tableChipStack .pokerChip{width:25px;height:18px}}

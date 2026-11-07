@@ -19,12 +19,14 @@ export function decideBot(view,random=Math.random){
  const premium=high===low&&high>=12||high===14&&low===13;
  const style=botStyle(view.botStyle),situation=view.mode==='tournament'?tournamentSituation(view):null;
  const features=preflop?null:boardFeatures(hole,board);
+ // The beginner profile deliberately over-calls small bets; it still respects stack caps.
+ if(view.botStyle==='fish'&&call>0&&commitment<(preflop?.12:.22)&&equity>odds-.07&&random()<.8)return passive();
  const tournamentAction=tournamentTactic(view,{quality,equity,features},random);if(tournamentAction)return tournamentAction;
  if(preflop){
   if(bet<=big){
    const threshold=(opponents===1?.36:position>.65?.46:position>.3?.55:.61)+(situation?.opening??style.opening);
    if(canRaise&&depth<=12&&quality>threshold+.06)return raiseTo(maximum);
-   if(canRaise&&quality>=threshold&&random()<.94)return raiseTo(big*((opponents>3?3:2.5)+(view.limpers||0)));
+   if(canRaise&&quality>=threshold&&random()<Math.min(.98,.94*style.aggression))return raiseTo(big*((opponents>3?3:2.5)+(view.limpers||0)));
    if(!call)return passive();
    // Cheap blind defences can continue; most other entries raise or fold.
    if(round>0&&call<=big&&quality>.37&&equity>odds+.02)return passive();
@@ -57,7 +59,7 @@ export function decideBot(view,random=Math.random){
  if(!call&&!latePosition&&!view.initiative&&!view.preflopAggressor&&view.opponentRaisedPreflop&&!view.checkedThisStreet)return passive();
  const valueThreshold=opponents===1?.59:Math.min(.82,.62+opponents*.035);
  if(equity>valueThreshold){
-  const frequency=equity>.95?.99:latePosition?.9:.79;
+  const frequency=Math.min(.99,(equity>.95?.99:latePosition?.9:.79)*style.aggression);
   if(random()<frequency){if(spr<1.25&&equity>.8)return raiseTo(maximum);const sizing=board.length===5&&equity>.88&&spr>2?1.15:f.wet?.75:equity>.85?.8:.5;return raiseTo(Math.max(big,pot*sizing));}
  }
  const initiative=view.initiative||view.preflopAggressor;
