@@ -1,5 +1,8 @@
 // UI copy only. Never translate user-entered names, messages, cards or values.
 const chinese = new Map(Object.entries({
+ 'POKER, YOUR WAY.':'你的扑克，你的玩法。','Your game.':'你的对局。','Your people.':'你的朋友。',
+ 'Cash Games':'现金桌','Tournaments':'锦标赛','GTO Self-Learning Bot':'GTO 自学习机器人','Private Tables':'私人牌桌',
+ 'Your pace. Your next hand.':'自在节奏，迎接下一手。','Four play styles. Built to improve.':'四种打法，持续精进。','Invite your people. Deal them in.':'邀请朋友，一起入座。',
  'Back to home':'返回首页','Click the Poker Night logo at the top left to return to the home page.':'点击左上角的 Poker Night 标志返回首页。',
  'Watch TAG, LAG, FISH and ROCK bots play automatically. This table is watch-only.':'观看 TAG、LAG、FISH 和 ROCK 机器人自动对局。此牌桌仅供观战。',
  'Reveal bot hands':'查看机器人手牌','After a hand ends, click Reveal hand to see all bot cards. Reveals are unlimited and visible only to you.':'每手结束后，点击查看手牌即可查看所有机器人手牌。查看次数不限，且仅你可见。',

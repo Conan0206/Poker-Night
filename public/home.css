@@ -27,3 +27,28 @@
 
 @keyframes liveDotBreath{0%,100%{opacity:.5;transform:scale(.85);box-shadow:0 0 0 0 #c8f49700}50%{opacity:1;transform:scale(1.12);box-shadow:0 0 0 4px #c8f49715,0 0 9px #c8f49755}}
 @media(prefers-reduced-motion:reduce){.liveTablesPulse::before{animation:none}}
+
+/* Four clear ways to play, beside the original 6-7-6-7 fan. */
+.homeArtwork{gap:24px;padding-top:46px}
+.homeHero{grid-template-columns:minmax(0,1.25fr) minmax(160px,.85fr);gap:18px 12px;min-height:0}
+.homeIntro .eyebrow{font-size:10px;letter-spacing:2.8px;color:#adc7c4}
+.homeIntro h1{font-size:clamp(44px,4.1vw,64px);line-height:1.04;letter-spacing:-2.8px;margin:16px 0 12px}
+.homeCardFan{height:210px;transform:scale(.82)}
+.homeFeatures{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.homeFeature{display:flex;gap:12px;align-items:center;min-width:0;padding:15px 14px;border:1px solid #50605d80;border-radius:13px;background:#152326b3}
+.homeFeatureIcon{display:grid;place-items:center;flex:none;width:36px;height:40px;color:#d1eecc}
+.homeFeatureIcon svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.homeFeature h3{font:600 clamp(15px,1.3vw,19px)/1.25 'Space Grotesk',sans-serif;letter-spacing:-.35px;margin:0;color:#f3f5eb}
+.homeFeature p{font-size:12px;line-height:1.4;margin:5px 0 0;color:#a6bdbe}
+.homeFeature-tournament{border-color:#9a805851}.homeFeature-tournament .homeFeatureIcon,.homeFeature-tournament h3{color:#efd094}
+.homeFeature-bot{background:#21342cb8;border-color:#b8dd9066}.homeFeature-bot .homeFeatureIcon,.homeFeature-bot h3{color:#d0f69d}
+.homeFeature-private .homeFeatureIcon{color:#adc9dc}
+.liveTablesHeading{margin-bottom:12px}
+@media(min-width:701px) and (max-height:780px){
+ .homeArtwork{gap:16px;padding-top:35px}.homeHero{gap:12px 8px}.homeIntro h1{font-size:44px;margin:12px 0}.homeCardFan{height:160px;transform:scale(.65)}
+ .homeFeatures{gap:8px}.homeFeature{padding:11px 12px;gap:9px}.homeFeature h3{font-size:16px}.homeFeature p{font-size:11px;margin-top:4px}.homeFeatureIcon{width:28px;height:32px}.homeFeatureIcon svg{width:24px;height:24px}
+}
+@media(min-width:701px) and (max-width:1100px){
+ .homeHero{grid-template-columns:minmax(0,1.35fr) minmax(120px,.7fr)}.homeIntro h1{font-size:40px;letter-spacing:-2px}.homeCardFan{transform:scale(.58)}
+ .homeFeature{gap:8px;padding:12px 10px}.homeFeature h3{font-size:15px}.homeFeature p{font-size:11px}.homeFeatureIcon{width:25px}.homeFeatureIcon svg{width:23px;height:23px}
+}
