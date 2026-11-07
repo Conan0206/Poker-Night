@@ -2,9 +2,10 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const section=document.createElement('section');section.className='settingsCommunity';
  const updates=document.createElement('details');
  const title=document.createElement('summary');title.textContent='What’s new · Recent improvements';updates.append(title);
- const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
+ const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 8 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Larger leaderboard text and Average BB, with eliminated players kept in grey.',
   'Fixed card-sound timing, added fold audio and tidied tournament blind formatting.',
   'Added dedicated flop and single-card sounds.',
   'Community-card deals no longer trigger an extra chip-collection sound.',

@@ -1,5 +1,6 @@
 // UI copy only. Never translate user-entered names, messages, cards or values.
 const chinese = new Map(Object.entries({
+ 'Eliminated':'已淘汰',
  'Language':'语言','Choose your language':'选择语言','Saved for this browser.':'已为此浏览器保存。',
  'Table settings':'牌桌设置','Audio':'音频','Recent updates':'最近更新','✦ Show tutorial':'✦ 查看教程',
  'Turn timer':'行动时限','Starting bank':'初始筹码','Cash Table · blinds':'现金桌 · 盲注','Tournament · blinds':'锦标赛 · 盲注',

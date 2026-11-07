@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {chipLeaderboard,eliminationLeaderboard} from './public/leaderboard-model.js';
+import {chipLeaderboard,eliminationLeaderboard,settledLeaderboardPlayers} from './public/leaderboard-model.js';
 import {tournamentSchedule,tournamentBlinds} from './public/tournament-structure.js';
 test('chip ranking converts current stacks to BB, stars tied leaders, and excludes every spectator',()=>{
  const players=[{id:'a',name:'Alice',chips:1000},{id:'b',name:'Bot',bot:true,chips:1200},{id:'c',name:'Carol',chips:1200},{id:'d',name:'Busted',chips:0,spectating:true,stats:{hands:5}},{id:'e',name:'Watcher',chips:0,spectating:true},{id:'f',name:'Kicked',chips:5000,kicked:true}];
@@ -13,4 +13,16 @@ test('tournament structure starts at 100 BB and uses gradual whole-chip increase
 test('spectators with chips, past hands or eliminations never affect either leaderboard',()=>{
  const players=[{id:'a',name:'Seated',chips:1000,eliminations:1},{id:'b',name:'Watching',spectating:true,chips:9000,eliminations:10,stats:{hands:20}},{id:'c',name:'Watching bot',bot:true,spectating:true,chips:5000,eliminations:5}];
  assert.deepEqual(chipLeaderboard(players,10).map(p=>p.id),['a']);assert.deepEqual(eliminationLeaderboard(players).map(p=>p.id),['a']);players[0].spectating=true;assert.equal(chipLeaderboard(players,10).length,0);assert.equal(eliminationLeaderboard(players).length,0);
+});
+
+test('eliminated entrants remain ranked after becoming spectators or leaving, while ordinary watchers stay excluded',()=>{
+ const winner={id:'a',name:'Winner',chips:2000,eliminations:1};
+ const busted={id:'b',name:'Busted',chips:0,eliminations:2,eliminated:true,spectating:true};
+ const watcher={id:'c',name:'Watcher',chips:1000,spectating:true,stats:{hands:10}};
+ const state={players:[winner,watcher],standings:{big:20,players:[winner,busted,watcher]}};
+ const settled=settledLeaderboardPlayers(state);
+ assert.deepEqual(chipLeaderboard(settled,20).map(p=>[p.id,p.rank,p.bb,p.chipLeader]),[['a',1,100,true],['b',2,0,false]]);
+ assert.deepEqual(eliminationLeaderboard(settled).map(p=>[p.id,p.eliminations]),[['b',2],['a',1]]);
+ state.players[0].spectating=true;
+ assert.deepEqual(settledLeaderboardPlayers(state).map(p=>p.id),['b']);
 });

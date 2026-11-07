@@ -3,6 +3,16 @@ test('settled standings keep chips and elimination counts unchanged until captur
  const room={big:10,players:[{id:'a',name:'A',chips:1000,eliminations:0,stats:{hands:0}}]};const first=captureStandings(room);room.players[0].chips=600;room.players[0].eliminations=1;room.players[0].stats.hands=1;room.big=20;assert.equal(first.players[0].chips,1000);assert.equal(first.players[0].eliminations,0);assert.equal(first.players[0].stats.hands,0);assert.equal(first.big,10);const next=captureStandings(room);assert.equal(next.players[0].chips,600);assert.equal(next.players[0].eliminations,1);assert.equal(next.big,20);assert.equal(next.players[0].cards,undefined);
 });
 
+test('tournament bust-outs survive spectating, later hands and leaving, but reset clears them',()=>{
+ const room={mode:'tournament',big:10,players:[{id:'a',name:'Winner',chips:2000,inHand:true},{id:'b',name:'Busted',chips:0,inHand:true,eliminations:2},{id:'c',name:'Watcher',chips:0,spectating:true}]};
+ let snapshot=captureStandings(room);assert.equal(snapshot.players[1].eliminated,true);assert.equal(snapshot.players[2].eliminated,false);
+ room.players[1].spectating=true;room.players[1].inHand=false;room.big=20;
+ snapshot=captureStandings(room);assert.equal(snapshot.players[1].eliminated,true);assert.equal(snapshot.players[1].chips,0);
+ room.players=room.players.filter(p=>p.id!=='b');snapshot=captureStandings(room);assert.equal(snapshot.players.find(p=>p.id==='b').eliminations,2);
+ room.standings=null;snapshot=captureStandings(room);assert.equal(snapshot.players.some(p=>p.id==='b'),false);
+ room.mode='cash';room.players[0].chips=0;assert.equal(captureStandings(room).players[0].eliminated,false);
+});
+
 import {spawn} from 'node:child_process';import {io} from 'socket.io-client';const wait=ms=>new Promise(r=>setTimeout(r,ms));
 test('server keeps standings through bets and a new street, then publishes awarded balances at showdown',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3152'},stdio:'pipe'}),clients=[];

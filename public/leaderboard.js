@@ -1,4 +1,4 @@
-import {chipLeaderboard,eliminationLeaderboard} from './leaderboard-model.js';
+import {chipLeaderboard,eliminationLeaderboard,settledLeaderboardPlayers} from './leaderboard-model.js';
 
 const menu=document.createElement('details');menu.id='leaderboardMenu';menu.hidden=true;
 const toggle=document.createElement('summary');toggle.setAttribute('aria-label','Leaderboard');toggle.title='Leaderboard';toggle.innerHTML='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 29V17h8v12M11 29V11h10v18M21 29V21h8v8M2 29h28"/><path class="podiumStar" d="m16 2 1.5 3 3.3.5-2.4 2.3.6 3.2-3-1.5-3 1.5.6-3.2-2.4-2.3 3.3-.5Z"/></svg>';
@@ -13,11 +13,12 @@ for(const label of ['Rank','Player','Eliminations']){const th=document.createEle
 document.querySelector('[data-panel="history"]').before(menu);
 addEventListener('poker-state',({detail:{state,me}})=>{
  menu.hidden=state.mode!=='tournament';if(menu.hidden){menu.open=false;return;}
- const activeIds=new Set(state.players.filter(p=>!p.spectating&&!p.kicked).map(p=>p.id));const settledPlayers=(state.standings?.players||state.players).filter(p=>activeIds.has(p.id)),settledBig=state.standings?.big||state.big;
- eliminationBody.replaceChildren();for(const p of eliminationLeaderboard(settledPlayers)){const row=document.createElement('tr');if(p.id===me)row.className='leaderboardSelf';for(const value of [p.rank,(p.eliminationLeader?'🔥 ':'')+p.avatar+' '+p.name+(p.bot?' · BOT':''),p.eliminations.toLocaleString(undefined,{maximumFractionDigits:2})]){const td=document.createElement('td');td.textContent=String(value);if(row.children.length===1)td.dataset.i18nSkip='';row.append(td);}eliminationBody.append(row);}
- const entries=chipLeaderboard(settledPlayers,settledBig);const averageBB=entries.length?entries.reduce((sum,p)=>sum+p.bb,0)/entries.length:0;note.textContent='Average BB = '+averageBB.toLocaleString(undefined,{maximumFractionDigits:1})+' BB';body.replaceChildren();
+ const settledPlayers=settledLeaderboardPlayers(state),settledBig=state.standings?.big||state.big;
+ eliminationBody.replaceChildren();for(const p of eliminationLeaderboard(settledPlayers)){const row=document.createElement('tr');if(p.id===me)row.classList.add('leaderboardSelf');if(p.eliminated){row.classList.add('leaderboardEliminated');row.title='Eliminated';}for(const value of [p.rank,(p.eliminationLeader?'🔥 ':'')+p.avatar+' '+p.name+(p.bot?' · BOT':''),p.eliminations.toLocaleString(undefined,{maximumFractionDigits:2})]){const td=document.createElement('td');td.textContent=String(value);if(row.children.length===1)td.dataset.i18nSkip='';row.append(td);}eliminationBody.append(row);}
+ const entries=chipLeaderboard(settledPlayers,settledBig),remaining=entries.filter(p=>!p.eliminated);const averageBB=remaining.length?remaining.reduce((sum,p)=>sum+p.bb,0)/remaining.length:0;note.textContent='Average BB = '+averageBB.toLocaleString(undefined,{maximumFractionDigits:1})+' BB';body.replaceChildren();
  for(const p of entries){
   const row=document.createElement('tr');if(p.id===me)row.classList.add('leaderboardSelf');
+  if(p.eliminated){row.classList.add('leaderboardEliminated');row.title='Eliminated';}
   const rank=document.createElement('td');rank.textContent=String(p.rank);
   const player=document.createElement('td'),name=document.createElement('span');name.dataset.i18nSkip='';name.textContent=p.avatar+' '+p.name+(p.bot?' · BOT':'');
   if(p.chipLeader){const star=document.createElement('span');star.className='chipLeaderStar';star.textContent='★';star.setAttribute('aria-label','Chip leader');player.append(star);}player.append(name);
@@ -32,5 +33,5 @@ menu.addEventListener('focusout',e=>{if(!menu.contains(e.relatedTarget))menu.ope
 menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;toggle.focus();}});
 document.addEventListener('pointerdown',e=>{if(!menu.contains(e.target))menu.open=false;});
 
-function fitStandings(){if(!menu.open)return;const available=Math.max(100,innerHeight-toggle.getBoundingClientRect().bottom-16);const scale=Math.min(1,available/panel.offsetHeight);panel.style.zoom=String(Math.floor(scale*1000)/1000);}
+function fitStandings(){if(!menu.open)return;const available=Math.max(100,innerHeight-toggle.getBoundingClientRect().bottom-16);const scale=Math.min(1,available/panel.offsetHeight);panel.style.zoom=String(Math.floor(scale*1000)/1000);panel.style.translate='0px';const bounds=panel.getBoundingClientRect();panel.style.translate=(bounds.left<12?12-bounds.left:bounds.right>innerWidth-12?innerWidth-12-bounds.right:0)+'px';}
 menu.addEventListener('toggle',fitStandings);new ResizeObserver(fitStandings).observe(panel);addEventListener('resize',fitStandings);
