@@ -1,5 +1,12 @@
 // UI copy only. Never translate user-entered names, messages, cards or values.
 const chinese = new Map(Object.entries({
+ 'Back to home':'返回首页','Click the Poker Night logo at the top left to return to the home page.':'点击左上角的 Poker Night 标志返回首页。',
+ 'Watch TAG, LAG, FISH and ROCK bots play automatically. This table is watch-only.':'观看 TAG、LAG、FISH 和 ROCK 机器人自动对局。此牌桌仅供观战。',
+ 'Reveal bot hands':'查看机器人手牌','After a hand ends, click Reveal hand to see all bot cards. Reveals are unlimited and visible only to you.':'每手结束后，点击查看手牌即可查看所有机器人手牌。查看次数不限，且仅你可见。',
+ 'Unlimited bot reveals · only visible to you':'无限次查看机器人手牌 · 仅你可见',
+ 'Adjust sound and language in Settings. Bot training table settings are managed automatically.':'可在设置中调整声音和语言。机器人训练牌桌设置由系统自动管理。',
+ 'Hover over the five community-card slots to see hand rankings. Move away to hide the guide. On touch screens, press and hold the cards.':'将鼠标悬停于五张公共牌区域查看牌型排行，移开即可隐藏。触屏设备请长按公共牌。',
+ 'Choose a card-back design. Tournament table felt stays fixed.':'选择牌背样式。锦标赛桌布保持固定。',
  'Eliminated':'已淘汰',
  'Language':'语言','Choose your language':'选择语言','Saved for this browser.':'已为此浏览器保存。',
  'Table settings':'牌桌设置','Audio':'音频','Recent updates':'最近更新','✦ Show tutorial':'✦ 查看教程',
