@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 8 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Bots now mix run-once and run-twice choices by play style.',
   'Larger leaderboard text and Average BB, with eliminated players kept in grey.',
   'Fixed card-sound timing, added fold audio and tidied tournament blind formatting.',
   'Added dedicated flop and single-card sounds.',
