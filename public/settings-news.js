@@ -5,7 +5,8 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
-  'Added dedicated flop and single-card sounds, timed to card arrivals.',
+  'Fixed card-sound timing, added fold audio and tidied tournament blind formatting.',
+  'Added dedicated flop and single-card sounds.',
   'Community-card deals no longer trigger an extra chip-collection sound.',
   'Updated winner chip-slide sound, continuous through distribution.',
   'Simpler reveal tutorial, larger table information and English/Chinese language settings.',

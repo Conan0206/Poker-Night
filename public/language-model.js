@@ -87,7 +87,8 @@ const chinese = new Map(Object.entries({
  'Simpler reveal tutorial, larger table information and English/Chinese language settings.':'简化查看手牌教程，放大牌桌信息面板，新增中英文语言设置。',
  'Updated winner chip-slide sound, continuous through distribution.':'更新筹码滑向赢家的音效，分配期间连续播放。',
  'Community-card deals no longer trigger an extra chip-collection sound.':'发公共牌时不再额外播放收集筹码音效。',
- 'Added dedicated flop and single-card sounds, timed to card arrivals.':'新增翻牌三张牌与单张牌专用音效，并与到达动画同步。'
+ 'Added dedicated flop and single-card sounds.':'新增翻牌三张牌与单张牌专用音效。',
+ 'Fixed card-sound timing, added fold audio and tidied tournament blind formatting.':'修正发牌音效时机，新增弃牌音效，并整理锦标赛盲注格式。'
 }));
 
 // Long help panels use the supplied explanations, translated without changing names.
