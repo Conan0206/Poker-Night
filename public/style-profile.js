@@ -10,8 +10,7 @@ const styleExplanations={
 };
 export function renderPlayerStyle(stats,mode){
  const model=measuredStyle(stats),highlight=model.id,card=document.createElement('section');card.className='playerStyleProfile';card.dataset.mode=mode||'cash';
- const header=document.createElement('div');header.className='styleProfileHeader';const title=document.createElement('strong');title.textContent='Observed play';const status=document.createElement('span');status.textContent=model.ready?(model.early?'Early estimate':'Style estimate'):'Building profile';header.append(title,status);card.append(header);
- const svg=svgNode('svg',{viewBox:'0 0 400 330',role:'img','aria-label':model.ready?`${BOT_STYLES[model.id].label} style estimate. VPIP ${Math.round(model.loose*100)}%. Aggression ${Math.round(model.aggressive*100)}%. ${model.hands} completed hands.`:'Playing-style chart. Not enough completed betting data yet.'});
+ const svg=svgNode('svg',{viewBox:'0 0 400 330',role:'img','aria-label':model.ready?`${BOT_STYLES[model.id].label} playing style. VPIP ${Math.round(model.loose*100)}%. Aggression ${Math.round(model.aggressive*100)}%. ${model.hands} completed hands.`:'Playing-style chart. Not enough completed betting data yet.'});
  const cx=200,cy=165,r=88,points=(top,right,bottom,left)=>`${cx},${cy-r*top} ${cx+r*right},${cy} ${cx},${cy+r*bottom} ${cx-r*left},${cy}`;
  for(const scale of [1,.75,.5,.25])svg.append(svgNode('polygon',{points:points(scale,scale,scale,scale),fill:'none',stroke:'#52606b','stroke-opacity':scale===1?.65:.35,'stroke-dasharray':scale===1?'none':'3 5'}));
  svg.append(svgNode('path',{d:'M112 165H288M200 77V253',stroke:'#536371','stroke-opacity':.28,fill:'none'}));
