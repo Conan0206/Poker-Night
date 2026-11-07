@@ -5,6 +5,8 @@ import {Worker} from 'node:worker_threads';
 import {decideBot} from './bot-strategy.js';
 const slots=[];let nextId=0;
 export function chooseBotAction(view,deadline=Date.now()+1500){
+ // Tournament training evaluates complete tournaments using this same decision path.
+ if(view.mode==='tournament')return Promise.resolve({action:decideBot(view),source:'tournament-context-v1'});
  if(view.opponents===1&&view.board.length>=3&&view.raiseAllowed&&(view.checkedThisStreet||!view.bet)){const action=postflopTactic(view,{equity:rangeEquity(view),features:boardFeatures(view.hole,view.board)});view={...view,tacticsEvaluated:true};if(action)return Promise.resolve({action,source:'contextual-tactics-v2'});}
  const fallback=()=>({action:decideBot(view),source:'range-heuristic'});
  const budget=Math.min(850,deadline-Date.now()-150);

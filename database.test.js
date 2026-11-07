@@ -1,6 +1,9 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {newDb} from 'pg-mem';import {createDatabase,archiveHand} from './database.js';
 import {BASELINE_POLICY_ID,DEFAULT_POLICY} from './bot-policy.js';
 import {promotionGate} from './training/evaluation.js';
+import {TOURNAMENT_BASELINE_ID,TOURNAMENT_DEFAULT} from './tournament-policy.js';
+import {TOURNAMENT_GROUPS,tournamentPromotionGate} from './training/tournament-evaluation.js';
+import {BOT_STYLE_IDS} from './public/bot-styles.js';
 const fixture={id:'bc0018a2-63d4-47ca-8c3d-03b3dbdf9c44',mode:'cash',small:5,big:10,boards:[['Ah','Ks','2d']],results:[{id:'bot1',bot:true,won:30,chips:1015}],actions:[{actorId:'bot1',bot:true,street:'flop',context:{hole:['As','Ad'],board:['Ah','Ks','2d'],pot:30,stack:985},action:{type:'check'}}]};
 test('PostgreSQL schema initializes and completed hand writes are idempotent',async()=>{const mem=newDb(),db=createDatabase({connectionString:'postgresql://test:test@localhost/test',PoolClass:mem.adapters.createPg().Pool});assert.equal(await db.init(),true);assert.deepEqual(db.status(),{configured:true,connected:true});assert.equal(await db.saveHand(fixture),true);assert.equal(await db.saveHand(fixture),true);assert.equal(mem.public.one('SELECT count(*) AS n FROM poker_hands').n,1);assert.equal(mem.public.one('SELECT count(*) AS n FROM poker_hand_actions').n,1);const row=mem.public.one('SELECT * FROM poker_hand_actions');assert.deepEqual(row.context.hole,['As','Ad']);assert.equal(row.action.type,'check');await db.close();});
 test('missing database keeps play functional; failure logs never contain credentials',async()=>{const disabled=createDatabase({connectionString:''});assert.equal(await disabled.init(),false);assert.equal(await disabled.saveHand(fixture),false);await disabled.close();const logs=[];class Broken{on(){}async query(){const e=Error('secret-password postgres://private');e.code='ECONNREFUSED';throw e;}async end(){}}const db=createDatabase({connectionString:'postgresql://user:private@localhost/db',PoolClass:Broken,logger:{warn:(...v)=>logs.push(v)}});assert.equal(await db.init(),false);assert.deepEqual(db.status(),{configured:true,connected:false});assert.ok(!JSON.stringify(logs).includes('private'));await db.close();});
@@ -12,4 +15,13 @@ test('training reports persist and promotion rejects incomplete or stale parent 
  report.gate=promotionGate(report);assert.equal(await db.saveTraining(report),true);assert.equal(await db.promotePolicy(report),false);assert.equal((await db.activePolicy()).id,parent.id);
  report.complete=true;report.gate=promotionGate(report);assert.equal(await db.promotePolicy(report),true);assert.equal((await db.activePolicy()).params.trap,.3);
  assert.equal(await db.promotePolicy({...report,candidate:{id:'stale-candidate',params:DEFAULT_POLICY}}),false);assert.equal((await db.activePolicy()).id,'candidate-1');await db.close();
+});
+test('tournament promotion is isolated from cash and cannot overwrite a newer tournament parent',async()=>{
+ const mem=newDb(),db=createDatabase({connectionString:'postgresql://test:test@localhost/test',PoolClass:mem.adapters.createPg().Pool});
+ const parent=await db.activePolicy('tournament');assert.equal(parent.id,TOURNAMENT_BASELINE_ID);assert.equal((await db.activePolicy()).id,BASELINE_POLICY_ID);
+ const report={id:'bc0018a2-63d4-47ca-8c3d-03b3dbdf9c45',mode:'tournament',metric:'tournament-win-rate',parentId:parent.id,candidate:{id:'tournament-test-policy',params:{...TOURNAMENT_DEFAULT,steal:.25}},complete:true,
+  validation:{samples:700,deltas:Array(512).fill(1),placementDeltas:Array(512).fill(.1),groups:Object.fromEntries(TOURNAMENT_GROUPS.map(g=>[g.key,Array(64).fill(1)])),personalities:Object.fromEntries(BOT_STYLE_IDS.map(s=>[s,Array(128).fill(1)]))}};
+ report.gate=tournamentPromotionGate(report);assert.equal(await db.saveTraining(report),true);assert.equal(await db.promotePolicy({...report,complete:false}),false);
+ assert.equal(await db.promotePolicy(report),true);assert.equal((await db.activePolicy('tournament')).params.steal,.25);assert.equal((await db.activePolicy()).id,BASELINE_POLICY_ID);
+ assert.equal(await db.promotePolicy({...report,candidate:{id:'stale-tournament',params:TOURNAMENT_DEFAULT}}),false);assert.equal((await db.activePolicy('tournament')).id,'tournament-test-policy');await db.close();
 });

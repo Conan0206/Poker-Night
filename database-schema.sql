@@ -20,3 +20,6 @@ CREATE TABLE IF NOT EXISTS poker_bot_policies (
 CREATE TABLE IF NOT EXISTS poker_active_policy (
  singleton integer PRIMARY KEY CHECK(singleton=1), policy_id text NOT NULL
 );
+CREATE TABLE IF NOT EXISTS poker_active_tournament_policy (
+ singleton integer PRIMARY KEY CHECK(singleton=1), policy_id text NOT NULL
+);

@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Bots now have distinct styles and blind-aware tournament play, with separate tournament training.',
   'Added optional turn-alert setup before entry and a notification test in Audio settings.',
   'Individual hand reveals now list human players; bots use Reveal all bot hands.',
   'Run-twice history now groups payouts by run with optional pot details.',

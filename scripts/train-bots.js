@@ -6,6 +6,7 @@ import os from 'node:os';
 import {createDatabase} from '../database.js';
 import {DEFAULT_POLICY,BASELINE_POLICY_ID,normalizePolicy,TRAINABLE_KEYS} from '../bot-policy.js';
 import {simulateHand,seededRandom} from '../training/simulator.js';
+import {BOT_STYLE_IDS} from '../public/bot-styles.js';
 import {estimate,promotionGate} from '../training/evaluation.js';
 const root=fileURLToPath(new URL('../',import.meta.url)),out=resolve(root,'.training');await mkdir(out,{recursive:true});
 const args=process.argv.slice(2),smoke=args.includes('--smoke'),secondsArg=args.find(a=>a.startsWith('--seconds='));
@@ -15,7 +16,7 @@ try{lock=await open(lockPath,'wx');await lock.writeFile(String(process.pid));}ca
 try{os.setPriority(os.constants.priority.PRIORITY_BELOW_NORMAL);}catch{}
 const db=createDatabase(),styles=['incumbent','station','tight','aggressive'],groups=styles.flatMap(style=>[3,6].map(seats=>({style,seats,key:`${style}-${seats}`})));
 async function atomicJSON(path,value){const temp=path+'.tmp';await writeFile(temp,JSON.stringify(value,null,2));await rename(temp,path);}
-const hash=createHash('sha256');for(const file of ['bot-policy.js','bot-tactics.js','bot-strategy.js','bot-ranges.js','training/simulator.js','training/evaluation.js','scripts/train-bots.js'])hash.update(await readFile(join(root,file)));const fingerprint=hash.digest('hex');
+const hash=createHash('sha256');for(const file of ['bot-policy.js','public/bot-styles.js','tournament-policy.js','bot-tactics.js','bot-strategy.js','bot-ranges.js','training/simulator.js','training/evaluation.js','scripts/train-bots.js'])hash.update(await readFile(join(root,file)));const fingerprint=hash.digest('hex');
 let report;
 try{
  const active=await db.activePolicy();if(!active&&!smoke)throw Error('Database unavailable; training skipped without changing the live policy. Run npm run db:check.');
@@ -23,7 +24,7 @@ try{
  let saved;try{saved=JSON.parse(await readFile(checkpointPath,'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
  report=!smoke&&saved?.kind==='nightly'&&saved.parentId===parent.id&&saved.fingerprint===fingerprint&&!saved.complete?saved:{id:randomUUID(),kind:smoke?'smoke':'nightly',parentId:parent.id,fingerprint,seed:randomBytes(4).readUInt32LE(),startedAt:new Date().toISOString(),scope:'multiway cash heuristic tactic frequencies; fixed-stack duplicate deals; heads-up heuristic continuation (not a CFR strength guarantee)',screening:[],validation:{samples:700,deltas:[],groups:{}},complete:false};
  const timedOut=()=>Date.now()>=deadline;
- function block(params,group,seed,samples){const deltas=[];for(let seat=0;seat<group.seats;seat++){if(timedOut())return null;const options={seed,seats:group.seats,heroSeat:seat,incumbent:parent.params,style:group.style,samples,depth:[30,60,100,150][seed%4]};const baseline=simulateHand({...options,policy:parent.params});if(timedOut())return null;const candidate=simulateHand({...options,policy:params});deltas.push(candidate.reward-baseline.reward);}return deltas.reduce((n,v)=>n+v,0)/deltas.length;}
+ function block(params,group,seed,samples){const deltas=[];for(let seat=0;seat<group.seats;seat++){if(timedOut())return null;const options={seed,seats:group.seats,heroSeat:seat,incumbent:parent.params,style:group.style,samples,depth:[30,60,100,150][seed%4],botStyles:Array.from({length:group.seats},(_,i)=>BOT_STYLE_IDS[(seed+i)%BOT_STYLE_IDS.length])};const baseline=simulateHand({...options,policy:parent.params});if(timedOut())return null;const candidate=simulateHand({...options,policy:params});deltas.push(candidate.reward-baseline.reward);}return deltas.reduce((n,v)=>n+v,0)/deltas.length;}
  if(!report.candidate){
   const random=seededRandom(report.seed),candidates=Array.from({length:smoke?1:3},()=>normalizePolicy(Object.fromEntries(Object.entries(parent.params).map(([key,value])=>[key,TRAINABLE_KEYS.includes(key)?value*(.8+random()*.4):value]))));
   for(let i=report.screening.length;i<candidates.length&&!timedOut();i++){

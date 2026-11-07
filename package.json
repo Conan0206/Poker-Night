@@ -7,8 +7,10 @@
     "start": "node --env-file-if-exists=.env server.js",
     "test": "node --test",
     "db:check": "node --env-file-if-exists=.env scripts/check-database.js",
-    "train:nightly": "node --env-file-if-exists=.env scripts/train-bots.js",
-    "train:check": "node --env-file-if-exists=.env scripts/train-bots.js --smoke --seconds=45"
+    "train:nightly": "node --env-file-if-exists=.env scripts/train-nightly.js",
+    "train:cash": "node --env-file-if-exists=.env scripts/train-bots.js",
+    "train:tournament": "node --env-file-if-exists=.env scripts/train-tournament.js",
+    "train:check": "node --env-file-if-exists=.env scripts/train-nightly.js --smoke --seconds=45"
   },
   "engines": {
     "node": ">=22"

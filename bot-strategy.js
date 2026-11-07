@@ -1,4 +1,6 @@
 import {postflopTactic} from './bot-tactics.js';
+import {botStyle} from './public/bot-styles.js';
+import {tournamentTactic,tournamentSituation} from './tournament-policy.js';
 import {preflopQuality,boardFeatures,rangeEquity} from './bot-ranges.js';
 export {preflopQuality,boardFeatures,rangeEquity} from './bot-ranges.js';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -15,9 +17,12 @@ export function decideBot(view,random=Math.random){
  const position=view.position??(latePosition?1:0),raises=view.raises??(bet>big?1:0);
  const [high,low]=hole.map(value).sort((a,b)=>b-a),suited=hole[0][1]===hole[1][1];
  const premium=high===low&&high>=12||high===14&&low===13;
+ const style=botStyle(view.botStyle),situation=view.mode==='tournament'?tournamentSituation(view):null;
+ const features=preflop?null:boardFeatures(hole,board);
+ const tournamentAction=tournamentTactic(view,{quality,equity,features},random);if(tournamentAction)return tournamentAction;
  if(preflop){
   if(bet<=big){
-   const threshold=opponents===1?.36:position>.65?.46:position>.3?.55:.61;
+   const threshold=(opponents===1?.36:position>.65?.46:position>.3?.55:.61)+(situation?.opening??style.opening);
    if(canRaise&&depth<=12&&quality>threshold+.06)return raiseTo(maximum);
    if(canRaise&&quality>=threshold&&random()<.94)return raiseTo(big*((opponents>3?3:2.5)+(view.limpers||0)));
    if(!call)return passive();
@@ -35,7 +40,7 @@ export function decideBot(view,random=Math.random){
   if(call>big*8&&quality<.68&&equity<odds+.1)return {type:'fold'};
   return passive();
  }
- const f=boardFeatures(hole,board),draw=f.flushDraw||f.straightDraw;const tactic=view.tacticsEvaluated?null:postflopTactic(view,{equity,features:f},random);if(tactic)return tactic;const station=(view.opponentModels||[]).some(m=>m.facedBets>=12&&m.foldsToBet/m.facedBets<.25||m.hands>=20&&m.vpip/m.hands>.48);
+ const f=features,draw=f.flushDraw||f.straightDraw;const tactic=view.tacticsEvaluated?null:postflopTactic(view,{equity,features:f},random);if(tactic)return tactic;const station=(view.opponentModels||[]).some(m=>m.facedBets>=12&&m.foldsToBet/m.facedBets<.25||m.hands>=20&&m.vpip/m.hands>.48);
  const opponentsAggressive=(view.opponentModels||[]).some(m=>m.hands>=8&&m.actions>0&&m.aggressive/m.actions>.45);
  const margin=.012+(commitment>.35?.025:0)+(opponents>2?.025:0)-(opponentsAggressive?.012:0);
  if(call&&equity<odds+margin){
@@ -57,9 +62,9 @@ export function decideBot(view,random=Math.random){
  }
  const initiative=view.initiative||view.preflopAggressor;
  if(board.length===3&&initiative&&opponents<=2&&!f.monotone&&equity>.23&&random()<(f.wet?.48:.76))return raiseTo(Math.max(big,pot*(f.wet?.65:.33)));
- if(draw&&board.length<5&&equity>.26&&opponents<=2&&random()<(latePosition?.65:.43))return raiseTo(Math.max(big,pot*.65));
+ if(draw&&board.length<5&&equity>.26&&opponents<=2&&random()<(latePosition?.65:.43)*style.aggression)return raiseTo(Math.max(big,pot*.65));
  const bluffCandidate=board.length===5?f.category===0||f.nutBlocker:f.category===0&&quality>.42;
- if(!station&&latePosition&&opponents<=2&&bluffCandidate&&equity<.48&&random()<(opponents===1?(f.nutBlocker?.32:.2):.065))return raiseTo(Math.max(big,pot*(board.length===5?.8:.55)));
+ if(!station&&latePosition&&opponents<=2&&bluffCandidate&&equity<.48&&random()<(opponents===1?(f.nutBlocker?.32:.2):.065)*style.bluff)return raiseTo(Math.max(big,pot*(board.length===5?.8:.55)));
  return passive();
 }
 
