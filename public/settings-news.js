@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Corrected chart colours, simplified bot choices, added type-based names and win-rate tooltips.',
   'Added separate chip sounds for bets and raises.',
   'Reveal hand now shows all bot cards directly when no other human is seated.',
   'Tidied six/seven-player bets, enlarged wager chips and amounts, and simplified the emote bank.',

@@ -4,7 +4,7 @@ import {spawn} from 'node:child_process';
 import {io} from 'socket.io-client';
 import {measuredStyle} from './public/style-metrics.js';
 import {capturePlayerStyles} from './player-statistics.js';
-import {BOT_STYLE_IDS} from './public/bot-styles.js';
+import {BOT_STYLE_IDS,BOT_STYLES} from './public/bot-styles.js';
 test('style chart uses completed-hand VPIP and aggressive versus calling decisions',()=>{
  assert.equal(measuredStyle().ready,false);assert.equal(measuredStyle({hands:3,vpip:0,raises:0,calls:0}).ready,false);
  for(const [vpip,raises,calls,id] of [[20,15,5,'tag'],[50,15,5,'lag'],[50,2,18,'fish'],[10,2,18,'rock']]){
@@ -20,6 +20,12 @@ test('chart counters ignore spectators, checks and folds and accumulate complete
  player.vpip=false;room.actionLog=[{actorId:'human',action:{type:'check'}}];capturePlayerStyles(room);
  assert.deepEqual(player.stats.style,{hands:2,vpip:1,raises:1,calls:1});
 });
+test('hand wins count once per completed deal, independently of chip payouts or uncalled returns',()=>{
+ const p={id:'p',inHand:true,wonHand:1200,stats:{won:5000}},q={id:'q',inHand:true,wonHand:0,stats:{won:2000}};
+ const room={players:[p,q],runBoards:[['As'],['Kh']],awards:[{winners:[{id:'p',amount:700}]},{winners:[{id:'p',amount:500}]}],actionLog:[]};
+ capturePlayerStyles(room);assert.equal(p.stats.handsWon,1);assert.equal(q.stats.handsWon,0);
+ p.wonHand=0;q.wonHand=100;capturePlayerStyles(room);assert.equal(p.stats.handsWon,1);assert.equal(q.stats.handsWon,1);assert.equal(p.stats.style.hands,2);
+});
 test('Add bot accepts each selected personality, supports Mixed and rejects invalid styles',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3188',DATABASE_URL:'',BOT_ARENA:'off',FEEDBACK_EMAIL_ENABLED:'false'},stdio:'pipe'});let socket;
  try{
@@ -28,8 +34,9 @@ test('Add bot accepts each selected personality, supports Mixed and rejects inva
   socket.on('state',s=>current=s);
   const state=predicate=>new Promise((resolve,reject)=>{if(current&&predicate(current))return resolve(current);const timer=setTimeout(()=>{socket.off('state',check);reject(Error('State timeout'));},3000);const check=s=>{if(predicate(s)){clearTimeout(timer);socket.off('state',check);resolve(s);}};socket.on('state',check);});
   await new Promise(resolve=>socket.on('connect',resolve));socket.emit('enter',{name:'Style test',mode:'tournament'});await state(s=>s.players.length===1);
-  for(const [i,style] of BOT_STYLE_IDS.entries()){socket.emit('addbot',{style});const s=await state(s=>s.players.filter(p=>p.bot).length===i+1);assert.equal(s.players.filter(p=>p.bot).at(-1).botStyle,style);}
-  socket.emit('addbot',{style:'mixed'});await state(s=>s.players.filter(p=>p.bot).length===5);assert.ok(BOT_STYLE_IDS.includes(current.players.filter(p=>p.bot).at(-1).botStyle));
-  const notice=new Promise(resolve=>socket.once('notice',resolve));socket.emit('addbot',{style:'invalid'});assert.match(await notice,/Choose TAG/);assert.equal(current.players.filter(p=>p.bot).length,5);
+  for(const [i,style] of BOT_STYLE_IDS.entries()){socket.emit('addbot',{style});const s=await state(s=>s.players.filter(p=>p.bot).length===i+1);assert.equal(s.players.filter(p=>p.bot).at(-1).botStyle,style);assert.equal(s.players.filter(p=>p.bot).at(-1).name,BOT_STYLES[style].label+' 1');}
+  socket.emit('addbot',{style:'tag'});await state(s=>s.players.filter(p=>p.bot).length===5);assert.equal(current.players.at(-1).name,'TAG 2');
+  socket.emit('addbot',{style:'mixed'});await state(s=>s.players.filter(p=>p.bot).length===6);const mixed=current.players.filter(p=>p.bot).at(-1);assert.ok(BOT_STYLE_IDS.includes(mixed.botStyle));assert.equal(mixed.name,BOT_STYLES[mixed.botStyle].label+' '+current.players.filter(p=>p.botStyle===mixed.botStyle).length);
+  const notice=new Promise(resolve=>socket.once('notice',resolve));socket.emit('addbot',{style:'invalid'});assert.match(await notice,/Choose TAG/);assert.equal(current.players.filter(p=>p.bot).length,6);
  }finally{socket?.disconnect();child.kill();}
 });

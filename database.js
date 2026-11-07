@@ -4,7 +4,7 @@ import {tournamentPromotionGate} from './training/tournament-evaluation.js';
 import {TOURNAMENT_BASELINE_ID,TOURNAMENT_DEFAULT,normalizeTournamentPolicy} from './tournament-policy.js';
 import pg from 'pg';
 import {readFileSync} from 'node:fs';
-export const BOT_VERSION='selectable-styles-v4';
+export const BOT_VERSION='style-statistics-v5';
 const policyTable=mode=>mode==='tournament'?'poker_active_tournament_policy':'poker_active_policy';
 const policyParams=(mode,params)=>mode==='tournament'?normalizeTournamentPolicy(params):normalizePolicy(params);
 const schema=readFileSync(new URL('./database-schema.sql',import.meta.url),'utf8');
