@@ -2,6 +2,12 @@ import {measuredStyle} from './style-metrics.js';
 import {BOT_STYLES,BOT_STYLE_IDS} from './bot-styles.js';
 let serial=0;
 const svgNode=(tag,attrs={},text)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(text!==undefined)el.textContent=text;return el;};
+const styleExplanations={
+ tag:{title:'The TAG',subtitle:'Tight-Aggressive',text:"TAGs are selective players who enter few pots but play them forcefully. They patiently wait for strong hands and then bet or raise aggressively. This style is generally considered one of the most profitable in poker. However, TAGs can become predictable if they're too rigid in their hand selection."},
+ lag:{title:'The LAG',subtitle:'Loose-Aggressive',text:"LAGs play a wide range of hands and aren't shy about betting big. Their unpredictable style keeps opponents guessing, allowing them to win pots both with good cards and well-timed bluffs. While exciting and potentially lucrative, this high-variance strategy requires skill to execute successfully."},
+ fish:{title:'The Fish',subtitle:'Loose-Passive',text:"Fish love to be in hands but rarely take the initiative to bet or raise. They frequently call bets with marginal hands and often chase draws. While occasionally hitting unlikely hands, this style generally loses money over time. Fish can be frustrating opponents as they're hard to bluff."},
+ rock:{title:'The Rock',subtitle:'Tight-Passive',text:"Rocks are ultra-conservative players who rarely enter pots and prefer calling to betting. They're difficult to bluff out of hands but also miss opportunities to maximize their winnings with strong cards. This cautious approach minimizes losses but limits winning potential, making it most effective in very loose games."}
+};
 export function renderPlayerStyle(stats,mode,assignedStyle){
  const model=measuredStyle(stats),fixedStyle=BOT_STYLES[assignedStyle]?assignedStyle:null,highlight=fixedStyle||model.id,card=document.createElement('section');card.className='playerStyleProfile';card.dataset.mode=mode||'cash';
  const header=document.createElement('div');header.className='styleProfileHeader';const title=document.createElement('strong');title.textContent='Observed play';const status=document.createElement('span');status.textContent=fixedStyle?'Bot style · '+BOT_STYLES[fixedStyle].label:model.ready?(model.early?'Early estimate':'Style estimate'):'Building profile';if(fixedStyle)status.title='Assigned bot style stays fixed. The chart shows observed play from completed hands.';header.append(title,status);card.append(header);
@@ -28,7 +34,13 @@ export function renderPlayerStyle(stats,mode,assignedStyle){
   svg.append(svgNode('text',{x,y,'text-anchor':'middle',class:'styleAxisLabel',fill:color},label));svg.append(svgNode('text',{x,y:y+16,'text-anchor':'middle',class:'styleAxisHint',fill:'#84939e'},hint));
  }
  if(!model.ready)svg.append(svgNode('text',{x:200,y:169,'text-anchor':'middle',class:'styleEmpty',fill:'#8c9ba6'},'Awaiting hand data'));
- card.append(svg);const note=document.createElement('p');note.className='styleProfileNote';note.textContent=model.ready?`${model.hands} completed ${model.hands===1?'hand':'hands'} · ${model.decisions} bets, raises & calls${model.early?' · small sample':''}`:'Play a hand with a bet, raise or call to build this chart.';card.append(note);
+ const chart=document.createElement('div');chart.className='styleChart';chart.append(svg);
+ for(const [id,[x,y]] of Object.entries(badges)){
+  const help=document.createElement('button'),tip=document.createElement('aside'),heading=document.createElement('strong'),subtitle=document.createElement('span'),description=document.createElement('p'),info=styleExplanations[id],tipId='style-explanation-'+(++serial);
+  help.type='button';help.className='styleBadgeHelp';help.dataset.styleHelp=id;help.setAttribute('aria-label','About '+BOT_STYLES[id].label);help.setAttribute('aria-describedby',tipId);help.style.cssText=`left:${x/4}%;top:${y/3.3}%;width:15%;height:${36/3.3}%`;
+  tip.id=tipId;tip.className='styleExplanation';tip.dataset.style=id;tip.setAttribute('role','tooltip');heading.textContent=info.title;subtitle.textContent=info.subtitle;description.textContent=info.text;tip.append(heading,subtitle,description);chart.append(help,tip);
+ }
+ card.append(chart);const note=document.createElement('p');note.className='styleProfileNote';note.textContent=model.ready?`${model.hands} completed ${model.hands===1?'hand':'hands'} · ${model.decisions} bets, raises & calls${model.early?' · small sample':''}`:'Play a hand with a bet, raise or call to build this chart.';card.append(note);
  return card;
 }
 export function renderBotStylePicker(body,socket,state){

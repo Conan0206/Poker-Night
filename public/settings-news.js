@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Hover over TAG, LAG, FISH or ROCK in Statistics for a play-style explanation.',
   'Statistics now keeps the assigned bot type highlighted beside its observed-play chart.',
   'Corrected chart colours, simplified bot choices, added type-based names and win-rate tooltips.',
   'Added separate chip sounds for bets and raises.',

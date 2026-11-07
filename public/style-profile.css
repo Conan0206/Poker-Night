@@ -15,3 +15,21 @@
 .botStyleChoice[data-style=lag]{--bot-style-color:#f5c85a}.botStyleChoice[data-style=fish]{--bot-style-color:#4bb6ee}.botStyleChoice[data-style=rock]{--bot-style-color:#a77aef}.botStyleChoice[data-style=mixed]{--bot-style-color:var(--accent)}
 .botStyleChoice>strong{display:grid;place-items:center;min-height:39px;border-radius:9px;color:var(--bot-style-color);background:color-mix(in srgb,var(--bot-style-color) 12%,transparent);font-size:12px;letter-spacing:.3px}.botStyleCopy{display:flex;flex-direction:column;gap:4px;min-width:0}.botStyleCopy>b{font-size:12px;font-weight:600;color:#e5ecee}.botStyleCopy>small{font-size:10px;line-height:1.4;color:#98aab5}.botChoicePlus{font-size:21px;font-weight:400;text-align:center;color:#a4b3bd}.botStyleChoice:hover{border-color:var(--bot-style-color);background:#202c36}.botStyleChoice:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 @media(max-width:650px){.statisticsPanel{padding:23px}.playerStatsOverview{grid-template-columns:1fr;gap:14px}.statisticsPanel .statGrid{grid-template-columns:1fr 1fr}.statisticsPanel .stat{padding:10px 12px}.statisticsPanel .stat strong{font-size:24px}.styleProfileHeader{padding-top:12px}.botStyleChoice{grid-template-columns:57px minmax(0,1fr) 18px;gap:10px;padding:11px}}
+
+.styleChart{position:relative}
+.styleBadgeHelp{position:absolute;z-index:1;min-height:0;padding:0;border:0;border-radius:13px;background:transparent;cursor:help}
+.styleBadgeHelp:hover{background:#ffffff0a}.styleBadgeHelp:focus-visible{outline:2px solid #e6efff;outline-offset:2px}
+.styleExplanation{--style-help-color:#ef6a92;position:absolute;z-index:5;top:17.87%;left:6%;width:88%;max-width:320px;padding:18px;border:1px solid var(--style-help-color);border-radius:14px;background:#17212c;color:#d5dfe5;box-shadow:0 10px 28px #0008;visibility:hidden;opacity:0;pointer-events:none;text-align:left;box-sizing:border-box}
+.styleExplanation[data-style=lag]{--style-help-color:#f5c85a;left:auto;right:6%}.styleExplanation[data-style=fish]{--style-help-color:#4bb6ee;left:auto;right:6%}.styleExplanation[data-style=rock]{--style-help-color:#a77aef}
+.styleExplanation[data-style=fish],.styleExplanation[data-style=rock]{top:auto;bottom:17.27%}
+.styleExplanation>strong{display:block;color:var(--style-help-color);font-size:18px;line-height:1.2}.styleExplanation>span{display:block;margin-top:5px;color:#aabcc8;font-size:12px}.playerStyleProfile .styleExplanation>p{margin:12px 0 0;color:#d5dfe5;font-size:12px;line-height:1.65}
+.styleChart:has(.styleBadgeHelp[data-style-help=tag]:hover) .styleExplanation[data-style=tag],
+.styleChart:not(:has(.styleBadgeHelp:hover,.styleExplanation:hover)):has(.styleBadgeHelp[data-style-help=tag]:focus) .styleExplanation[data-style=tag],
+.styleChart:has(.styleBadgeHelp[data-style-help=lag]:hover) .styleExplanation[data-style=lag],
+.styleChart:not(:has(.styleBadgeHelp:hover,.styleExplanation:hover)):has(.styleBadgeHelp[data-style-help=lag]:focus) .styleExplanation[data-style=lag],
+.styleChart:has(.styleBadgeHelp[data-style-help=fish]:hover) .styleExplanation[data-style=fish],
+.styleChart:not(:has(.styleBadgeHelp:hover,.styleExplanation:hover)):has(.styleBadgeHelp[data-style-help=fish]:focus) .styleExplanation[data-style=fish],
+.styleChart:has(.styleBadgeHelp[data-style-help=rock]:hover) .styleExplanation[data-style=rock],
+.styleChart:not(:has(.styleBadgeHelp:hover,.styleExplanation:hover)):has(.styleBadgeHelp[data-style-help=rock]:focus) .styleExplanation[data-style=rock],
+.styleExplanation:hover{visibility:visible;opacity:1;pointer-events:auto}
+@media(max-width:420px){.styleExplanation{padding:13px}.styleExplanation>strong{font-size:16px}.playerStyleProfile .styleExplanation>p{font-size:11px;line-height:1.5}}
