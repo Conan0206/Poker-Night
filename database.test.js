@@ -25,3 +25,10 @@ test('tournament promotion is isolated from cash and cannot overwrite a newer to
  assert.equal(await db.promotePolicy(report),true);assert.equal((await db.activePolicy('tournament')).params.steal,.25);assert.equal((await db.activePolicy()).id,BASELINE_POLICY_ID);
  assert.equal(await db.promotePolicy({...report,candidate:{id:'stale-tournament',params:TOURNAMENT_DEFAULT}}),false);assert.equal((await db.activePolicy('tournament')).id,'tournament-test-policy');await db.close();
 });
+test('training report retries recover a dropped connection without duplicate rows',async()=>{
+ // pg-mem's AST coverage rejects repeated CREATE IF NOT EXISTS during reconnect bootstrap.
+ const mem=newDb({noAstCoverageCheck:true}),Pool=mem.adapters.createPg().Pool;let failures=0;
+ class FlakyPool extends Pool{async query(sql,...args){if(sql.startsWith('INSERT INTO poker_training_runs')&&failures++===0){const error=new Error('Connection dropped');error.code='ECONNRESET';throw error;}return super.query(sql,...args);}}
+ const db=createDatabase({connectionString:'postgresql://test:test@localhost/test',PoolClass:FlakyPool,logger:{warn(){}}});
+ assert.equal(await db.saveTraining({id:fixture.id,mode:'tournament',status:'collecting'}),true);assert.equal(mem.public.one('SELECT count(*) AS n FROM poker_training_runs').n,1);assert.equal(db.status().connected,true);await db.close();
+});
