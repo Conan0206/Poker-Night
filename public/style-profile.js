@@ -2,10 +2,10 @@ import {measuredStyle} from './style-metrics.js';
 import {BOT_STYLES,BOT_STYLE_IDS} from './bot-styles.js';
 let serial=0;
 const svgNode=(tag,attrs={},text)=>{const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(text!==undefined)el.textContent=text;return el;};
-export function renderPlayerStyle(stats,mode){
- const model=measuredStyle(stats),card=document.createElement('section');card.className='playerStyleProfile';card.dataset.mode=mode||'cash';
- const header=document.createElement('div');header.className='styleProfileHeader';const title=document.createElement('strong');title.textContent='Playing style';const status=document.createElement('span');status.textContent=model.ready?(model.early?'Early estimate':'Style estimate'):'Building profile';header.append(title,status);card.append(header);
- const svg=svgNode('svg',{viewBox:'0 0 400 330',role:'img','aria-label':model.ready?`${BOT_STYLES[model.id].label} style estimate. VPIP ${Math.round(model.loose*100)}%. Aggression ${Math.round(model.aggressive*100)}%. ${model.hands} completed hands.`:'Playing-style chart. Not enough completed betting data yet.'});
+export function renderPlayerStyle(stats,mode,assignedStyle){
+ const model=measuredStyle(stats),fixedStyle=BOT_STYLES[assignedStyle]?assignedStyle:null,highlight=fixedStyle||model.id,card=document.createElement('section');card.className='playerStyleProfile';card.dataset.mode=mode||'cash';
+ const header=document.createElement('div');header.className='styleProfileHeader';const title=document.createElement('strong');title.textContent='Observed play';const status=document.createElement('span');status.textContent=fixedStyle?'Bot style · '+BOT_STYLES[fixedStyle].label:model.ready?(model.early?'Early estimate':'Style estimate'):'Building profile';if(fixedStyle)status.title='Assigned bot style stays fixed. The chart shows observed play from completed hands.';header.append(title,status);card.append(header);
+ const svg=svgNode('svg',{viewBox:'0 0 400 330',role:'img','aria-label':model.ready?`${fixedStyle?'Assigned bot style '+BOT_STYLES[fixedStyle].label+'. Observed play':BOT_STYLES[model.id].label+' style estimate'}. VPIP ${Math.round(model.loose*100)}%. Aggression ${Math.round(model.aggressive*100)}%. ${model.hands} completed hands.`:'Playing-style chart. Not enough completed betting data yet.'});
  const cx=200,cy=165,r=88,points=(top,right,bottom,left)=>`${cx},${cy-r*top} ${cx+r*right},${cy} ${cx},${cy+r*bottom} ${cx-r*left},${cy}`;
  for(const scale of [1,.75,.5,.25])svg.append(svgNode('polygon',{points:points(scale,scale,scale,scale),fill:'none',stroke:'#52606b','stroke-opacity':scale===1?.65:.35,'stroke-dasharray':scale===1?'none':'3 5'}));
  svg.append(svgNode('path',{d:'M112 165H288M200 77V253',stroke:'#536371','stroke-opacity':.28,fill:'none'}));
@@ -17,12 +17,12 @@ export function renderPlayerStyle(stats,mode){
   const clipId='playing-style-clip-'+(++serial),defs=svgNode('defs'),clip=svgNode('clipPath',{id:clipId,clipPathUnits:'userSpaceOnUse'});
   const shape=points(model.aggressive,model.loose,1-model.aggressive,1-model.loose);
   clip.append(svgNode('polygon',{points:shape}));defs.append(clip);svg.append(defs);
-  const [bx,by]=badges[model.id];svg.append(svgNode('line',{x1:bx+30,y1:by+18,x2:cx+(model.loose*2-1)*r*.5,y2:cy+(1-model.aggressive*2)*r*.5,stroke:colors[model.id],'stroke-width':1.5,'stroke-opacity':.7}));
+  if(!fixedStyle){const [bx,by]=badges[model.id];svg.append(svgNode('line',{x1:bx+30,y1:by+18,x2:cx+(model.loose*2-1)*r*.5,y2:cy+(1-model.aggressive*2)*r*.5,stroke:colors[model.id],'stroke-width':1.5,'stroke-opacity':.7}));}
   const field=svgNode('foreignObject',{x:cx-r,y:cy-r,width:r*2,height:r*2}),paint=document.createElementNS('http://www.w3.org/1999/xhtml','div');paint.className='styleColorField';field.append(paint);
   const clipped=svgNode('g',{'clip-path':`url(#${clipId})`});clipped.append(field);svg.append(clipped,svgNode('polygon',{points:shape,fill:'none',stroke:'#dbe8f9','stroke-opacity':.35}));
  }
  for(const [id,[x,y]] of Object.entries(badges)){
-  const active=model.id===id;svg.append(svgNode('rect',{x,y,width:60,height:36,rx:13,fill:active?colors[id]:'#161c24',stroke:active?colors[id]:'#46505c','stroke-opacity':active?1:.6}));svg.append(svgNode('text',{x:x+30,y:y+23,'text-anchor':'middle',class:'styleBadgeText',fill:active?'#121827':'#a5afba'},BOT_STYLES[id].label));
+  const active=highlight===id;svg.append(svgNode('rect',{'data-style':id,'data-active':active,x,y,width:60,height:36,rx:13,fill:active?colors[id]:'#161c24',stroke:active?colors[id]:'#46505c','stroke-opacity':active?1:.6}));svg.append(svgNode('text',{x:x+30,y:y+23,'text-anchor':'middle',class:'styleBadgeText',fill:active?'#121827':'#a5afba'},BOT_STYLES[id].label));
  }
  for(const [label,hint,x,y,color] of [['Aggressive','More bets & raises',200,43,colors.tag],['Loose','More hands',343,162,colors.lag],['Passive','More calls',200,289,colors.fish],['Tight','Fewer hands',58,162,colors.rock]]){
   svg.append(svgNode('text',{x,y,'text-anchor':'middle',class:'styleAxisLabel',fill:color},label));svg.append(svgNode('text',{x,y:y+16,'text-anchor':'middle',class:'styleAxisHint',fill:'#84939e'},hint));
