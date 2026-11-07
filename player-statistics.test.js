@@ -12,6 +12,17 @@ test('style chart uses completed-hand VPIP and aggressive versus calling decisio
  }
  assert.equal(measuredStyle({hands:1,vpip:1,raises:1,calls:0}).early,true);
 });
+test('style label follows the same directional balance as the chart',()=>{
+ // The reported examples must remain tight despite their assigned bot personalities.
+ assert.equal(measuredStyle({hands:10,vpip:2,raises:5,calls:1}).id,'tag');
+ assert.equal(measuredStyle({hands:13,vpip:4,raises:6,calls:1}).id,'tag');
+ assert.equal(measuredStyle({hands:13,vpip:5,raises:2,calls:4}).id,'rock');
+ for(const [vpip,raises,id] of [[49,51,'tag'],[51,51,'lag'],[49,49,'rock'],[51,49,'fish'],[50,50,'lag']]){
+  const model=measuredStyle({hands:100,vpip,raises,calls:100-raises});
+  assert.equal(model.id,id);assert.equal(model.loose>=1-model.loose,['lag','fish'].includes(id));assert.equal(model.aggressive>=1-model.aggressive,['tag','lag'].includes(id));
+ }
+});
+
 test('chart counters ignore spectators, checks and folds and accumulate completed hand actions',()=>{
  const player={id:'human',inHand:true,vpip:true,stats:{}},watch={id:'watch',inHand:false,stats:{}};
  const room={players:[player,watch],actionLog:['call','check','raise','fold'].map(type=>({actorId:'human',action:{type}}))};

@@ -8,10 +8,10 @@ const styleExplanations={
  fish:{title:'The Fish',subtitle:'Loose-Passive',text:"Fish love to be in hands but rarely take the initiative to bet or raise. They frequently call bets with marginal hands and often chase draws. While occasionally hitting unlikely hands, this style generally loses money over time. Fish can be frustrating opponents as they're hard to bluff."},
  rock:{title:'The Rock',subtitle:'Tight-Passive',text:"Rocks are ultra-conservative players who rarely enter pots and prefer calling to betting. They're difficult to bluff out of hands but also miss opportunities to maximize their winnings with strong cards. This cautious approach minimizes losses but limits winning potential, making it most effective in very loose games."}
 };
-export function renderPlayerStyle(stats,mode,assignedStyle){
- const model=measuredStyle(stats),fixedStyle=BOT_STYLES[assignedStyle]?assignedStyle:null,highlight=fixedStyle||model.id,card=document.createElement('section');card.className='playerStyleProfile';card.dataset.mode=mode||'cash';
- const header=document.createElement('div');header.className='styleProfileHeader';const title=document.createElement('strong');title.textContent='Observed play';const status=document.createElement('span');status.textContent=fixedStyle?'Bot style · '+BOT_STYLES[fixedStyle].label:model.ready?(model.early?'Early estimate':'Style estimate'):'Building profile';if(fixedStyle)status.title='Assigned bot style stays fixed. The chart shows observed play from completed hands.';header.append(title,status);card.append(header);
- const svg=svgNode('svg',{viewBox:'0 0 400 330',role:'img','aria-label':model.ready?`${fixedStyle?'Assigned bot style '+BOT_STYLES[fixedStyle].label+'. Observed play':BOT_STYLES[model.id].label+' style estimate'}. VPIP ${Math.round(model.loose*100)}%. Aggression ${Math.round(model.aggressive*100)}%. ${model.hands} completed hands.`:'Playing-style chart. Not enough completed betting data yet.'});
+export function renderPlayerStyle(stats,mode){
+ const model=measuredStyle(stats),highlight=model.id,card=document.createElement('section');card.className='playerStyleProfile';card.dataset.mode=mode||'cash';
+ const header=document.createElement('div');header.className='styleProfileHeader';const title=document.createElement('strong');title.textContent='Observed play';const status=document.createElement('span');status.textContent=model.ready?(model.early?'Early estimate':'Style estimate'):'Building profile';header.append(title,status);card.append(header);
+ const svg=svgNode('svg',{viewBox:'0 0 400 330',role:'img','aria-label':model.ready?`${BOT_STYLES[model.id].label} style estimate. VPIP ${Math.round(model.loose*100)}%. Aggression ${Math.round(model.aggressive*100)}%. ${model.hands} completed hands.`:'Playing-style chart. Not enough completed betting data yet.'});
  const cx=200,cy=165,r=88,points=(top,right,bottom,left)=>`${cx},${cy-r*top} ${cx+r*right},${cy} ${cx},${cy+r*bottom} ${cx-r*left},${cy}`;
  for(const scale of [1,.75,.5,.25])svg.append(svgNode('polygon',{points:points(scale,scale,scale,scale),fill:'none',stroke:'#52606b','stroke-opacity':scale===1?.65:.35,'stroke-dasharray':scale===1?'none':'3 5'}));
  svg.append(svgNode('path',{d:'M112 165H288M200 77V253',stroke:'#536371','stroke-opacity':.28,fill:'none'}));
@@ -23,7 +23,7 @@ export function renderPlayerStyle(stats,mode,assignedStyle){
   const clipId='playing-style-clip-'+(++serial),defs=svgNode('defs'),clip=svgNode('clipPath',{id:clipId,clipPathUnits:'userSpaceOnUse'});
   const shape=points(model.aggressive,model.loose,1-model.aggressive,1-model.loose);
   clip.append(svgNode('polygon',{points:shape}));defs.append(clip);svg.append(defs);
-  if(!fixedStyle){const [bx,by]=badges[model.id];svg.append(svgNode('line',{x1:bx+30,y1:by+18,x2:cx+(model.loose*2-1)*r*.5,y2:cy+(1-model.aggressive*2)*r*.5,stroke:colors[model.id],'stroke-width':1.5,'stroke-opacity':.7}));}
+  const [bx,by]=badges[model.id];svg.append(svgNode('line',{'data-style':model.id,x1:bx+30,y1:by+18,x2:cx+(model.loose*2-1)*r*.5,y2:cy+(1-model.aggressive*2)*r*.5,stroke:colors[model.id],'stroke-width':1.5,'stroke-opacity':.7}));
   const field=svgNode('foreignObject',{x:cx-r,y:cy-r,width:r*2,height:r*2}),paint=document.createElementNS('http://www.w3.org/1999/xhtml','div');paint.className='styleColorField';field.append(paint);
   const clipped=svgNode('g',{'clip-path':`url(#${clipId})`});clipped.append(field);svg.append(clipped,svgNode('polygon',{points:shape,fill:'none',stroke:'#dbe8f9','stroke-opacity':.35}));
  }
