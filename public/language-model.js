@@ -84,7 +84,8 @@ const chinese = new Map(Object.entries({
  'Invite link copied!':'邀请链接已复制！','Create a table first.':'请先创建牌桌。','Create a table or join your friends to get started.':'创建牌桌或加入朋友的牌桌即可开始。',
  'Browser notifications':'浏览器通知','Send test notification':'发送测试通知','Turn alerts':'行动提醒','Enable notifications':'启用通知','Not now':'暂不启用','Allow notifications':'允许通知',
  'What’s new · Recent improvements':'最新内容 · 最近改进','Latest update · 7 November 2026':'最近更新 · 2026年11月7日',
- 'Simpler reveal tutorial, larger table information and English/Chinese language settings.':'简化查看手牌教程，放大牌桌信息面板，新增中英文语言设置。'
+ 'Simpler reveal tutorial, larger table information and English/Chinese language settings.':'简化查看手牌教程，放大牌桌信息面板，新增中英文语言设置。',
+ 'Pot payouts now repeat the betting chip sound until distribution ends.':'底池分配期间会连续播放下注筹码音效，直到分配结束。'
 }));
 
 // Long help panels use the supplied explanations, translated without changing names.

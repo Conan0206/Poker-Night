@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 7 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Pot payouts now repeat the betting chip sound until distribution ends.',
   'Simpler reveal tutorial, larger table information and English/Chinese language settings.',
   'Restored chart connector lines and matched style highlights to observed play.',
   'Hover over TAG, LAG, FISH or ROCK in Statistics for a play-style explanation.',
