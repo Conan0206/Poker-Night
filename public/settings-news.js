@@ -2,9 +2,10 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const section=document.createElement('section');section.className='settingsCommunity';
  const updates=document.createElement('details');
  const title=document.createElement('summary');title.textContent='What’s new · Recent improvements';updates.append(title);
- const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 8 November 2026';updates.append(date);
+ const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 9 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Simpler payout history and reliable tournament spectator all-in audio.',
   'Tidied left-side bets when watching a six-player table.',
   'Refreshed the homepage with larger game features and the original card fan.',
   'Tutorial now points to the home logo and works correctly in Bot training.',

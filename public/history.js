@@ -8,20 +8,30 @@
   return [1,2].map(number=>{const totals=new Map();for(const m of matches.filter(m=>Number(m[1])===number))totals.set(m[2],(totals.get(m[2])||0)+Number(m[3].replaceAll(',','')));return {number,winners:[...totals].map(([name,amount])=>({name,amount})),board:[],pots:[]};});
  };
  const money=(amount,h)=>'$'+amount.toLocaleString()+(h.mode==='tournament'?' ('+(amount/h.big).toLocaleString(undefined,{maximumFractionDigits:1})+' BB)':'');
- function winnerRows(parent,winners,h){for(const winner of winners){const row=document.createElement('div'),name=document.createElement('span'),amount=document.createElement('strong');row.className='historyWinner';name.textContent=winner.name;amount.textContent='+'+money(winner.amount,h);row.append(name,amount);parent.append(row);}}
+ window.pokerHistorySummary=h=>{
+  if(h.winners?.length)return {winners:h.winners,pots:h.pots||[],split:!!h.split};
+  const chunks=(h.message||'').split(' · '),matches=chunks.map(s=>s.match(/^(.*?) \+\$(\d[\d,]*)$/));
+  if(!matches.length||matches.some(m=>!m))return null;
+  const totals=new Map();for(const m of matches)totals.set(m[1],(totals.get(m[1])||0)+Number(m[2].replaceAll(',','')));
+  return {winners:[...totals].map(([name,amount])=>({name,amount})),pots:[],split:false};
+ };
+ function winnerRows(parent,winners,h){for(const winner of winners){const row=document.createElement('div'),name=document.createElement('span'),amount=document.createElement('strong');row.className='historyWinner';name.textContent=winner.name;amount.textContent='+'+money(winner.amount,h);amount.title='Amount received from pots, not net profit.';row.append(name,amount);parent.append(row);}}
+ function potDetails(parent,pots,h){if(pots.length<2)return;const details=document.createElement('details'),summary=document.createElement('summary');details.className='historyPotDetails';summary.textContent='Pot breakdown';details.append(summary);for(const pot of pots){const group=document.createElement('div'),label=document.createElement('small');label.textContent=pot.label;group.append(label);winnerRows(group,pot.winners,h);details.append(group);}parent.append(details);}
+ function returnedNote(parent,h){if(!h.returned?.amount)return;const note=document.createElement('p');note.className='historyReturned';note.textContent='Uncalled chips returned · '+h.returned.name+' '+money(h.returned.amount,h);parent.append(note);}
+ function renderSummary(body,h,data){const hand=document.createElement('article'),header=document.createElement('div'),label=document.createElement('strong'),number=document.createElement('span');hand.className='historySummaryHand';header.className='historySummaryHeader';label.textContent=data.split?'Split pot':data.winners.length>1?'Pot payouts':'Winner';number.textContent=h.handNumber?'Hand #'+h.handNumber:'';header.append(label,number);hand.append(header);winnerRows(hand,data.winners,h);potDetails(hand,data.pots,h);returnedNote(hand,h);body.append(hand);}
  function renderRuns(body,h,runs){
   const hand=document.createElement('article'),header=document.createElement('div'),title=document.createElement('strong'),tag=document.createElement('span');hand.className='historyRunHand';header.className='historyRunHeader';title.textContent=h.handNumber?'Hand #'+h.handNumber:'All-in hand';tag.textContent='Run it twice';header.append(title,tag);hand.append(header);
   for(const run of runs){
    const section=document.createElement('section'),heading=document.createElement('div'),label=document.createElement('strong');section.className='historyRun';section.dataset.run=run.number;heading.className='historyRunHeading';label.textContent='Run '+run.number;heading.append(label);
    if(run.board?.length){const board=document.createElement('div');board.className='historyBoard';board.setAttribute('aria-label','Run '+run.number+' community cards');for(const card of run.board){const chip=document.createElement('span');chip.className='historyCard'+('hd'.includes(card[1])?' red':'');chip.textContent=(card[0]==='T'?'10':card[0])+({s:'♠',h:'♥',d:'♦',c:'♣'}[card[1]]||'');board.append(chip);}heading.append(board);}
    section.append(heading);winnerRows(section,run.winners,h);
-   if(run.pots?.length>1){const details=document.createElement('details'),summary=document.createElement('summary');details.className='historyPotDetails';summary.textContent='Pot breakdown';details.append(summary);for(const pot of run.pots){const group=document.createElement('div'),label=document.createElement('small');label.textContent=pot.label;group.append(label);winnerRows(group,pot.winners,h);details.append(group);}section.append(details);}
+   potDetails(section,run.pots||[],h);
    hand.append(section);
   }
-  if(h.returned?.amount){const note=document.createElement('p');note.className='historyReturned';note.textContent='Uncalled chips returned · '+h.returned.name+' '+money(h.returned.amount,h);hand.append(note);}
+  returnedNote(hand,h);
   body.append(hand);
  }
  window.renderPokerHistory=(body,s)=>{const history=s?.handHistory||[];if(!history.length){for(const h of s?.history||[]){const row=document.createElement('p');row.textContent=h;body.append(row);}if(!s?.history?.length)body.textContent='Your completed hands will appear here.';return;}
- let group='';for(const h of history){const key=h.mode+':'+h.level+':'+h.small+':'+h.big;if(key!==group){group=key;const heading=document.createElement('h3');heading.className='historyLevelDivider';heading.textContent=h.mode==='tournament'?'Level '+Math.min(h.level,13)+' · $'+h.small+' ('+(h.small/h.big).toLocaleString(undefined,{maximumFractionDigits:1})+' BB) / $'+h.big+' (1 BB)':'Cash · $'+h.small+' / $'+h.big;body.append(heading);}const runs=window.pokerHistoryRuns(h);if(runs){renderRuns(body,h,runs);continue;}const row=document.createElement('p');row.className='historyHand';row.textContent=window.formatPokerHistory(h);body.append(row);}
+ let group='';for(const h of history){const key=h.mode+':'+h.level+':'+h.small+':'+h.big;if(key!==group){group=key;const heading=document.createElement('h3');heading.className='historyLevelDivider';heading.textContent=h.mode==='tournament'?'Level '+Math.min(h.level,13)+' · $'+h.small+' ('+(h.small/h.big).toLocaleString(undefined,{maximumFractionDigits:1})+' BB) / $'+h.big+' (1 BB)':'Cash · $'+h.small+' / $'+h.big;body.append(heading);}const runs=window.pokerHistoryRuns(h);if(runs){renderRuns(body,h,runs);continue;}const summary=window.pokerHistorySummary(h);if(summary){renderSummary(body,h,summary);continue;}const row=document.createElement('p');row.className='historyHand';row.textContent=window.formatPokerHistory(h);body.append(row);}
  };
 })();

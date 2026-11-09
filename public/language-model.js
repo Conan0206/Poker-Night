@@ -1,5 +1,6 @@
 // UI copy only. Never translate user-entered names, messages, cards or values.
 const chinese = new Map(Object.entries({
+ 'Amount received from pots, not net profit.':'从底池收到的筹码，并非净利润。','Split pot':'平分底池','Pot payouts':'底池派彩','Winner':'赢家',
  'POKER, YOUR WAY.':'你的扑克，你的玩法。','Your game.':'你的对局。','Your people.':'你的朋友。',
  'Cash Games':'现金桌','Tournaments':'锦标赛','GTO Self-Learning Bot':'GTO 自学习机器人','Private Tables':'私人牌桌',
  'Your pace. Your next hand.':'自在节奏，迎接下一手。','Four play styles. Built to improve.':'四种打法，持续精进。','Invite your people. Deal them in.':'邀请朋友，一起入座。',

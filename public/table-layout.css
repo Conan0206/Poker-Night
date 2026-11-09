@@ -220,6 +220,10 @@ body.tutorialCommunityHighlight #middle #board{display:flex!important;visibility
 }
 .languageSetting{display:flex;flex-direction:column;gap:12px;margin:22px 0;font-size:14px}.languageSetting select{width:100%;padding:14px;font-size:16px}
 #pokerTutorial[data-home-step=true] .tutorialSpotlight::after{content:'↑';position:absolute;left:20px;top:100%;color:#d0f79c;font-size:24px;font-weight:700;line-height:18px;text-shadow:0 2px 4px #000}
+.historySummaryHand{margin:12px 0;padding:12px 0;border-bottom:1px solid #8faeb326}
+.historySummaryHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.historySummaryHeader>strong{font-size:12px;color:#edcf8c}.historySummaryHeader>span{font-size:10px;color:#93a9ad}
+.historySummaryHand .historyWinner{flex-wrap:wrap;row-gap:0;padding:2px 0}.historySummaryHand .historyWinner>strong{margin-left:auto}
 html[lang=zh-Hans] body,html[lang=zh-Hans] button,html[lang=zh-Hans] input,html[lang=zh-Hans] select,html[lang=zh-Hans] textarea,html[lang=zh-Hans] .playerStyleProfile svg{font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif}
 @media(min-width:701px) and (max-width:1400px){#tableInfoDock{gap:8px}#tableInfoDock #tableInfo{flex-basis:225px;width:225px;padding:18px}#tableInfoDock #tableInfo>div{font-size:12px;padding:12px 0}#tableInfoDock #tableInfo b{font-size:14px}#tableInfoDock #tournamentMode{width:98px;flex-basis:98px;font-size:12px}}
 @media(max-width:700px){#tableInfoDock #tableInfo{flex-basis:195px;width:195px;padding:15px}#tableInfoDock #tableInfo>div{font-size:12px;padding:10px 0;gap:8px}#tableInfoDock #tableInfo b{font-size:13px}#tableInfoDock #blindLevels summary{padding:12px 9px;font-size:12px}#tableInfoDock #blindLevels summary small{font-size:10px}}

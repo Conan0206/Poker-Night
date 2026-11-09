@@ -15,7 +15,27 @@ test('uncalled chips stay separate and players with identical names retain disti
  const entry=handHistoryEntry({mode:'cash',players:[{id:'a',name:'Player',inHand:true,total:150},{id:'b',name:'Player',inHand:true,total:100}],runBoards:[[],[]],awards:[{run:1,displayPotIndex:0,winners:[{id:'a',amount:100},{id:'b',amount:50}]}]},'');
  assert.equal(entry.returned.amount,50);assert.equal(entry.runs[0].winners.length,2);assert.equal(entry.runs[0].winners.reduce((n,w)=>n+w.amount,0),150);
 });
+
+test('single-board split payouts are totalled once per player in cash, Bot training and tournaments',()=>{
+ for(const mode of ['cash','tournament']){
+  const room={mode,practice:mode==='cash',handNumber:3,small:5,big:10,players:[{id:'r',name:'ROCK 1',total:715,inHand:true},{id:'l',name:'LAG 1',total:715,inHand:true}],awards:[{displayPotIndex:0,winners:[{id:'r',amount:15},{id:'l',amount:15}]},{displayPotIndex:1,winners:[{id:'r',amount:700},{id:'l',amount:700}]}]};
+  const h=handHistoryEntry(room,'long message');assert.deepEqual(h.winners.map(p=>p.amount),[715,715]);assert.equal(h.split,true);assert.equal(h.pots.length,2);assert.equal(h.returned,undefined);
+ }
+});
+
+test('fold settlements separate returned chips without changing the underlying awards',()=>{
+ const room={mode:'cash',endedByFold:true,players:[{id:'a',name:'A',total:100,inHand:true},{id:'b',name:'B',total:10,inHand:true,folded:true}],awards:[{potIndex:0,winners:[{id:'a',amount:110}]}]};
+ const h=handHistoryEntry(room,'A wins $110');assert.equal(h.winners[0].amount,20);assert.equal(h.returned.amount,90);assert.equal(room.awards[0].winners[0].amount,110);
+});
 function historyRuntime(){const window={},document={createElement:tag=>({tag,children:[],dataset:{},append(...items){this.children.push(...items);},setAttribute(){}})};vm.runInNewContext(readFileSync('public/history.js','utf8'),{window,document});return window;}
+
+test('legacy repeated payouts condense safely and structured tournament rows include BB',()=>{
+ const w=historyRuntime();const summary=w.pokerHistorySummary({message:'ROCK 1 +$15 · LAG 1 +$15 · ROCK 1 +$700 · LAG 1 +$700'});
+ assert.deepEqual(Array.from(summary.winners,p=>p.amount),[715,715]);assert.equal(w.pokerHistorySummary({message:'Switched tables · A +$50'}),null);
+ const body={children:[],append(el){this.children.push(el);}};
+ w.renderPokerHistory(body,{handHistory:[{mode:'tournament',level:1,small:5,big:10,handNumber:3,winners:[{id:'a',name:'A',amount:715}],pots:[{label:'Main pot',winners:[{name:'A',amount:15}]},{label:'Side pot 1',winners:[{name:'A',amount:700}]}]}]});
+ const hand=body.children[1];assert.equal(hand.className,'historySummaryHand');const winner=hand.children.find(n=>n.className==='historyWinner');assert.equal(winner.children[1].textContent,'+$715 (71.5 BB)');assert.equal(hand.children.at(-1).tag,'details');assert.equal(hand.children.at(-1).open,undefined);
+});
 test('older run-twice messages become two summed rows while ordinary history stays unchanged',()=>{
  const w=historyRuntime(),runs=w.pokerHistoryRuns({message:'Run 1 · Conan +$10 · Run 2 · Conan +$10 · Run 1 · Conan +$8 · Run 2 · Conan +$7 · Run 1 · Conan +$990 · Run 2 · Conan +$990'});
  assert.equal(runs[0].winners[0].amount,1008);assert.equal(runs[1].winners[0].amount,1007);assert.equal(w.pokerHistoryRuns({message:'Bot wins $80'}),null);assert.equal(w.pokerHistoryRuns({message:'Unrecognized · Run 1 · Conan +$10 · Run 2 · Conan +$10'}),null);
