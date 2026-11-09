@@ -32,13 +32,14 @@ function opponentAction(view,style,random){
 }
 // Independent full hands: shuffled cards, rotated positions and fixed starting stacks.
 // Decisions receive their own hole cards and public information, never the deck.
-export function simulateHand({seed,seats=3,heroSeat=0,policy,incumbent,style='incumbent',samples=64,depth=100,decider,beforeDecision,startingStacks,dealerSeat,big=10,small=big/2,mode='cash',tournament,botStyles=[],tournamentPolicy,tournamentIncumbent}={}){
+export function simulateHand({seed,seats=3,heroSeat=0,policy,incumbent,style='incumbent',samples=64,depth=100,decider,beforeDecision,startingStacks,dealerSeat,big=10,small=big/2,mode='cash',tournament,botStyles=[],tournamentPolicy,tournamentIncumbent,recordTrace=false}={}){
  if(!Number.isInteger(seats)||seats<2||seats>8)throw Error('Invalid seats');
  const deckRandom=seededRandom(seed),deck=[...'23456789TJQKA'].flatMap(v=>[...'shdc'].map(s=>v+s));
  for(let i=51;i>0;i--){const j=Math.floor(deckRandom()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
  const bank=depth*big,initial=startingStacks||Array(seats).fill(bank);if(initial.length!==seats||initial.some(n=>!Number.isSafeInteger(n)||n<=0)||!Number.isSafeInteger(big)||big<1||!Number.isSafeInteger(small)||small<1)throw Error('Invalid simulation stacks/blinds');const players=Array.from({length:seats},(_,i)=>({hole:[deck.pop(),deck.pop()],chips:initial[i],total:0,round:0,folded:false,acted:false,raiseAllowed:true,checked:false,pfr:false,action:'',random:seededRandom((seed^Math.imul(i+1,0x9e3779b9))>>>0)}));
  const dealer=dealerSeat??((seed>>>0)%seats),sb=seats===2?dealer:(dealer+1)%seats,bb=(sb+1)%seats;
  const pay=(p,n)=>{n=Math.min(p.chips,n);p.chips-=n;p.total+=n;p.round+=n;};pay(players[sb],small);pay(players[bb],big);
+ const decisionTrace=recordTrace?[]:null;
  let board=[],previousStreetBoard=[],bet=big,minRaise=big,raises=0,preflopAggressor=-1,lastAggressor=-1,actions=0;
  const active=()=>players.filter(p=>!p.folded),next=(i,predicate)=>{for(let n=1;n<=seats;n++){const j=(i+n)%seats;if(predicate(players[j]))return j;}return -1;};
  for(let street=0;street<4&&active().length>1;street++){
@@ -50,7 +51,7 @@ export function simulateHand({seed,seats=3,heroSeat=0,policy,incumbent,style='in
    const p=players[index];if(actionable.length===1&&p.round>=bet)break;
    const opponents=players.filter(q=>q!==p&&!q.folded),order=[];for(let n=1;n<=seats;n++){const j=(dealer+n)%seats;if(!players[j].folded)order.push(j);}
    const ownPosition=order.indexOf(index),view={mode,botStyle:botStyles[index],tournament,tournamentPolicy:index===heroSeat?tournamentPolicy:tournamentIncumbent,hole:[...p.hole],board:[...board],previousStreetBoard:[...previousStreetBoard],opponents:opponents.length,pot:players.reduce((n,q)=>n+Math.min(q.total,p.total+p.chips),0),bet,round:p.round,stack:p.chips,big,minRaise,raiseAllowed:p.raiseAllowed,latePosition:ownPosition>=Math.floor(order.length*2/3),position:ownPosition/Math.max(1,order.length-1),raises,checkedThisStreet:p.checked,opponentRaisedPreflop:opponents.some(q=>q.pfr),opponentsChecked:opponents.every(q=>q.action==='check'),preflopAggressor:preflopAggressor===index,initiative:lastAggressor===index,limpers:opponents.filter(q=>q.action==='call'&&q.round===big).length,effectiveStack:Math.min(p.chips+p.round,Math.max(...opponents.map(q=>q.chips+q.round))),opponentStack:opponents[0]?.chips||0,opponentModels:opponents.map(q=>({hands:0,vpip:0,pfr:0,raisedPreflop:q.pfr,aggressor:players[lastAggressor]===q&&q.round>0})),policyParams:index===heroSeat?policy:incumbent,equitySamples:samples};
-   beforeDecision?.();const action=legalAction(view,decider?decider(view,index,p.random):index===heroSeat?decideBot(view,p.random):opponentAction(view,style,p.random));actions++;if(actions>400)throw Error('Simulation action limit');
+   beforeDecision?.();const action=legalAction(view,decider?decider(view,index,p.random):index===heroSeat?decideBot(view,p.random):opponentAction(view,style,p.random));if(decisionTrace)decisionTrace.push(index+':'+street+':'+action.type+':'+(action.amount??''));actions++;if(actions>400)throw Error('Simulation action limit');
    if(action.type==='fold')p.folded=true;
    else if(action.type==='call')pay(p,bet-p.round);
    else if(action.type==='check')p.checked=true;
@@ -62,5 +63,5 @@ export function simulateHand({seed,seats=3,heroSeat=0,policy,incumbent,style='in
  let paid;if(active().length===1){paid=players.map(p=>p.folded?0:players.reduce((n,q)=>n+q.total,0));}else paid=settlePots(players,board,dealer);
  const balances=players.map((p,i)=>p.chips+paid[i]),rewards=balances.map((n,i)=>(n-initial[i])/big);
  if(balances.reduce((n,v)=>n+v,0)!==initial.reduce((a,b)=>a+b,0)||balances.some(n=>n<0||!Number.isSafeInteger(n)))throw Error('Simulation chips not conserved');
- return {reward:rewards[heroSeat],rewards,balances,board,actions};
+ return {reward:rewards[heroSeat],rewards,balances,board,actions,...(decisionTrace?{decisionTrace:decisionTrace.join(';')}:{})};
 }
