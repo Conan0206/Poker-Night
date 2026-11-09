@@ -19,4 +19,4 @@ export function mergeCompletedModel(stored,observed={}){
  // These cover overlapping hands, so never add session counters to saved counters.
  return stored&&stored.hands>=(observed.hands||0)?{...observed,...stored}:observed;
 }
-export function publicModel(value={}){return Object.fromEntries(MODEL_KEYS.map(k=>[k,Number.isSafeInteger(value[k])&&value[k]>=0?value[k]:0]));}
+export function publicModel(value={}){return Object.fromEntries([...MODEL_KEYS,'shownOpenings','shownOpeningQuality'].map(k=>[k,Number.isSafeInteger(value[k])&&value[k]>=0?value[k]:0]));}

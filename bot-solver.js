@@ -1,5 +1,5 @@
 import {rank} from './public/equity.js';
-import {preflopQuality,boardFeatures} from './bot-ranges.js';
+import {preflopQuality,boardFeatures,publicOpeningCutoff} from './bot-ranges.js';
 import {trainCfr} from './cfr.js';
 const deck=[...'23456789TJQKA'].flatMap(r=>[...'shdc'].map(s=>r+s));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -10,7 +10,7 @@ const overlaps=(a,b)=>a.some(c=>b.includes(c));
 export function publicRange(board,model={},samples=48,random=Math.random,include){
  const available=deck.filter(c=>!board.includes(c)),combos=[];let total=0;
  const observed=model.hands>=8,vpip=observed?clamp(model.vpip/model.hands,.12,.65):.3;
- const cutoff=model.raisedPreflop?(observed?clamp(.82-vpip*.55,.48,.76):.62):.43;
+ const cutoff=model.raisedPreflop?publicOpeningCutoff(observed?clamp(.82-vpip*.55,.48,.76):.62,model):.43;
  for(let i=0;i<available.length;i++)for(let j=i+1;j<available.length;j++){
   const cards=[available[i],available[j]];let weight=clamp(.38+(preflopQuality(cards)-cutoff)*4,.025,1);
   if(model.aggressor){const f=boardFeatures(cards,board);if(f.category===0)weight*=(f.flushDraw||f.straightDraw)?.7:.22;else if(f.category>=3)weight=Math.max(.9,weight);}

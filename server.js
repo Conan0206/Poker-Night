@@ -1,3 +1,4 @@
+import {revealSelfPublicly,publicShowModel} from './public-show-knowledge.js';
 import {captureScenario,keepScenario} from './recorded-scenario.js';
 import {mergeCompletedModel,handModels,addCounts} from './opponent-model.js';
 import {handHistoryEntry} from './history-record.js';
@@ -48,7 +49,7 @@ async function botAct(r,p){
  if(r.paused||r.players[r.turn]!==p||!actionable(p)||r.runningOut||r.street==='showdown')return;
  const decisionHand=r.handNumber,decisionStreet=r.street,decisionEpoch=r.pauseEpoch||0;
  const contenders=r.players.filter(live),order=[];for(let n=1;n<=r.players.length;n++){const q=r.players[(r.dealer+n)%r.players.length];if(live(q))order.push(q);}
- for(const q of contenders)q.completedModel=mergeCompletedModel(learnedModels[r.mode]?.[q.id],{});void refreshModels();
+ for(const q of contenders)q.completedModel={...mergeCompletedModel(learnedModels[r.mode]?.[q.id],{}),...publicShowModel(r,q.id)};void refreshModels();
  const opponents=contenders.filter(q=>q!==p),eligiblePot=r.players.reduce((n,q)=>n+Math.min(q.total,p.total+p.chips),0);
  const {action:decision}=await chooseBotAction({mode:r.mode,botStyle:p.botStyle,tournament:tournamentContext(r),tournamentPolicy:r.mode==='tournament'?r.botPolicy?.params:undefined,policyParams:r.mode==='cash'?r.botPolicy?.params:undefined,hole:[...p.cards],board:[...r.board],checkedThisStreet:!!p.checkedThisStreet,opponentRaisedPreflop:opponents.some(q=>q.pfr),previousStreetBoard:r.previousStreetBoard||[],opponentsChecked:opponents.every(q=>q.action==='check'),opponents:opponents.length,pot:eligiblePot,bet:r.bet,round:p.round,stack:p.chips,big:r.big,minRaise:r.minRaise,raiseAllowed:p.raiseAllowed,latePosition:order.indexOf(p)>=Math.floor(order.length*2/3),position:order.indexOf(p)/Math.max(1,order.length-1),raises:r.streetRaises||0,preflopAggressor:r.preflopAggressor===p.id,initiative:r.lastAggressor===p.id,limpers:opponents.filter(q=>q.action==='call'&&q.round===r.big).length,effectiveStack:Math.min(p.chips+p.round,Math.max(...opponents.map(q=>q.chips+q.round))),opponentStack:opponents[0]?.chips||0,heroModel:{hands:p.stats.hands,vpip:p.stats.vpip,raisedPreflop:!!p.pfr,aggressor:r.lastAggressor===p.id},opponentModels:opponents.map(q=>({...q.completedModel,raisedPreflop:!!q.pfr,aggressor:r.lastAggressor===q.id&&q.round>0}))},r.deadline);
  // A fold, kick, timeout or next hand may have happened while the worker searched.
@@ -75,7 +76,7 @@ s.on('resetTournament',()=>{if(!room||!player||player.kicked||room.mode!=='tourn
 s.on('switchMode',data=>{if(!room||!player||player.kicked||player.spectating&&!(room.mode==='tournament'&&data?.mode==='cash'))return error('Take a seat to switch table mode.');const mode=data?.mode;if(!['cash','tournament'].includes(mode)||room.mode===mode||room.pendingMode)return;room.pendingTournamentReset=false;room.pendingMode=mode;if(!room.started)applyTournament(room);publish(room);});
 s.on('rabbit',()=>{if(!room||player.kicked||room.street!=='showdown'||room.board.length>=5||room.rabbitBoard?.length||Date.now()>=room.nextHandAt)return;const deck=[...room.deck],board=[...room.board];while(board.length<5){deck.pop();board.push(...deck.splice(-(board.length===0?3:1)));}room.rabbitBoard=board;publish(room);});
 s.on('runVote',data=>{if(!room||room.paused||!room.runVote||data?.handNumber!==room.handNumber||!room.runVote.voters.includes(player.id)||room.runVote.votes[player.id]||![1,2].includes(data.count))return;room.runVote.votes[player.id]=data.count;if(data.count===1||room.runVote.voters.every(id=>room.runVote.votes[id]===2))resolveRunVote(room,data.count===1?1:2);else publish(room);});
-s.on('reveal',value=>{if(!room||room.mode==='tournament'||room.street!=='showdown'||!player.inHand||player.hideHoleCards||player.kicked||!Number.isInteger(value)||value<0||value>3)return;player.shown=(player.shown||0)|value;publish(room);});
+s.on('reveal',value=>{if(revealSelfPublicly(room,player,value))publish(room);});
 function handlePrivateReveal(data,allBots=false){const result=revealPrivately(room,player,{handNumber:data?.handNumber,targetId:data?.id,allBots});if(result==='limit')return error('No hand reveals remaining.');if(result==='revealed')publish(room);}
 s.on('revealHand',data=>handlePrivateReveal(data));
 s.on('revealAllBots',data=>handlePrivateReveal(data,true));

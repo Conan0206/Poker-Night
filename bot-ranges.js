@@ -8,6 +8,13 @@ export function preflopQuality(hole){
  const gap=high-low,suited=hole[0][1]===hole[1][1];
  return clamp((high+low)/38+(suited?.075:0)+(gap===1?.055:gap===2?.015:0)-(gap>4?.1:0)+(high===14?.035:0),0,1);
 }
+export function publicOpeningCutoff(cutoff,model={}){
+ // Voluntary shows are selected evidence, not an unbiased sample of a player's range.
+ // Require several fully shown raises and keep their influence small.
+ const n=model.shownOpenings,q=model.shownOpeningQuality;
+ if(!Number.isSafeInteger(n)||n<6||!Number.isSafeInteger(q)||q<0||q>n*1000)return cutoff;
+ return clamp(cutoff+clamp((q/n/1000-.68)*.15,-.025,.025),.12,.9);
+}
 export function boardFeatures(hole,board){
  const all=[...hole,...board],ranks=new Set(all.map(value));if(ranks.has(14))ranks.add(1);
  const flushDraw=board.length<5&&[...'shdc'].some(s=>all.filter(c=>c[1]===s).length===4&&hole.some(c=>c[1]===s));
@@ -32,7 +39,7 @@ export function rangeEquity(view,random=Math.random){
    const model=view.opponentModels?.[n]||{},observed=model.hands>=8;
    const vpip=observed?clamp(model.vpip/model.hands,.12,.65):.3;
    const raised=model.raisedPreflop??(!board.length&&view.bet>view.big);
-   const cutoff=raised?(observed?clamp(.82-vpip*.55,.48,.76):.62):.43;
+   const cutoff=raised?publicOpeningCutoff(observed?clamp(.82-vpip*.55,.48,.76):.62,model):.43;
    let a,b,cards;
    for(let attempt=0;attempt<16;attempt++){
     a=Math.floor(random()*pool.length);b=Math.floor(random()*(pool.length-1));if(b>=a)b++;

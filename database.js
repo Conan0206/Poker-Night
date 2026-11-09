@@ -5,7 +5,7 @@ import {TOURNAMENT_BASELINE_ID,TOURNAMENT_DEFAULT,normalizeTournamentPolicy} fro
 import pg from 'pg';
 import {learningStore} from './learning-store.js';
 import {readFileSync} from 'node:fs';
-export const BOT_VERSION='recorded-matches-v1';
+export const BOT_VERSION='cash-public-shows-v1';
 const policyTable=mode=>mode==='tournament'?'poker_active_tournament_policy':'poker_active_policy';
 const policyParams=(mode,params)=>mode==='tournament'?normalizeTournamentPolicy(params):normalizePolicy(params);
 const schema=readFileSync(new URL('./database-schema.sql',import.meta.url),'utf8');

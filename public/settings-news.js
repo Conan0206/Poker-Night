@@ -5,6 +5,7 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 10 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
+  'Cash bots remember hands players choose to show publicly.',
   'Bots practise recorded matches; the all-in theme now loops until showdown.',
   'Simpler payout history and reliable tournament spectator all-in audio.',
   'Tidied left-side bets when watching a six-player table.',
