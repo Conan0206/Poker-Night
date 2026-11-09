@@ -1,6 +1,8 @@
 /* Screen-coordinate geometry shared by every seat and game mode. */
 (()=>{
- window.pokerWagerTarget=({count,order,avatar:a,plate,width,height})=>{
+ window.pokerWagerTarget=({count,order,avatar:a,plate,width,height,spectating=false})=>{
+  // The three left-side panels in the six-seat spectator view have their own wager lanes.
+  if(count===6&&spectating&&order<=2)return {x:plate.right+width/2+12,y:plate.top+plate.height/2};
   // Seven seats use the same left-rail anchors as the approved eight-seat layout.
   if(count===8||count===7){
    if(order===1)return {x:plate.right+width/2+12,y:a.top-height/2-5};

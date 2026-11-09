@@ -11,7 +11,7 @@
   const felt=document.querySelector('#table .felt').getBoundingClientRect(),size=pile.getBoundingClientRect();
   const obstacles=[...document.querySelectorAll('.seat .avatar,.seat .nameplate,.seat .seatActionBadge,.seatCards,#myCards,#pot .potBadge,#street,#board,#result,#sitDown,#start,#rabbit')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'&&(el.id!=='result'||el.textContent.trim())).map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
   const tail=[...document.querySelectorAll('#board .card')].slice(3).map(el=>el.getBoundingClientRect());const communityAnchor=tail.length===2?{left:tail[0].left,right:tail[1].right,bottom:Math.max(tail[0].bottom,tail[1].bottom)}:null;
-  const a=avatar.getBoundingClientRect(),plate=seat.querySelector('.nameplate').getBoundingClientRect(),order=Number(seat.dataset.seatOrder),count=document.querySelectorAll('.seat').length;const target=window.pokerWagerTarget({count,order,avatar:a,plate,width:size.width,height:size.height});
+  const a=avatar.getBoundingClientRect(),plate=seat.querySelector('.nameplate').getBoundingClientRect(),order=Number(seat.dataset.seatOrder),count=document.querySelectorAll('.seat').length;const target=window.pokerWagerTarget({count,order,avatar:a,plate,width:size.width,height:size.height,spectating:!document.querySelector('.seat.self')});
   const best=window.findPokerWagerPosition({felt,avatar:avatar.getBoundingClientRect(),width:size.width,height:size.height,obstacles,occupied,target,self:seat.classList.contains('self'),communityAnchor});
   if(best){occupied.push(best.rect);wagerPositions.set(id,{x:best.x,y:best.y});}return best;
  }

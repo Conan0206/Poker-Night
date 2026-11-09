@@ -28,3 +28,15 @@ test('seven-player left seats reuse approved eight-player anchors; six-player lo
  const six=target({count:6,order:1,avatar,plate,width:150,height:38});assert.ok(six.x-75>plate.right);assert.ok(six.y+19<plate.top);
  assert.equal(target({count:6,order:2,avatar,plate,width:150,height:38}),null);
 });
+
+test('six-seat spectators see three separate wagers beside the matching left-side panels',()=>{
+ const felt=rect(210,240,1360,400),avatars=[rect(395,555,80,80),rect(205,400,80,80),rect(395,245,80,80)];
+ const plates=[rect(490,538,140,88),rect(295,383,140,88),rect(490,227,140,88)];
+ const obstacles=[...avatars,...plates,rect(695,422,430,114)],occupied=[];
+ for(let order=0;order<3;order++){
+  const target=context.window.pokerWagerTarget({count:6,order,avatar:avatars[order],plate:plates[order],width:160,height:38,spectating:true});
+  const at=place({felt,avatar:avatars[order],width:160,height:38,obstacles,occupied,target});
+  assert.ok(at);inside(at,felt);assert.ok(at.rect.left>=plates[order].right);assert.ok(Math.abs(at.y-(plates[order].top+44))<20);occupied.push(at.rect);
+ }
+ assert.equal(context.window.pokerWagerTarget({count:6,order:0,avatar:avatars[0],plate:plates[0],width:160,height:38,spectating:false}),null);
+});
