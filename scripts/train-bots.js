@@ -1,3 +1,4 @@
+import {freezeCorpus,recordedScreen,validateRecorded} from '../training/recorded-matches.js';
 import {mkdir,readFile,writeFile,rename} from 'node:fs/promises';
 import {randomUUID,randomBytes,createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
@@ -18,21 +19,22 @@ if(!release){console.log('Training already running; skipped.');process.exit(0);}
 try{os.setPriority(os.constants.priority.PRIORITY_BELOW_NORMAL);}catch{}
 const db=createDatabase(),styles=['incumbent','station','tight','aggressive'],groups=styles.flatMap(style=>[3,6].map(seats=>({style,seats,key:`${style}-${seats}`})));
 async function atomicJSON(path,value){const temp=path+'.tmp';await writeFile(temp,JSON.stringify(value,null,2));await rename(temp,path);}
-const hash=createHash('sha256');for(const file of ['bot-policy.js','public/bot-styles.js','tournament-policy.js','bot-tactics.js','bot-strategy.js','bot-ranges.js','training/simulator.js','training/evaluation.js','training/screening.js','scripts/train-bots.js'])hash.update(await readFile(join(root,file)));const fingerprint=hash.digest('hex');
+const hash=createHash('sha256');for(const file of ['bot-policy.js','public/bot-styles.js','tournament-policy.js','bot-tactics.js','bot-strategy.js','bot-ranges.js','training/simulator.js','training/evaluation.js','training/screening.js','scripts/train-bots.js','opponent-model.js','recorded-scenario.js','training/recorded-matches.js'])hash.update(await readFile(join(root,file)));const fingerprint=hash.digest('hex');
 let report;
 try{
  const active=await db.activePolicy();if(!active&&!smoke)throw Error('Database unavailable; training skipped without changing the live policy. Run npm run db:check.');
  const parent=active||{id:BASELINE_POLICY_ID,params:DEFAULT_POLICY};
  let saved;try{saved=JSON.parse(await readFile(checkpointPath,'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
  report=!smoke&&saved?.kind==='nightly'&&saved.parentId===parent.id&&saved.fingerprint===fingerprint&&!saved.complete&&!saved.screeningRejected&&!saved.earlyRejected?saved:{id:randomUUID(),kind:smoke?'smoke':'nightly',parentId:parent.id,fingerprint,seed:randomBytes(4).readUInt32LE(),startedAt:new Date().toISOString(),scope:'multiway cash heuristic tactic frequencies; fixed-stack duplicate deals; heads-up heuristic continuation (not a CFR strength guarantee)',phase:'screening',screening:[],validation:{samples:700,deltas:[],groups:{},changedPairs:0},complete:false};
+ if(!smoke&&!await db.ingestRecordedHands())throw Error('Database match ingestion unavailable');if(!report.recorded){const data=await db.recordedCorpus('cash');if(!data&&!smoke)throw Error('Database recorded corpus unavailable');report.recorded=freezeCorpus(data,'cash');}
  const timedOut=()=>Date.now()>=deadline,baselineCache=new Map();
  function block(params,group,seed,samples,index){
   const deltas=[];let changed=false;
   for(let seat=0;seat<group.seats;seat++){
    if(timedOut())return null;
-   const options={seed,seats:group.seats,heroSeat:seat,incumbent:parent.params,style:group.style,samples,depth:[30,60,100,150][Math.floor(index/groups.length)%4],botStyles:Array.from({length:group.seats},(_,i)=>BOT_STYLE_IDS[(Math.floor(index/(groups.length*4))+i)%BOT_STYLE_IDS.length]),recordTrace:true};
+   const options={seed,seats:group.seats,heroSeat:seat,incumbent:parent.params,style:group.style,samples,depth:[30,60,100,150][Math.floor(index/groups.length)%4],botStyles:Array.from({length:group.seats},(_,i)=>BOT_STYLE_IDS[(Math.floor(index/(groups.length*4))+i)%BOT_STYLE_IDS.length]),recordTrace:true,models:report.recorded.models.length?Array.from({length:group.seats},(_,i)=>report.recorded.models[(index+i)%report.recorded.models.length]):[]};
    const simulate=()=>simulateHand({...options,policy:parent.params});
-   const baseline=samples===32?cachedBaseline(baselineCache,[seed,group.key,seat,samples,options.depth,options.botStyles.join(',')].join(':'),simulate):simulate();
+   const baseline=samples===32?cachedBaseline(baselineCache,[seed,group.key,seat,samples,options.depth,options.botStyles.join(','),JSON.stringify(options.models)].join(':'),simulate):simulate();
    if(timedOut())return null;
    const candidate=simulateHand({...options,policy:params});
    deltas.push(candidate.reward-baseline.reward);changed ||= candidate.decisionTrace!==baseline.decisionTrace;
@@ -49,9 +51,10 @@ try{
    }
   }
   if(report.screening.length===candidates.length&&report.screening.every(s=>s.deltas.length===goal)){
-   const winner=smoke?report.screening[0]:selectScreenedCandidate(report.screening);
+   let recordedDone=true;for(const item of report.screening){const result=await recordedScreen(report,item.params,parent.params,deadline,()=>atomicJSON(checkpointPath,report),smoke);if(!result){recordedDone=false;break;}item.recordedMean=result.deltas.length?result.deltas.reduce((a,b)=>a+b,0)/result.deltas.length:0;}
+   const winner=recordedDone?(smoke?report.screening[0]:selectScreenedCandidate(report.screening.filter(s=>s.recordedMean>=0))):null;
    if(winner){report.candidate={id:'policy-'+report.id,params:winner.params};report.phase='validation';}
-   else{report.screeningRejected=true;report.rejectionReason=screeningReason(report.screening);}
+   else if(recordedDone){report.screeningRejected=true;report.rejectionReason=screeningReason(report.screening)+' Recorded-scenario losses also exclude a candidate.';}
   }
  }
  if(report.candidate){
@@ -65,7 +68,8 @@ try{
    const reason=smoke?null:earlyRejection(report.validation,250);
    if(reason){report.earlyRejected=true;report.rejectionReason=reason;break;}
   }
-  report.complete=!smoke&&!report.earlyRejected&&report.validation.deltas.length>=2000;
+  const full=report.validation.deltas.length>=2000;if(full&&!report.earlyRejected){report.phase='recorded-validation';await validateRecorded(report,parent.params,deadline,()=>atomicJSON(checkpointPath,report),smoke);}
+  report.complete=!smoke&&!report.earlyRejected&&full&&(!report.recorded.train.length||(report.recordedValidation?.deltas.length||0)>=Math.min(32,report.recorded.holdout.length));
  }
  if(report.screeningRejected||report.earlyRejected||report.complete)report.phase='finished';
  report.gate=promotionGate(report);report.updatedAt=new Date().toISOString();report.smoke=smoke;report.promoted=false;
@@ -73,6 +77,6 @@ try{
  if(!smoke&&report.gate.qualified)report.promoted=await db.promotePolicy(report);
  report.status=smoke?'smoke':report.promoted?'promoted':report.screeningRejected?'screened_out':report.complete||report.earlyRejected?'rejected':'collecting';
  await atomicJSON(join(out,report.id+'.json'),report);if(!smoke)await atomicJSON(checkpointPath,report);if(stored)await db.saveTraining(report);
- console.log(JSON.stringify({status:report.status,phase:report.phase,validationBlocks:report.validation.deltas.length,requiredBlocks:2000,changedBlocks:report.validation.changedPairs,screeningChangedBlocks:report.screening.reduce((n,s)=>n+s.changedPairs,0),screenedBlocks:report.screening.reduce((n,s)=>n+s.deltas.length,0),report:join(out,report.id+'.json'),promoted:report.promoted,reasons:[...(report.rejectionReason?[report.rejectionReason]:[]),...report.gate.reasons].slice(0,3)},null,2));
+ console.log(JSON.stringify({status:report.status,phase:report.phase,validationBlocks:report.validation.deltas.length,requiredBlocks:2000,changedBlocks:report.validation.changedPairs,screeningChangedBlocks:report.screening.reduce((n,s)=>n+s.changedPairs,0),recordedHands:report.recorded.processedHands,recordedTraining:report.recorded.train.length,recordedHoldout:report.recorded.holdout.length,recordedValidated:report.recordedValidation?.deltas.length||0,screenedBlocks:report.screening.reduce((n,s)=>n+s.deltas.length,0),report:join(out,report.id+'.json'),promoted:report.promoted,reasons:[...(report.rejectionReason?[report.rejectionReason]:[]),...report.gate.reasons].slice(0,3)},null,2));
 }catch(error){console.error('Training stopped:',error.message.startsWith('Database')||error.message.startsWith('Training report')?error.message:'Local simulation or report error; inspect local code and rerun.');process.exitCode=1;}
 finally{await db.close();await release();}

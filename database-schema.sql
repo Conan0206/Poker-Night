@@ -23,3 +23,17 @@ CREATE TABLE IF NOT EXISTS poker_active_policy (
 CREATE TABLE IF NOT EXISTS poker_active_tournament_policy (
  singleton integer PRIMARY KEY CHECK(singleton=1), policy_id text NOT NULL
 );
+CREATE TABLE IF NOT EXISTS poker_modelled_hands (
+ hand_id uuid PRIMARY KEY REFERENCES poker_hands(id), processed_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS poker_opponent_models (
+ mode text NOT NULL, split text NOT NULL, actor_id text NOT NULL, counts jsonb NOT NULL,
+ updated_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(mode,split,actor_id)
+);
+CREATE TABLE IF NOT EXISTS poker_training_scenarios (
+ hand_id uuid PRIMARY KEY REFERENCES poker_hands(id), mode text NOT NULL, split text NOT NULL,
+ ordinal integer NOT NULL, scenario jsonb NOT NULL
+);
+CREATE INDEX IF NOT EXISTS poker_training_scenarios_mode_split ON poker_training_scenarios(mode,split);
+CREATE TABLE IF NOT EXISTS poker_learning_lock (singleton integer PRIMARY KEY CHECK(singleton=1));
+INSERT INTO poker_learning_lock(singleton) VALUES(1) ON CONFLICT DO NOTHING;

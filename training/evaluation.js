@@ -1,3 +1,4 @@
+import {recordedGate} from './recorded-matches.js';
 // The unit of uncertainty is a complete duplicate-deal block, not a seat/hand.
 export function estimate(values){
  if(!values.length)return {blocks:0,bb100:0,lower99:null,standardError:null};
@@ -8,7 +9,7 @@ export function estimate(values){
 }
 export function promotionGate(report){
  // Validation uses new seeds and live-sized equity sampling. No partial-run promotion.
- const reasons=[];const result=estimate(report.validation?.deltas||[]);
+ const reasons=recordedGate(report,estimate);const result=estimate(report.validation?.deltas||[]);
  if(!report.complete)reasons.push('Evaluation did not complete');
  if(report.validation?.samples!==700)reasons.push('Full equity sampling required');
  if(result.blocks<2000)reasons.push('At least 2,000 independent validation blocks required');

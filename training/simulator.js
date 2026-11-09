@@ -1,6 +1,7 @@
 import {decideBot} from '../bot-strategy.js';
 import {preflopQuality} from '../bot-ranges.js';
 import {rank} from '../public/equity.js';
+import {cleanScenario} from '../recorded-scenario.js';
 export function seededRandom(seed){let x=seed>>>0;return ()=>{x+=0x6D2B79F5;let t=Math.imul(x^x>>>15,1|x);t^=t+Math.imul(t^t>>>7,61|t);return ((t^t>>>14)>>>0)/4294967296;};}
 export function settlePots(players,board,dealer=0){
  const paid=players.map(()=>0),levels=[...new Set(players.map(p=>p.total).filter(Boolean))].sort((a,b)=>a-b);let previous=0;
@@ -32,25 +33,32 @@ function opponentAction(view,style,random){
 }
 // Independent full hands: shuffled cards, rotated positions and fixed starting stacks.
 // Decisions receive their own hole cards and public information, never the deck.
-export function simulateHand({seed,seats=3,heroSeat=0,policy,incumbent,style='incumbent',samples=64,depth=100,decider,beforeDecision,startingStacks,dealerSeat,big=10,small=big/2,mode='cash',tournament,botStyles=[],tournamentPolicy,tournamentIncumbent,recordTrace=false}={}){
+export function simulateHand({seed,seats=3,heroSeat=0,policy,incumbent,style='incumbent',samples=64,depth=100,decider,beforeDecision,startingStacks,dealerSeat,big=10,small=big/2,mode='cash',tournament,botStyles=[],tournamentPolicy,tournamentIncumbent,recordTrace=false,scenario,models=[]}={}){
+ const recorded=scenario?cleanScenario(scenario):null;if(scenario&&!recorded)throw Error('Invalid recorded scenario');
+ if(recorded){({heroSeat,dealerSeat,big,small,mode,tournament}=recorded);seats=recorded.players.length;botStyles=recorded.players.map(p=>p.botStyle);models=recorded.players.map(p=>p.model);}
  if(!Number.isInteger(seats)||seats<2||seats>8)throw Error('Invalid seats');
- const deckRandom=seededRandom(seed),deck=[...'23456789TJQKA'].flatMap(v=>[...'shdc'].map(s=>v+s));
- for(let i=51;i>0;i--){const j=Math.floor(deckRandom()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
- const bank=depth*big,initial=startingStacks||Array(seats).fill(bank);if(initial.length!==seats||initial.some(n=>!Number.isSafeInteger(n)||n<=0)||!Number.isSafeInteger(big)||big<1||!Number.isSafeInteger(small)||small<1)throw Error('Invalid simulation stacks/blinds');const players=Array.from({length:seats},(_,i)=>({hole:[deck.pop(),deck.pop()],chips:initial[i],total:0,round:0,folded:false,acted:false,raiseAllowed:true,checked:false,pfr:false,action:'',random:seededRandom((seed^Math.imul(i+1,0x9e3779b9))>>>0)}));
+ const known=recorded?[...recorded.hole,...recorded.board]:[],deckRandom=seededRandom(seed),deck=[...'23456789TJQKA'].flatMap(v=>[...'shdc'].map(s=>v+s)).filter(c=>!known.includes(c));
+ for(let i=deck.length-1;i>0;i--){const j=Math.floor(deckRandom()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+ const bank=depth*big,initial=recorded?recorded.players.map(p=>p.chips+p.total):startingStacks||Array(seats).fill(bank);if(initial.length!==seats||initial.some(n=>!Number.isSafeInteger(n)||n<0||!recorded&&n===0)||!Number.isSafeInteger(big)||big<1||!Number.isSafeInteger(small)||small<1)throw Error('Invalid simulation stacks/blinds');
+ function unknownHole(i){if(!recorded)return [deck.pop(),deck.pop()];const m=models[i]||{},p=recorded.players[i],vpip=m.hands>=20?Math.max(.12,Math.min(.65,m.vpip/m.hands)):.3,cutoff=p.pfr?.82-vpip*.55:.43;let a,b;
+  for(let n=0;n<16;n++){a=Math.floor(deckRandom()*deck.length);b=Math.floor(deckRandom()*(deck.length-1));if(b>=a)b++;if(p.folded||deckRandom()<Math.max(.025,Math.min(1,.38+(preflopQuality([deck[a],deck[b]])-cutoff)*4)))break;}
+  const hole=[deck[a],deck[b]];deck.splice(Math.max(a,b),1);deck.splice(Math.min(a,b),1);return hole;}
+ const players=Array.from({length:seats},(_,i)=>({...recorded?.players[i],hole:recorded&&i===heroSeat?[...recorded.hole]:unknownHole(i),chips:recorded?recorded.players[i].chips:initial[i],total:recorded?.players[i].total||0,round:recorded?.players[i].round||0,folded:recorded?.players[i].folded||false,acted:recorded?.players[i].acted||false,raiseAllowed:recorded?recorded.players[i].raiseAllowed:true,checked:recorded?.players[i].checked||false,pfr:recorded?.players[i].pfr||false,action:recorded?.players[i].action||'',random:seededRandom((seed^Math.imul(i+1,0x9e3779b9))>>>0)}));
  const dealer=dealerSeat??((seed>>>0)%seats),sb=seats===2?dealer:(dealer+1)%seats,bb=(sb+1)%seats;
- const pay=(p,n)=>{n=Math.min(p.chips,n);p.chips-=n;p.total+=n;p.round+=n;};pay(players[sb],small);pay(players[bb],big);
+ const pay=(p,n)=>{n=Math.min(p.chips,n);p.chips-=n;p.total+=n;p.round+=n;};if(!recorded){pay(players[sb],small);pay(players[bb],big);}
  const decisionTrace=recordTrace?[]:null;
- let board=[],previousStreetBoard=[],bet=big,minRaise=big,raises=0,preflopAggressor=-1,lastAggressor=-1,actions=0;
+ let board=recorded?[...recorded.board]:[],previousStreetBoard=recorded?[...recorded.previousStreetBoard]:[],bet=recorded?.bet??big,minRaise=recorded?.minRaise??big,raises=recorded?.raises||0,preflopAggressor=recorded?.preflopAggressor??-1,lastAggressor=recorded?.lastAggressor??-1,actions=0;
  const active=()=>players.filter(p=>!p.folded),next=(i,predicate)=>{for(let n=1;n<=seats;n++){const j=(i+n)%seats;if(predicate(players[j]))return j;}return -1;};
- for(let street=0;street<4&&active().length>1;street++){
-  if(street){previousStreetBoard=[...board];deck.pop();board.push(...Array.from({length:street===1?3:1},()=>deck.pop()));bet=0;minRaise=big;raises=0;for(const p of players){p.round=0;p.acted=false;p.raiseAllowed=true;p.checked=false;p.action='';}}
-  let cursor=street?dealer:bb;
+ const firstStreet=recorded?({0:0,3:1,4:2,5:3})[board.length]:0;
+ for(let street=firstStreet;street<4&&active().length>1;street++){
+  if(street&&(!recorded||street!==firstStreet)){previousStreetBoard=[...board];deck.pop();board.push(...Array.from({length:street===1?3:1},()=>deck.pop()));bet=0;minRaise=big;raises=0;for(const p of players){p.round=0;p.acted=false;p.raiseAllowed=true;p.checked=false;p.action='';}}
+  let cursor=recorded&&street===firstStreet?(heroSeat+seats-1)%seats:street?dealer:bb;
   while(active().length>1){
    const actionable=players.filter(p=>!p.folded&&p.chips>0);if(!actionable.length)break;
    const index=next(cursor,p=>!p.folded&&p.chips>0&&(!p.acted||p.round<bet));if(index<0)break;
    const p=players[index];if(actionable.length===1&&p.round>=bet)break;
    const opponents=players.filter(q=>q!==p&&!q.folded),order=[];for(let n=1;n<=seats;n++){const j=(dealer+n)%seats;if(!players[j].folded)order.push(j);}
-   const ownPosition=order.indexOf(index),view={mode,botStyle:botStyles[index],tournament,tournamentPolicy:index===heroSeat?tournamentPolicy:tournamentIncumbent,hole:[...p.hole],board:[...board],previousStreetBoard:[...previousStreetBoard],opponents:opponents.length,pot:players.reduce((n,q)=>n+Math.min(q.total,p.total+p.chips),0),bet,round:p.round,stack:p.chips,big,minRaise,raiseAllowed:p.raiseAllowed,latePosition:ownPosition>=Math.floor(order.length*2/3),position:ownPosition/Math.max(1,order.length-1),raises,checkedThisStreet:p.checked,opponentRaisedPreflop:opponents.some(q=>q.pfr),opponentsChecked:opponents.every(q=>q.action==='check'),preflopAggressor:preflopAggressor===index,initiative:lastAggressor===index,limpers:opponents.filter(q=>q.action==='call'&&q.round===big).length,effectiveStack:Math.min(p.chips+p.round,Math.max(...opponents.map(q=>q.chips+q.round))),opponentStack:opponents[0]?.chips||0,opponentModels:opponents.map(q=>({hands:0,vpip:0,pfr:0,raisedPreflop:q.pfr,aggressor:players[lastAggressor]===q&&q.round>0})),policyParams:index===heroSeat?policy:incumbent,equitySamples:samples};
+   const ownPosition=order.indexOf(index),view={mode,botStyle:botStyles[index],tournament,tournamentPolicy:index===heroSeat?tournamentPolicy:tournamentIncumbent,hole:[...p.hole],board:[...board],previousStreetBoard:[...previousStreetBoard],opponents:opponents.length,pot:players.reduce((n,q)=>n+Math.min(q.total,p.total+p.chips),0),bet,round:p.round,stack:p.chips,big,minRaise,raiseAllowed:p.raiseAllowed,latePosition:ownPosition>=Math.floor(order.length*2/3),position:ownPosition/Math.max(1,order.length-1),raises,checkedThisStreet:p.checked,opponentRaisedPreflop:opponents.some(q=>q.pfr),opponentsChecked:opponents.every(q=>q.action==='check'),preflopAggressor:preflopAggressor===index,initiative:lastAggressor===index,limpers:opponents.filter(q=>q.action==='call'&&q.round===big).length,effectiveStack:Math.min(p.chips+p.round,Math.max(...opponents.map(q=>q.chips+q.round))),opponentStack:opponents[0]?.chips||0,opponentModels:opponents.map(q=>({...models[players.indexOf(q)],hands:models[players.indexOf(q)]?.hands||0,vpip:models[players.indexOf(q)]?.vpip||0,pfr:models[players.indexOf(q)]?.pfr||0,raisedPreflop:q.pfr,aggressor:players[lastAggressor]===q&&q.round>0})),policyParams:index===heroSeat?policy:incumbent,equitySamples:samples};
    beforeDecision?.();const action=legalAction(view,decider?decider(view,index,p.random):index===heroSeat?decideBot(view,p.random):opponentAction(view,style,p.random));if(decisionTrace)decisionTrace.push(index+':'+street+':'+action.type+':'+(action.amount??''));actions++;if(actions>400)throw Error('Simulation action limit');
    if(action.type==='fold')p.folded=true;
    else if(action.type==='call')pay(p,bet-p.round);

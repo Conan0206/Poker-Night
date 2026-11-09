@@ -6,11 +6,20 @@ import {spawn} from 'node:child_process';
 import {io} from 'socket.io-client';
 
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
+test('theme preloads before the first all-in and retries a failed MP3 request instead of remaining silent',async()=>{
+ const events={},timers=[];let attempts=0,now=1000,starts=0;
+ const context={state:'running',currentTime:0,destination:{},addEventListener(){},decodeAudioData:async()=>({duration:32}),createGain:()=>({connect(){},gain:{setValueAtTime(){}}}),createBufferSource:()=>({connect(){},disconnect(){},stop(){},start(){starts++;}})};
+ const window={pokerAudio:{level:()=>1},pokerEffects:{audioContext:()=>context}};
+ vm.runInNewContext(readFileSync('public/all-in-music.js','utf8'),{window,document:{addEventListener:(name,fn)=>events[name]=fn},addEventListener:(name,fn)=>events[name]=fn,localStorage:{getItem:()=>null},Date:{now:()=>now},clearTimeout(){},setTimeout:fn=>{timers.push(fn);return timers.length;},fetch:async()=>{if(++attempts===1)throw Error('Temporary request failure');return {ok:true,arrayBuffer:async()=>new ArrayBuffer(8)};}});
+ events.click();await tick();assert.equal(window.pokerAllInMusic.status.retries,1);assert.equal(starts,0);
+ now+=1000;timers.shift()();await tick();assert.equal(window.pokerAllInMusic.status.loaded,true);assert.equal(starts,0);assert.equal(attempts,2);
+ const state={code:'TOUR',handNumber:1,street:'preflop',actionNumber:1,allInSound:{actionNumber:1}};events['poker-state']({detail:{state}});assert.equal(starts,1);
+});
 test('spectators and seated players share unlocked 32-second all-in audio, with pause, mute and volume controls',async()=>{
  const events={},stored=new Map(),sources=[],gains=[];let volume=1,unlocked=false;
  const context={state:'running',currentTime:0,destination:{},addEventListener(){},decodeAudioData:async()=>({duration:32}),createGain(){const gain={connect(){},gain:{setValueAtTime(value){gain.value=value;}}};gains.push(gain);return gain;},createBufferSource(){const source={connect(){},disconnect(){},start(time,offset){this.offset=offset;},stop(){this.stopped=true;}};sources.push(source);return source;}};
  const window={pokerAudio:{level:()=>volume},pokerEffects:{audioContext:()=>unlocked?context:null}},document={addEventListener:(name,fn)=>events[name]=fn};
- vm.runInNewContext(readFileSync('public/all-in-music.js','utf8'),{window,document,fetch:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)}),addEventListener:(name,fn)=>events[name]=fn,localStorage:{getItem:k=>stored.get(k)}});
+ vm.runInNewContext(readFileSync('public/all-in-music.js','utf8'),{window,document,fetch:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)}),addEventListener:(name,fn)=>events[name]=fn,localStorage:{getItem:k=>stored.get(k)},clearTimeout,setTimeout});
  const state={code:'TEST',mode:'tournament',handNumber:1,street:'preflop',actionNumber:0,allInSound:{actionNumber:0},paused:false,spectating:true};
  const update=()=>events['poker-state']({detail:{state}});update();assert.equal(sources.length,0);
  unlocked=true;events.click();await tick();assert.equal(window.pokerAllInMusic.status.playing,true);assert.equal(sources[0].loop,true);assert.equal(sources[0].loopEnd,32);
@@ -19,8 +28,8 @@ test('spectators and seated players share unlocked 32-second all-in audio, with 
  stored.set('poker-muted','true');events.click();assert.equal(window.pokerAllInMusic.status.playing,false);
  stored.set('poker-muted','false');volume=0;events['poker-volume-change']();assert.equal(window.pokerAllInMusic.status.playing,false);
  volume=.5;events['poker-volume-change']();assert.equal(gains[0].value,.25);assert.equal(window.pokerAllInMusic.status.playing,true);
- state.actionNumber=1;update();assert.equal(window.pokerAllInMusic.status.playing,false);
- state.allInSound={actionNumber:1};state.spectating=false;state.mode='cash';update();assert.equal(window.pokerAllInMusic.status.playing,true);assert.equal(sources.at(-1).offset,0);
+ const sourcesBefore=sources.length;state.actionNumber=1;update();assert.equal(window.pokerAllInMusic.status.playing,true);assert.equal(sources.length,sourcesBefore);
+ state.allInSound={actionNumber:1};state.handNumber=2;state.spectating=false;state.mode='cash';update();assert.equal(window.pokerAllInMusic.status.playing,true);assert.equal(sources.at(-1).offset,0);
  state.street='showdown';update();assert.equal(window.pokerAllInMusic.status.playing,false);
 });
 

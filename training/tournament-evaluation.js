@@ -1,9 +1,10 @@
+import {recordedGate} from './recorded-matches.js';
 import {estimate} from './evaluation.js';
 import {BOT_STYLE_IDS} from '../public/bot-styles.js';
 export const TOURNAMENT_GROUPS=['incumbent','station','tight','aggressive'].flatMap(style=>[3,6].map(seats=>({style,seats,key:`${style}-${seats}`})));
 export const TOURNAMENT_VALIDATION_BLOCKS=512;
 export function tournamentPromotionGate(report){
- const reasons=[],validation=report.validation||{},result=estimate(validation.deltas||[]);
+ const reasons=recordedGate(report,estimate),validation=report.validation||{},result=estimate(validation.deltas||[]);
  if(report.mode!=='tournament'||report.metric!=='tournament-win-rate')reasons.push('Tournament win-rate evaluation required');
  if(!report.complete)reasons.push('Evaluation did not complete');
  if(validation.samples!==700)reasons.push('Full equity sampling required');
