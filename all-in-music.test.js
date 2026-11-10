@@ -6,6 +6,17 @@ import {spawn} from 'node:child_process';
 import {io} from 'socket.io-client';
 
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
+test('a different tab saved as muted cannot silence the unmuted tournament theme',async()=>{
+ const events={},stored=new Map([['poker-muted','true']]);let tabMuted=false;
+ const context={state:'running',currentTime:0,destination:{},addEventListener(){},decodeAudioData:async()=>({duration:32}),createGain:()=>({connect(){},gain:{setValueAtTime(){}}}),createBufferSource:()=>({connect(){},disconnect(){},stop(){},start(){}})};
+ const window={pokerAudio:{level:()=>1},pokerEffects:{audioContext:()=>context,isMuted:()=>tabMuted}};
+ vm.runInNewContext(readFileSync('public/all-in-music.js','utf8'),{window,document:{addEventListener:(name,fn)=>events[name]=fn},addEventListener:(name,fn)=>events[name]=fn,localStorage:{getItem:k=>stored.get(k)},fetch:async()=>({ok:true,arrayBuffer:async()=>new ArrayBuffer(8)}),clearTimeout,setTimeout});
+ const state={code:'TOUR',handNumber:1,street:'preflop',allInSound:{actionNumber:1}};
+ events['poker-state']({detail:{state}});await tick();assert.equal(window.pokerAllInMusic.status.playing,true);assert.equal(window.pokerAllInMusic.status.muted,false);
+ // The reverse mismatch must still respect this tab's mute button.
+ stored.set('poker-muted','false');tabMuted=true;events.click();assert.equal(window.pokerAllInMusic.status.playing,false);assert.equal(window.pokerAllInMusic.status.muted,true);
+ tabMuted=false;events.click();assert.equal(window.pokerAllInMusic.status.playing,true);
+});
 test('theme preloads before the first all-in and retries a failed MP3 request instead of remaining silent',async()=>{
  const events={},timers=[];let attempts=0,now=1000,starts=0;
  const context={state:'running',currentTime:0,destination:{},addEventListener(){},decodeAudioData:async()=>({duration:32}),createGain:()=>({connect(){},gain:{setValueAtTime(){}}}),createBufferSource:()=>({connect(){},disconnect(){},stop(){},start(){starts++;}})};

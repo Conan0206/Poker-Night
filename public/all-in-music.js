@@ -3,6 +3,7 @@
  let bytes,retryTimer,retryAt=0,failures=0,lastError='';
  function encoded(){if(!bytes)bytes=fetch('/audio/all-in-theme-32s.mp3').then(r=>{if(!r.ok)throw Error('All-in audio unavailable');return r.arrayBuffer();});return bytes;}
  encoded().catch(()=>{});
+ const isMuted=()=>window.pokerEffects?.isMuted?.()??(localStorage.getItem('poker-muted')==='true');
  let current,key='',context,gain,buffer,source,offset=0,started=0,loading=false;
  function stop(reset=false){
   if(source){const old=source;source=null;offset+=Math.max(0,context.currentTime-started);old.stop();old.disconnect();}
@@ -16,7 +17,7 @@
   const s=current,event=s?.allInSound;
   const next=event&&s.street!=='showdown'&&s.street!=='waiting'?[s.code,s.handNumber].join(':'):'';
   if(next!==key){stop(true);key=next;}
-  const muted=localStorage.getItem('poker-muted')==='true',volume=.5*window.pokerAudio.level('effects');
+  const muted=isMuted(),volume=.5*window.pokerAudio.level('effects');
   if(!key||s.paused||muted||volume===0){stop();return;}
   if(!context)return;
   gain.gain.setValueAtTime(volume,context.currentTime);
@@ -28,5 +29,5 @@
  addEventListener('poker-volume-change',sync);
  document.addEventListener('pointerdown',sync);document.addEventListener('keydown',sync);document.addEventListener('click',sync);
  addEventListener('pagehide',()=>{stop(true);key='';});
- window.pokerAllInMusic={sync,get status(){return {pending:!!key,playing:!!source,unlocked:context?.state==='running',loaded:!!buffer,loading,lastError,retries:failures};}};
+ window.pokerAllInMusic={sync,get status(){return {pending:!!key,playing:!!source,muted:isMuted(),unlocked:context?.state==='running',loaded:!!buffer,loading,lastError,retries:failures};}};
 })();
