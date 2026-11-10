@@ -8,6 +8,7 @@
   return [1,2].map(number=>{const totals=new Map();for(const m of matches.filter(m=>Number(m[1])===number))totals.set(m[2],(totals.get(m[2])||0)+Number(m[3].replaceAll(',','')));return {number,winners:[...totals].map(([name,amount])=>({name,amount})),board:[],pots:[]};});
  };
  const money=(amount,h)=>'$'+amount.toLocaleString()+(h.mode==='tournament'?' ('+(amount/h.big).toLocaleString(undefined,{maximumFractionDigits:1})+' BB)':'');
+ function replayButton(parent,h){if(!h.replayId)return;const b=document.createElement('button');b.type='button';b.className='historyReplay';b.textContent='▶ Replay';b.setAttribute('aria-label','Replay hand #'+h.handNumber);b.onclick=()=>window.replayHand?.(h.replayId);parent.append(b);}
  window.pokerHistorySummary=h=>{
   if(h.winners?.length)return {winners:h.winners,pots:h.pots||[],split:!!h.split};
   const chunks=(h.message||'').split(' · '),matches=chunks.map(s=>s.match(/^(.*?) \+\$(\d[\d,]*)$/));
@@ -18,7 +19,7 @@
  function winnerRows(parent,winners,h){for(const winner of winners){const row=document.createElement('div'),name=document.createElement('span'),amount=document.createElement('strong');row.className='historyWinner';name.textContent=winner.name;amount.textContent='+'+money(winner.amount,h);amount.title='Amount received from pots, not net profit.';row.append(name,amount);parent.append(row);}}
  function potDetails(parent,pots,h){if(pots.length<2)return;const details=document.createElement('details'),summary=document.createElement('summary');details.className='historyPotDetails';summary.textContent='Pot breakdown';details.append(summary);for(const pot of pots){const group=document.createElement('div'),label=document.createElement('small');label.textContent=pot.label;group.append(label);winnerRows(group,pot.winners,h);details.append(group);}parent.append(details);}
  function returnedNote(parent,h){if(!h.returned?.amount)return;const note=document.createElement('p');note.className='historyReturned';note.textContent='Uncalled chips returned · '+h.returned.name+' '+money(h.returned.amount,h);parent.append(note);}
- function renderSummary(body,h,data){const hand=document.createElement('article'),header=document.createElement('div'),label=document.createElement('strong'),number=document.createElement('span');hand.className='historySummaryHand';header.className='historySummaryHeader';label.textContent=data.split?'Split pot':data.winners.length>1?'Pot payouts':'Winner';number.textContent=h.handNumber?'Hand #'+h.handNumber:'';header.append(label,number);hand.append(header);winnerRows(hand,data.winners,h);potDetails(hand,data.pots,h);returnedNote(hand,h);body.append(hand);}
+ function renderSummary(body,h,data){const hand=document.createElement('article'),header=document.createElement('div'),label=document.createElement('strong'),number=document.createElement('span');hand.className='historySummaryHand';header.className='historySummaryHeader';label.textContent=data.split?'Split pot':data.winners.length>1?'Pot payouts':'Winner';number.textContent=h.handNumber?'Hand #'+h.handNumber:'';header.append(label,number);hand.append(header);winnerRows(hand,data.winners,h);potDetails(hand,data.pots,h);returnedNote(hand,h);replayButton(hand,h);body.append(hand);}
  function renderRuns(body,h,runs){
   const hand=document.createElement('article'),header=document.createElement('div'),title=document.createElement('strong'),tag=document.createElement('span');hand.className='historyRunHand';header.className='historyRunHeader';title.textContent=h.handNumber?'Hand #'+h.handNumber:'All-in hand';tag.textContent='Run it twice';header.append(title,tag);hand.append(header);
   for(const run of runs){
@@ -28,7 +29,7 @@
    potDetails(section,run.pots||[],h);
    hand.append(section);
   }
-  returnedNote(hand,h);
+  returnedNote(hand,h);replayButton(hand,h);
   body.append(hand);
  }
  window.renderPokerHistory=(body,s)=>{const history=s?.handHistory||[];if(!history.length){for(const h of s?.history||[]){const row=document.createElement('p');row.textContent=h;body.append(row);}if(!s?.history?.length)body.textContent='Your completed hands will appear here.';return;}

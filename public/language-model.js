@@ -1,5 +1,11 @@
 // UI copy only. Never translate user-entered names, messages, cards or values.
 const chinese = new Map(Object.entries({
+ 'Hand replay':'手牌回放','Review the action, one decision at a time.':'逐步回顾每次行动。','Back to history':'返回记录','Close hand replay':'关闭手牌回放','Recent hands':'最近手牌',
+ 'Your cards stay visible. Other cards appear only when shown or revealed to you.':'你的手牌始终可见。其他手牌只在公开或向你展示后可见。','Live table continues':'实时对局继续进行',
+ '↓ Save frame':'↓ 保存画面','Action log':'行动记录','▶ Replay':'▶ 回放','Loading replay…':'正在加载回放……','Replay unavailable':'暂无回放',
+ 'Previous action':'上一步','Next action':'下一步','Play or pause replay':'播放或暂停回放','Replay action':'回放步骤','Replay speed':'回放速度','Hidden card':'暗牌','Undealt card':'未发的牌',
+ 'Replay is not available for this hand.':'此手暂无回放。','Replay request timed out. Please try again.':'回放请求超时，请重试。','Uncalled chips returned':'未跟注筹码已退回','Cards revealed':'手牌已展示','Folded':'已弃牌','In hand':'对局中','Cash game':'现金桌',
+ 'Replay completed hands in a new full-screen workspace, with up to eight players.':'新增一屏手牌回放，支持最多八位玩家。',
  'Amount received from pots, not net profit.':'从底池收到的筹码，并非净利润。','Split pot':'平分底池','Pot payouts':'底池派彩','Winner':'赢家',
  'POKER, YOUR WAY.':'你的扑克，你的玩法。','Your game.':'你的对局。','Your people.':'你的朋友。',
  'Cash Games':'现金桌','Tournaments':'锦标赛','GTO Self-Learning Bot':'GTO 自学习机器人','Private Tables':'私人牌桌',
