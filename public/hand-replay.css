@@ -75,6 +75,32 @@
 #handReplay .rpProgress{display:flex;justify-content:space-between;color:var(--rp-muted);font-size:11px;font-variant-numeric:tabular-nums}
 #handReplay .rpMessage{align-self:center;text-align:center;padding:25px;grid-column:1/-1;color:var(--rp-gold)}
 html:has(#handReplay[open]){overflow:hidden!important}
+/* Cash and Bot training share the live table's felt and mint/charcoal palette. */
+#handReplay[data-mode=cash]{--rp-gold:#c8f497;--rp-ink:#f3f6ee;--rp-muted:#a8c0be;background:#101b1c;border-color:#526d66}
+#handReplay[data-mode=cash]::backdrop{background:#060d0ecc}
+#handReplay[data-mode=cash] button{border-color:#405952;background:#223331}
+#handReplay[data-mode=cash] button:hover{background:#304943;border-color:var(--rp-gold)}
+#handReplay[data-mode=cash] button[aria-pressed=true]{border-color:var(--rp-gold);background:#334b38;color:#d9ffb2}
+#handReplay[data-mode=cash] .rpTop{border-color:#354c48;background:linear-gradient(100deg,#213733,#142326)}
+#handReplay[data-mode=cash] .rpRecent,#handReplay[data-mode=cash] .rpMain{background:#172426;border-color:#3d5651}
+#handReplay[data-mode=cash] .rpPrivacy,#handReplay[data-mode=cash] .rpHandHeader,#handReplay[data-mode=cash] .rpLog,#handReplay[data-mode=cash] .rpControls{border-color:#3d5651}
+#handReplay[data-mode=cash] .rpRecentList,#handReplay[data-mode=cash] .rpLogList{scrollbar-color:#6d9183 transparent}
+#handReplay[data-mode=cash] .rpTable{border-color:#b5c6d3;background:radial-gradient(ellipse,#ffffff0a,transparent),var(--felt,#467f78);box-shadow:0 0 0 7px #475778,inset 0 0 30px #071a2355}
+#handReplay[data-mode=cash] .rpStreet{color:#cee1d3}
+#handReplay[data-mode=cash] .rpPot{border-color:#96b77d;background:#14262b;color:#e8f6dc}
+#handReplay[data-mode=cash] .rpPots,#handReplay[data-mode=cash] .rpPlayerStatus{color:#bdd6cf}
+#handReplay[data-mode=cash] .rpCard.rpHidden{background:var(--back,repeating-linear-gradient(135deg,#284b49 0 4px,#658a80 4px 5px));border-color:#9bb7b3}
+#handReplay[data-mode=cash] .rpCard.rpEmpty{background:#ffffff06;border-color:#c8e9d24d}
+#handReplay[data-mode=cash] .rpPlayer{background:#1e3030;border-color:#435f57}
+#handReplay[data-mode=cash] .rpPlayer.rpWinner{border-color:var(--winner,#56dbef)}
+#handReplay[data-mode=cash] .rpStack{color:#c8f497}
+#handReplay[data-mode=cash] .rpCaption{border-color:#435f57;background:#1b2e2b;color:#e6f3e6}
+#handReplay[data-mode=cash] .rpLogList button{background:transparent;border-color:transparent}
+#handReplay[data-mode=cash] .rpLogList button[aria-current=step]{border-color:#8eae76;background:#30453b;color:#e0f8c5}
+#handReplay[data-mode=cash] .rpControls{background:#1a2a2b}
+#handReplay[data-mode=cash] .rpTransport .rpPlay{background:#c8f497;color:#172217;border-color:#c8f497}
+#handReplay[data-mode=cash] input[type=range]{accent-color:#c8f497}
+body:not(.tournamentTheme) .historyReplay{border-color:#8bab72!important;color:#c8f497!important;background:#263c30!important}
 @media(max-height:800px){#handReplay .rpTop{padding:10px 18px}#handReplay .rpWorkspace{padding:12px;gap:12px}#handReplay .rpStage{padding:10px;gap:8px}#handReplay .rpPlayer{padding:5px 7px}#handReplay .rpHole{margin:0}#handReplay .rpHole .rpCard{height:25px;width:20px;font-size:12px}#handReplay .rpHandHeader{padding:9px 14px}#handReplay .rpControls{padding:9px 12px;gap:7px}#handReplay .rpTable{gap:5px}#handReplay .rpPot{font-size:20px;padding:3px 13px}#handReplay .rpCard{height:52px;width:38px;font-size:22px}#handReplay .rpPlayerStatus{font-size:10px}#handReplay .rpCaption{padding:6px 10px;min-height:30px;font-size:12px}}
 @media(max-width:1100px){#handReplay .rpWorkspace{grid-template-columns:170px minmax(0,1fr)}#handReplay .rpContent{grid-template-columns:minmax(0,1fr) 165px}#handReplay .rpStack .rpBB{display:block;font-size:10px;margin:0}#handReplay .rpName{font-size:11px}#handReplay .rpRecent{padding:12px}}
 @media(max-width:760px){#handReplay{width:calc(100vw - 12px);height:calc(100dvh - 12px);border-radius:14px}#handReplay .rpWorkspace{grid-template-columns:minmax(0,1fr);padding:8px}#handReplay .rpRecent{display:none}#handReplay .rpContent{grid-template-columns:minmax(0,1fr)}#handReplay .rpLog{display:none}#handReplay .rpTop{padding:10px 12px}#handReplay .rpTop h2{font-size:19px}#handReplay .rpTopActions button{font-size:11px;padding:6px 9px}#handReplay .rpHandHeader button{font-size:11px}#handReplay .rpPlayers{gap:5px}#handReplay .rpPlayer{grid-template-columns:20px minmax(0,1fr);padding:5px}#handReplay .rpAvatar{font-size:18px}#handReplay .rpStack{font-size:13px}#handReplay .rpStack .rpBB{display:block}#handReplay .rpName{font-size:10px}#handReplay .rpPrivacy{font-size:11px}}
