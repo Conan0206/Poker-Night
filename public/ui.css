@@ -2,14 +2,14 @@
 
 /* Panels: a larger close button that no longer crowds the title. */
 #panel>.close{position:absolute;top:16px;right:16px;float:none;width:40px;height:40px;padding:0;border-radius:10px;font-size:18px;line-height:1;display:grid;place-items:center;z-index:3}
-#panel>.close:hover{background:#252a2d}
+#panel>.close:hover{background:var(--c-252a2d)}
 #panel>#panelTitle{padding-right:44px}
 #panel .settingsTitleRow{margin-right:44px}
 
 /* Settings: one row of tabs, a Save bar that stays in view, tighter rows, readable help text. */
-.settingsCategories{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;margin:16px 0 8px;border:1px solid #3b4145;border-radius:14px;background:#1a1f22}
+.settingsCategories{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;margin:16px 0 8px;border:1px solid var(--c-3b4145);border-radius:14px;background:var(--c-1a1f22)}
 .settingsCategories button{min-height:44px;padding:8px 4px;border-color:transparent;background:transparent;border-radius:10px;line-height:1.2}
-.tableSettingsHeading{position:sticky;top:-33px;z-index:2;margin:0 -8px 4px;padding:16px 8px 12px;background:#111416;border-bottom:1px solid #292e31}
+.tableSettingsHeading{position:sticky;top:-33px;z-index:2;margin:0 -8px 4px;padding:16px 8px 12px;background:var(--c-111416);border-bottom:1px solid var(--c-292e31)}
 .settingField{margin:16px 0}
 .settingField small{font-size:12px}
 #panel .fine{font-size:12px!important}
@@ -18,7 +18,7 @@
 #panelBody .feltLockedNote{font-size:13px}
 
 /* Header: room details readable at a glance. */
-header .headerRight #roomBadge{padding:7px 12px;border:1px solid #3b4145;border-radius:999px;background:#171c1fcc;color:#c5cdd0;font-size:11px;letter-spacing:.6px;max-width:none;white-space:nowrap}
+header .headerRight #roomBadge{padding:7px 12px;border:1px solid var(--c-3b4145);border-radius:999px;background:var(--c-171c1fcc);color:var(--c-c5cdd0);font-size:11px;letter-spacing:.6px;max-width:none;white-space:nowrap}
 header .headerRight .live{font-size:11px}
 
 /* Header tools: one consistent button size on wide screens. */
@@ -31,7 +31,7 @@ header .headerRight .live{font-size:11px}
 .felt:has(#board .card) .tableLogo{opacity:0}
 
 /* Home: a plain line under the headline saying what this is. */
-.homeLead{margin:0;max-width:440px;font-size:15px;line-height:1.5;color:#a6bdbe}
+.homeLead{margin:0;max-width:440px;font-size:15px;line-height:1.5;color:var(--c-a6bdbe)}
 
 /* Phones: stop the top-right tools covering the wordmark. */
 @media(max-width:520px){
