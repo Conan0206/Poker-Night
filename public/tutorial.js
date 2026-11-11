@@ -29,7 +29,7 @@
  function stepsFor(s){
   const home=['.brand','Back to home','Click the Poker Night logo at the top left to return to the home page.'];
   const intro=['#roomBadge','Bot training','Watch TAG, LAG, FISH and ROCK bots play automatically. This table is watch-only.'];
-  const steps=tableSteps.filter(step=>!s.bankroll||!['#addbot','.seat:not(.self) .avatar'].includes(step[0])).filter(step=>!s.practice||!['#addbot','.seat:not(.self) .avatar','#notificationToggle','#rabbit'].includes(step[0])).filter(step=>s.mode!=='tournament'||step[0]!=='#revealHands').map(step=>[...step]);
+  const steps=tableSteps.filter(step=>!s.practice||!['#addbot','.seat:not(.self) .avatar','#notificationToggle','#rabbit'].includes(step[0])).filter(step=>s.mode!=='tournament'||step[0]!=='#revealHands').map(step=>[...step]);
   if(s.practice){
    const reveal=steps.find(step=>step[0]==='#revealHands');if(reveal){reveal[1]='Reveal bot hands';reveal[2]='After a hand ends, click Reveal hand to see all bot cards. Reveals are unlimited and visible only to you.';}
    const audio=steps.find(step=>step[0]==='[data-panel="settings"]');if(audio)audio[2]='Adjust sound and language in Settings. Bot training table settings are managed automatically.';

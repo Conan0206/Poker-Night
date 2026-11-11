@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {io} from 'socket.io-client';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-async function until(fn){for(let i=0;i<120;i++){if(fn())return;await wait(25);}throw Error('Timed out waiting for tournament state');}
 test('tournament defaults and configurable levels apply safely; optional reveals are disabled',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3144'},stdio:'pipe'}),clients=[];
  try{
@@ -16,14 +15,14 @@ test('tournament defaults and configurable levels apply safely; optional reveals
   a.s.emit('settings',{...settings,startingBank:1700,levelMinutes:3});await wait(30);assert.equal(a.state.levelMinutes,2);assert.equal(a.state.pendingSettings.levelMinutes,3);
   const actor=[a,b].find(p=>p.id===a.state.players[a.state.turn].id);actor.s.emit('action',{type:'fold'});await wait(40);actor.s.emit('reveal',3);b.s.emit('revealHand',{id:a.id,handNumber:a.state.handNumber});await wait(30);const observer=actor===a?b:a;assert.deepEqual(observer.state.players.find(p=>p.id===actor.id).cards,['?','?']);assert.equal(a.state.players.find(p=>p.id===actor.id).shown,0);
   await wait(7800);assert.equal(a.state.levelMinutes,3);assert.equal(a.state.startingBank,1700);assert.ok(a.state.nextBlindAt-a.state.serverNow>179000&&a.state.nextBlindAt-a.state.serverNow<=180000);assert.equal(a.state.players.reduce((sum,p)=>sum+p.chips+p.total,0),3000);
-  const cash=await join(undefined,'cash');cash.s.emit('settings',{small:2,big:4,startingBank:1000,turnSeconds:30,tournamentBank:2200,levelMinutes:4});await wait(30);cash.s.emit('tournament');await until(()=>cash.state.mode==='tournament');assert.equal(cash.state.startingBank,2200);assert.equal(cash.state.players[0].chips,2200);assert.equal(cash.state.levelMinutes,4);cash.s.emit('switchMode',{mode:'cash'});await until(()=>cash.state.mode==='cash');assert.equal(cash.state.mode,'cash');assert.equal(cash.state.small,2);assert.equal(cash.state.big,4);assert.equal(cash.state.startingBank,1000);assert.equal(cash.state.players[0].chips,2200);
+  const cash=await join(undefined,'cash');cash.s.emit('settings',{small:2,big:4,startingBank:1000,turnSeconds:30,tournamentBank:2200,levelMinutes:4});await wait(30);cash.s.emit('tournament');await wait(30);assert.equal(cash.state.startingBank,2200);assert.equal(cash.state.players[0].chips,2200);assert.equal(cash.state.levelMinutes,4);cash.s.emit('switchMode',{mode:'cash'});await wait(30);assert.equal(cash.state.mode,'cash');assert.equal(cash.state.small,2);assert.equal(cash.state.big,4);assert.equal(cash.state.startingBank,1000);assert.equal(cash.state.players[0].chips,2200);
  }finally{clients.forEach(s=>s.disconnect());child.kill();}
 });
 
 test('switching either mode removes every bot and leaves a lone human ready to add replacements',async()=>{
  const child=spawn(process.execPath,['server.js'],{env:{...process.env,PORT:'3145'},stdio:'pipe'});let socket,state;
  try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});socket=io('http://localhost:3145',{transports:['websocket']});socket.on('state',s=>state=s);await new Promise(r=>socket.on('connect',r));socket.emit('enter',{name:'Mode bot test'});await wait(50);
- for(const mode of ['tournament','cash']){socket.emit('addbot');socket.emit('addbot');await wait(50);assert.equal(state.players.filter(p=>p.bot).length,2);socket.emit('switchMode',{mode});await until(()=>state.mode===mode&&state.players.length===1);assert.equal(state.mode,mode);assert.equal(state.players.length,1);assert.equal(state.started,false);assert.equal(state.seatingClosed,false);assert.equal(state.big,10);assert.equal(state.players[0].chips,1000);}
+ for(const mode of ['tournament','cash']){socket.emit('addbot');socket.emit('addbot');await wait(50);assert.equal(state.players.filter(p=>p.bot).length,2);socket.emit('switchMode',{mode});await wait(50);assert.equal(state.mode,mode);assert.equal(state.players.length,1);assert.equal(state.started,false);assert.equal(state.seatingClosed,false);assert.equal(state.big,10);assert.equal(state.players[0].chips,1000);}
  }finally{socket?.disconnect();child.kill();}
 });
 

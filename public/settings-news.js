@@ -2,10 +2,9 @@ window.renderSettingsCommunity=(body,socket,category)=>{
  const section=document.createElement('section');section.className='settingsCommunity';
  const updates=document.createElement('details');
  const title=document.createElement('summary');title.textContent='What’s new · Recent improvements';updates.append(title);
- const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 11 November 2026';updates.append(date);
+ const date=document.createElement('p');date.className='fine';date.textContent='Latest update · 10 November 2026';updates.append(date);
  const list=document.createElement('ul');list.className='updateList';
  for(const text of [
-  'Custom keeps editable games; Cash adds Google sign-in, saved bankrolls and fixed-stakes tables.',
   'Replay completed hands in a new full-screen workspace, with up to eight players.',
   'Fixed the all-in theme being muted by another open table tab.',
   'Cash bots remember hands players choose to show publicly.',

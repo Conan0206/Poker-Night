@@ -15,7 +15,7 @@ function append(record,frame){
 }
 export function startHandReplay(r){
  const seated=r.players.filter(p=>p.inHand);
- r.currentReplay={id:r.archiveId,handNumber:r.handNumber,mode:r.mode,bankroll:!!r.bankroll,practice:!!r.practice,level:r.level||1,small:r.small,big:r.big,players:seated.map(p=>({id:p.id,name:p.name,avatar:p.avatar,bot:!!p.bot})),holes:new Map(seated.map(p=>[p.id,[...p.cards]])),privateRights:new Map(),frames:[],complete:false};
+ r.currentReplay={id:r.archiveId,handNumber:r.handNumber,mode:r.mode,practice:!!r.practice,level:r.level||1,small:r.small,big:r.big,players:seated.map(p=>({id:p.id,name:p.name,avatar:p.avatar,bot:!!p.bot})),holes:new Map(seated.map(p=>[p.id,[...p.cards]])),privateRights:new Map(),frames:[],complete:false};
  captureHandReplay(r,{kind:'blinds'});
 }
 export function captureHandReplay(r,event){
@@ -66,5 +66,5 @@ export function grantReplayPrivateCards(r,viewerId){
 export function handReplayForViewer(r,id,viewerId){
  const raw=r.replayHistory?.get(id);if(!raw?.complete||raw.truncated)return null;
  const rights=raw.privateRights.get(viewerId);
- return {id:raw.id,handNumber:raw.handNumber,mode:raw.mode,bankroll:raw.bankroll,practice:raw.practice,level:raw.level,small:raw.small,big:raw.big,message:raw.message,players:raw.players.map(p=>({...p,self:p.id===viewerId})),frames:raw.frames.map((f,index)=>({street:f.street,run:f.run,board:[...f.board],pot:f.pot,pots:clone(f.pots),event:clone(f.event),winners:f.winners.map(w=>({...w,cards:(w.cards||[]).map(c=>c.replace(/^10/,'T')).filter(c=>f.board.includes(c)||f.players.some(p=>p.shown===3&&raw.holes.get(p.id)?.includes(c)))})),players:f.players.map(p=>({id:p.id,chips:p.chips,bet:p.bet,folded:p.folded,action:p.action,cards:(raw.holes.get(p.id)||[]).map((c,i)=>p.id===viewerId||p.shown&(1<<i)||rights?.has(p.id)&&index>=rights.get(p.id)?c:'?')}))}))};
+ return {id:raw.id,handNumber:raw.handNumber,mode:raw.mode,practice:raw.practice,level:raw.level,small:raw.small,big:raw.big,message:raw.message,players:raw.players.map(p=>({...p,self:p.id===viewerId})),frames:raw.frames.map((f,index)=>({street:f.street,run:f.run,board:[...f.board],pot:f.pot,pots:clone(f.pots),event:clone(f.event),winners:f.winners.map(w=>({...w,cards:(w.cards||[]).map(c=>c.replace(/^10/,'T')).filter(c=>f.board.includes(c)||f.players.some(p=>p.shown===3&&raw.holes.get(p.id)?.includes(c)))})),players:f.players.map(p=>({id:p.id,chips:p.chips,bet:p.bet,folded:p.folded,action:p.action,cards:(raw.holes.get(p.id)||[]).map((c,i)=>p.id===viewerId||p.shown&(1<<i)||rights?.has(p.id)&&index>=rights.get(p.id)?c:'?')}))}))};
 }

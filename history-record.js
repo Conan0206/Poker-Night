@@ -1,6 +1,6 @@
 // Store public board/payout snapshots, never private hole cards or reveal maps.
 export function handHistoryEntry(room,message){
- const entry={message,bankroll:!!room.bankroll,practice:!!room.practice,mode:room.mode,handNumber:room.handNumber,level:room.level||1,small:room.small,big:room.big};
+ const entry={message,mode:room.mode,handNumber:room.handNumber,level:room.level||1,small:room.small,big:room.big};
  const players=new Map(room.players.map(p=>[p.id,p]));
  const contributors=[...room.players].filter(p=>p.total>0).sort((a,b)=>b.total-a.total),largest=contributors[0],uncalled=largest?largest.total-(contributors[1]?.total||0):0;
  if(uncalled>0&&largest.inHand&&!largest.folded)entry.returned={name:largest.name,amount:uncalled};

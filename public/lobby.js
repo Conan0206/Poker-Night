@@ -6,7 +6,7 @@
   for(const table of tables){
    const row=document.createElement('div'),icon=document.createElement('span'),info=document.createElement('div'),name=document.createElement('strong'),details=document.createElement('small'),button=document.createElement('button');
    row.className='liveTableRow'+(table.practice?' arenaRow':'');icon.className='liveTableIcon';icon.textContent=table.practice?'🤖':table.private?'🔒':table.mode==='tournament'?'🏆':'♠';icon.setAttribute('aria-hidden','true');
-   name.textContent=table.name;details.textContent=`${table.mode==='tournament'?'Tournament':table.practice?'Bot training':table.bankroll?'Cash':'Custom'} · ${table.players}/8 seated · ${table.watching} watching${table.playing?' · Playing':''}`;
+   name.textContent=table.name;details.textContent=`${table.mode==='tournament'?'Tournament':'Cash'} · ${table.players}/8 seated · ${table.watching} watching${table.playing?' · Playing':''}`;
    button.type='button';button.textContent=table.private?'Enter code':'Watch';button.setAttribute('aria-label',`${table.private?'Enter code for':'Watch'} ${table.name}`);
    button.onclick=()=>{if(table.private){document.getElementById('code').focus();status.textContent='Private tables need an invite code from the host.';}else window.joinDirectoryTable(table.code);};
    info.append(name,details);row.append(icon,info,button);list.append(row);
