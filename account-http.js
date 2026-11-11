@@ -1,0 +1,17 @@
+import {randomBytes,timingSafeEqual} from 'node:crypto';
+import {OAuth2Client} from 'google-auth-library';
+import express from 'express';
+export function cookies(header=''){return Object.fromEntries(header.split(';').map(s=>s.trim().split('=')).filter(p=>p.length===2));}
+const equal=(a,b)=>typeof a==='string'&&typeof b==='string'&&Buffer.byteLength(a)===Buffer.byteLength(b)&&timingSafeEqual(Buffer.from(a),Buffer.from(b));
+export function installAccountHTTP(app,store,{clientId=process.env.GOOGLE_CLIENT_ID||'',verifyToken}={}){
+ const google=new OAuth2Client(clientId),verify=verifyToken||((credential)=>google.verifyIdToken({idToken:credential,audience:clientId}).then(t=>t.getPayload()));
+ const attempts=new Map();
+ const csrf=req=>{const c=cookies(req.headers.cookie);return /^[a-f0-9]{64}$/.test(c.poker_csrf||'')&&equal(c.poker_csrf,req.headers['x-poker-csrf']);};
+ function guard(req,res,next){const origin=req.headers.origin;let valid=false;try{valid=new URL(origin).host===req.get('host');}catch{}if(!valid||!csrf(req))return res.status(403).json({error:'Please refresh and try again.'});next();}
+ const session=async req=>store.account(cookies(req.headers.cookie).poker_session).catch(()=>null);
+ app.use('/api/account',express.json({limit:'12kb'}),(req,res,next)=>{res.set('Cache-Control','no-store');next();});
+ app.get('/api/account',async(req,res)=>{const c=cookies(req.headers.cookie),token=/^[a-f0-9]{64}$/.test(c.poker_csrf||'')?c.poker_csrf:randomBytes(32).toString('hex');res.cookie('poker_csrf',token,{sameSite:'strict',secure:req.secure,path:'/',maxAge:30*86400000});try{const id=await session(req);res.json({clientId,csrf:token,configured:!!clientId&&store.configured(),account:id?await store.profile(id):null});}catch{res.status(503).json({error:'Bankroll is temporarily unavailable.',clientId,csrf:token,account:null});}});
+ app.post('/api/account/google',guard,async(req,res)=>{if(!clientId||!store.configured())return res.status(503).json({error:'Google sign-in is being configured.'});const key=req.ip,last=attempts.get(key)||[];const recent=last.filter(t=>Date.now()-t<60000);if(recent.length>=12)return res.status(429).json({error:'Please wait a minute before trying again.'});recent.push(Date.now());attempts.set(key,recent);if(attempts.size>2000)attempts.clear();try{if(typeof req.body?.credential!=='string'||req.body.credential.length>10000)throw Error();const payload=await verify(req.body.credential);if(!payload?.sub||!equal(payload.nonce,cookies(req.headers.cookie).poker_csrf))throw Error();const token=randomBytes(32).toString('hex'),id=await store.login(payload,token);res.cookie('poker_session',token,{httpOnly:true,sameSite:'lax',secure:req.secure,path:'/',maxAge:30*86400000});res.json({account:await store.profile(id)});}catch(e){res.status(e.code==='UNAVAILABLE'?503:401).json({error:e.code==='UNAVAILABLE'?e.message:'Google sign-in could not be verified. Please try again.'});}});
+ app.post('/api/account/logout',guard,async(req,res)=>{try{const token=cookies(req.headers.cookie).poker_session;if(token)await store.logout(token);res.clearCookie('poker_session',{httpOnly:true,sameSite:'lax',secure:req.secure,path:'/'});res.json({ok:true});}catch(e){res.status(409).json({error:e.code==='SEATED'?e.message:'Please try again shortly.'});}});
+ return {accountForSocket:async socket=>{try{const h=socket.handshake.headers;if(h.origin?new URL(h.origin).host!==h.host:h['sec-fetch-site']!=='same-origin')return null;return await session({headers:{cookie:h.cookie}});}catch{return null;}}};
+}

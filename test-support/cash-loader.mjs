@@ -1,0 +1,3 @@
+// Explicit test-process loader. Never loaded by npm start or the live server.
+import {registerHooks} from 'node:module';
+registerHooks({load(url,context,next){const result=next(url,context);if(url.endsWith('/bankroll-store.js'))return {...result,source:String(result.source).replace("import pg from 'pg';","import {newDb} from 'pg-mem';const pg=newDb({noAstCoverageCheck:true}).adapters.createPg();").replace('connectionString=process.env.DATABASE_URL,',"connectionString='postgres://test:test@localhost/test',")};if(url.endsWith('/account-http.js'))return {...result,source:String(result.source).replace("clientId=process.env.GOOGLE_CLIENT_ID||'',verifyToken}","clientId='local-test-client',verifyToken=async raw=>JSON.parse(raw)}")};return result;}});
