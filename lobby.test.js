@@ -6,8 +6,7 @@ import {tableDirectory} from './lobby.js';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 test('directory includes live private tables without leaking codes or identities',()=>{
  const rooms=new Map([['SECRET',{code:'SECRET',mode:'cash',started:true,players:[{id:'secret-id',name:'Private name',socket:'private-socket',token:'secret-token'},{bot:true},{socket:'watch-socket',spectating:true}]}]]);
- rooms.set('CASH1',{code:'CASH1',bankroll:{stage:1},mode:'cash',players:[{socket:'funded-player'}]});rooms.set('CASH2',{code:'CASH2',bankroll:{stage:2},mode:'cash',players:[]});
- const rows=tableDirectory(rooms);assert.equal(rows.length,3);assert.ok(!rows.some(r=>r.code==='CASH1'||r.code==='CASH2'));const entry=rows.find(p=>p.private);assert.equal(entry.players,2);assert.equal(entry.watching,1);assert.equal(entry.playing,true);
+ const rows=tableDirectory(rooms);assert.equal(rows.length,5);assert.ok(rows.some(r=>r.code==='CASH1'&&r.bankroll&&r.minBuyIn===40&&r.maxBuyIn===200));const entry=rows.find(p=>p.private);assert.equal(entry.players,2);assert.equal(entry.watching,1);assert.equal(entry.playing,true);
  for(const secret of ['SECRET','secret-id','Private name','private-socket','secret-token','watch-socket'])assert.ok(!JSON.stringify(rows).includes(secret));
 });
 test('bot training plays across hands without people, stays watch-only and releases disconnected watchers',async()=>{
